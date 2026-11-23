@@ -152,16 +152,44 @@ export interface ReplayEvent {
   historicalDisclaimer: string;
 }
 
+export type NewsCategory =
+  | 'All'
+  | 'Stock Market'
+  | 'RBI Policy'
+  | 'Inflation & Rates'
+  | 'Quarterly Results'
+  | 'Corporate Actions'
+  | 'Global Signals';
+
 export interface MarketNewsItem {
   id: string;
   headline: string;
   source: string;
   publishedAt: string;
-  category: 'Macro Economy' | 'Earnings' | 'Policy' | 'Global Signals';
-  plainEnglishTranslation: string;
-  whyItMattersToYou: string;
-  impactedSectors: { name: string; impact: 'positive' | 'negative' | 'neutral'; rationale: string }[];
+  category: string;
+  newsCategory: 'Stock Market' | 'RBI Policy' | 'Inflation & Rates' | 'Quarterly Results' | 'Corporate Actions' | 'Global Signals';
+  relevantStockOrSector: string;
   marketSentiment: 'Bullish' | 'Bearish' | 'Neutral';
+  whatHappened: string;
+  whyDidItHappen: string;
+  whatDoesItMean: string;
+  learnTheConcept: {
+    conceptName: string;
+    definition: string;
+    lessonRoute: string;
+    lessonTitle: string;
+    keyTakeaway: string;
+  };
+  understandTheRisk: string;
+  knowledgeCheck: {
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  };
+  plainEnglishTranslation?: string;
+  whyItMattersToYou?: string;
+  impactedSectors?: { name: string; impact: 'positive' | 'negative' | 'neutral'; rationale: string }[];
 }
 
 export interface ChallengeQuest {

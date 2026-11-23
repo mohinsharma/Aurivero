@@ -695,43 +695,302 @@ export const MARKET_NEWS_ITEMS: MarketNewsItem[] = [
     source: 'Reserve Bank of India Bulletin',
     publishedAt: '2 hours ago',
     category: 'Policy',
+    newsCategory: 'RBI Policy',
+    relevantStockOrSector: 'Banking, NBFCs, Real Estate (HDFC Bank, ICICI Bank, DLF)',
+    marketSentiment: 'Bullish',
+    whatHappened: 'The Reserve Bank of India’s Monetary Policy Committee voted to keep the policy repo rate unchanged at 6.50%. The central bank highlighted resilient domestic economic growth while keeping its policy stance focused on aligning inflation with its 4% target.',
+    whyDidItHappen: 'Retail inflation showed signs of softening, but unpredictable weather conditions and vegetable prices continue to present upside risks. The RBI preferred keeping interest rates steady rather than rushing to cut.',
+    whatDoesItMean: 'Home loan EMIs, vehicle loan rates, and fixed deposit interest rates will remain steady for consumers. Commercial banks can maintain healthy net interest margins without immediate pressure on deposit costs.',
+    learnTheConcept: {
+      conceptName: 'Repo Rate & Cost of Capital',
+      definition: 'The Repo Rate is the benchmark interest rate at which the Reserve Bank of India lends short-term money to commercial banks. It directly anchors borrowing costs across the entire economy.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 2: Macroeconomics, Central Banks & Market Liquidity',
+      keyTakeaway: 'When repo rates are high, borrowing becomes expensive and economic overheating slows down; when rates fall, loans become cheaper, spurring business capex and consumer spending.'
+    },
+    understandTheRisk: 'An unchanged repo rate does not guarantee banking stocks will rally. If bond yields rise globally or loan growth slows down due to high borrowing costs, bank earnings can still disappoint investors.',
+    knowledgeCheck: {
+      question: 'When the RBI keeps the repo rate unchanged at 6.50%, what is the most direct short-term consequence for retail borrowers?',
+      options: [
+        'Existing floating-rate home loan EMIs generally remain at their current levels.',
+        'Banks immediately slash savings account interest rates to zero.',
+        'The stock market is guaranteed to experience a 10% crash.',
+        'Gold prices automatically double overnight.'
+      ],
+      correctIndex: 0,
+      explanation: 'Because floating-rate retail loans are pegged directly to the RBI External Benchmark Lending Rate (EBLR), keeping the repo rate steady keeps benchmark borrowing costs and monthly EMIs unchanged.'
+    },
     plainEnglishTranslation: 'The RBI decided neither to hike nor to cut the base interest rate banks borrow at. They are keeping their powder dry while ensuring inflation stays anchored near 4%.',
     whyItMattersToYou: 'Your home loan EMIs and fixed deposit rates will remain stable. Banking stocks like HDFC Bank and ICICI Bank preserve their net interest margins.',
     impactedSectors: [
       { name: 'Banking & NBFCs', impact: 'positive', rationale: 'Stable margin environment without immediate squeeze on lending spreads.' },
       { name: 'Real Estate & Housing', impact: 'neutral', rationale: 'Home loan interest rates stay steady without further affordability headwinds.' },
       { name: 'Auto Sector', impact: 'neutral', rationale: 'Vehicle financing rates remain at current levels.' }
-    ],
-    marketSentiment: 'Bullish'
+    ]
   },
   {
     id: 'news-2',
-    headline: 'Brent Crude Oil Steadies at $74/bbl as Middle East Supply Disruption Fears Recede',
-    source: 'Commodities Watch',
+    headline: 'India CPI Inflation Cools to 4.85% in March as Food Prices Moderate',
+    source: 'Ministry of Statistics & Programme Implementation / Mint',
     publishedAt: '4 hours ago',
-    category: 'Global Signals',
-    plainEnglishTranslation: 'Crude oil prices fell slightly. Since India imports over 85% of its crude oil needs, cheaper oil reduces import bills, curbs inflation, and strengthens the Indian Rupee.',
-    whyItMattersToYou: 'Lower oil prices are a massive tailwind for the entire Indian economy. Paint manufacturers (Asian Paints), airlines (IndiGo), and tyre makers save substantially on raw material costs.',
+    category: 'Macro Economy',
+    newsCategory: 'Inflation & Rates',
+    relevantStockOrSector: 'FMCG, Consumer Durables (Hindustan Unilever, ITC, Titan)',
+    marketSentiment: 'Bullish',
+    whatHappened: 'India’s annual retail inflation, measured by the Consumer Price Index (CPI), declined to a five-month low of 4.85% in March. Core inflation—which excludes volatile food and energy items—fell below 3.5%.',
+    whyDidItHappen: 'A sustained winter harvest reduced the prices of pulses and key vegetables, while international edible oil prices remained subdued, relieving consumer grocery bills.',
+    whatDoesItMean: 'When household inflation moderates, families have more disposable income left over for discretionary purchases like clothing, packaged snacks, electronics, and travel. It also opens room for the RBI to consider interest rate cuts later in the year.',
+    learnTheConcept: {
+      conceptName: 'Inflation & Real Purchasing Power',
+      definition: 'Inflation is the rate at which the general level of prices for goods and services rises, eroding the purchasing power of money over time.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 1: The Invisible Tax — How Inflation Compounds Against Savings',
+      keyTakeaway: 'Stocks are one of the few asset classes that historically beat inflation over the long term because productive businesses can increase prices to protect profit margins.'
+    },
+    understandTheRisk: 'A drop in headline inflation does not mean corporate profits will automatically surge. If rural wage growth remains weak or unseasonal summer heat waves spike food costs again, consumer demand could quickly stagnate.',
+    knowledgeCheck: {
+      question: 'Why do fast-moving consumer goods (FMCG) companies like Hindustan Unilever benefit when retail inflation declines?',
+      options: [
+        'Consumers have greater purchasing power for everyday household items, and raw material packaging costs decrease.',
+        'FMCG companies are legally prohibited from paying taxes during low inflation.',
+        'Stock exchanges automatically double the share prices of consumer companies.',
+        'Banks forgive all corporate debts when inflation reaches 4%.'
+      ],
+      correctIndex: 0,
+      explanation: 'Lower inflation reduces input costs (like crude derivatives, palm oil, packaging) while leaving more purchasing power in consumers\' pockets, expanding sales volumes and profit margins.'
+    },
+    plainEnglishTranslation: 'Prices of everyday groceries and consumer goods rose at a slower speed in March, bringing headline inflation closer to the RBI’s comfort band.',
+    whyItMattersToYou: 'Your grocery bills are stabilizing, and companies selling consumer goods see lower raw material costs.',
     impactedSectors: [
-      { name: 'Paints & Adhesives', impact: 'positive', rationale: 'Crude derivatives represent ~50% of input costs; gross margins expand.' },
-      { name: 'Aviation', impact: 'positive', rationale: 'Aviation Turbine Fuel (ATF) expenses drop immediately.' },
-      { name: 'Oil Exploration (ONGC)', impact: 'negative', rationale: 'Lower realization per barrel of extracted crude.' }
-    ],
-    marketSentiment: 'Bullish'
+      { name: 'FMCG & Consumer Goods', impact: 'positive', rationale: 'Lower packaging and agricultural input costs lift gross margins.' },
+      { name: 'Consumer Discretionary', impact: 'positive', rationale: 'Households have more spare savings for discretionary retail purchases.' }
+    ]
   },
   {
     id: 'news-3',
-    headline: 'US Federal Reserve Signals Measured Pace of Rate Cuts Amid Resilient US Job Growth',
-    source: 'Global Macro Times',
-    publishedAt: '6 hours ago',
-    category: 'Macro Economy',
-    plainEnglishTranslation: 'The US central bank will reduce interest rates more slowly than Wall Street hoped because the American economy is still hiring strongly.',
-    whyItMattersToYou: 'When US interest rates stay high, Foreign Institutional Investors (FIIs) might keep more money parked in US Treasury bonds instead of pouring capital into emerging markets like India.',
+    headline: 'TCS Q4 Net Profit Climbs 9% to ₹12,434 Cr on Record $13.2 Billion Deal Wins',
+    source: 'The Economic Times',
+    publishedAt: '5 hours ago',
+    category: 'Earnings',
+    newsCategory: 'Quarterly Results',
+    relevantStockOrSector: 'Information Technology (TCS, Infosys, Wipro, HCLTech)',
+    marketSentiment: 'Bullish',
+    whatHappened: 'Tata Consultancy Services, India’s largest software exporter, posted a 9.1% year-on-year increase in quarterly net profit, accompanied by an operating margin expansion to 26% and an all-time record total contract value (TCV) of $13.2 Billion.',
+    whyDidItHappen: 'Global banks, retailers, and airlines are outsourcing legacy IT infrastructure and consolidating enterprise cloud contracts into multi-year digital transformation partnerships.',
+    whatDoesItMean: 'IT services represent a major portion of India’s benchmark indices (NIFTY 50 and SENSEX). Strong deal signings by the sector leader signal that enterprise technology spending is recovering despite global recession fears.',
+    learnTheConcept: {
+      conceptName: 'Operating Margin & Order Book (TCV)',
+      definition: 'Operating Margin measures the percentage of profit a company produces from its core operations before interest and taxes. Order Book (TCV) shows the total dollar value of signed future contracts.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 4: Reading Financial Statements — Balance Sheets and P&L for Beginners',
+      keyTakeaway: 'Revenue growth alone can be misleading; investors look for expanding operating margins to confirm that a company can deliver profitable earnings growth.'
+    },
+    understandTheRisk: 'Signing a large total contract value ($13.2B) does not mean all revenue arrives immediately. If clients delay project rollouts or reduce discretionary consulting budgets later, realized revenue can fall below expectations.',
+    knowledgeCheck: {
+      question: 'What does a rising "Operating Margin" indicate about a company’s operational health?',
+      options: [
+        'The company is generating more operating profit per rupee of revenue, indicating strong pricing power and cost discipline.',
+        'The company has taken on massive high-interest bank debt.',
+        'The stock price is guaranteed to go up 20% by tomorrow.',
+        'The company is planning to shut down its operations.'
+      ],
+      correctIndex: 0,
+      explanation: 'Operating margin reflects the efficiency with which a business converts sales into profit after paying for salaries and operational costs, signaling operational strength.'
+    },
+    plainEnglishTranslation: 'TCS earned record profits and signed massive contracts with international clients, proving the resilience of the Indian software export sector.',
+    whyItMattersToYou: 'IT index stocks represent nearly 14% of the NIFTY 50; strong earnings provide underlying support to equity mutual funds.',
     impactedSectors: [
-      { name: 'IT Services', impact: 'neutral', rationale: 'US client spending on tech modernization remains cautious until rate clarity emerges.' },
-      { name: 'Emerging Market Inflows', impact: 'neutral', rationale: 'FII flow pace may be measured; domestic retail SIPs continue to counterbalance.' }
-    ],
-    marketSentiment: 'Neutral'
+      { name: 'IT Services & Software', impact: 'positive', rationale: 'Strong order pipeline provides revenue visibility for upcoming quarters.' }
+    ]
+  },
+  {
+    id: 'news-4',
+    headline: 'Tata Motors Board Approves Demerger into Two Distinct Listed Entities for Commercial and Passenger Vehicles',
+    source: 'Business Standard',
+    publishedAt: '8 hours ago',
+    category: 'Corporate Actions',
+    newsCategory: 'Corporate Actions',
+    relevantStockOrSector: 'Automotive (Tata Motors, Ashok Leyland, Mahindra & Mahindra)',
+    marketSentiment: 'Bullish',
+    whatHappened: 'The Board of Tata Motors approved a strategic demerger splitting the automobile conglomerate into two separate publicly traded companies: one focused on Commercial Vehicles (trucks and buses) and the other housing Passenger Vehicles, Electric Vehicles (EV), and Jaguar Land Rover (JLR).',
+    whyDidItHappen: 'Commercial trucks and passenger passenger cars operate on totally different economic cycles, consumer behaviors, and capital requirements. Segregating them allows each management team to pursue independent growth strategies.',
+    whatDoesItMean: 'Existing shareholders will receive shares in both independent listed companies without paying cash. Demergers often unlock value because specialized investors can choose which business model fits their risk appetite.',
+    learnTheConcept: {
+      conceptName: 'Corporate Demerger & Conglomerate Discount',
+      definition: 'A demerger is the restructuring of a corporate conglomerate into two or more independent public companies. A conglomerate discount occurs when the market values a combined diversified company at less than the sum of its individual parts.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 5: Corporate Actions — Dividends, Stock Splits, Rights Issues & Demergers',
+      keyTakeaway: 'Demergers can remove the "conglomerate discount," allowing high-growth segments (like electric passenger vehicles) to command higher valuation multiples.'
+    },
+    understandTheRisk: 'A demerger does not eliminate business risks. If commercial truck demand falls due to a freight slowdown, or if Jaguar Land Rover faces supply chain issues abroad, the newly listed entity can still lose value.',
+    knowledgeCheck: {
+      question: 'What is a primary motivation for a large company to demerge its business into separate listed stocks?',
+      options: [
+        'To eliminate the conglomerate discount and allow each business to be valued based on its specific growth and profitability metrics.',
+        'To prevent shareholders from receiving dividends forever.',
+        'To hide financial losses from regulators and tax authorities.',
+        'To reduce the total number of cars produced.'
+      ],
+      correctIndex: 0,
+      explanation: 'Separating diverse businesses enables focused capital allocation, distinct management incentives, and market valuations that reflect the true worth of each operating segment.'
+    },
+    plainEnglishTranslation: 'Tata Motors is dividing into two separate stock market companies—one for trucks/buses and one for passenger cars/EVs/JLR—giving shareholders stock in both.',
+    whyItMattersToYou: 'Investors holding Tata Motors shares will automatically receive shares in both companies, allowing cleaner evaluation of EV growth vs truck cycles.',
+    impactedSectors: [
+      { name: 'Automotive & EVs', impact: 'positive', rationale: 'Pure-play EV and luxury passenger business can attract dedicated global green investors.' }
+    ]
+  },
+  {
+    id: 'news-5',
+    headline: 'NIFTY 50 Breaches 24,000 Milestone as India Market Cap Crosses $5 Trillion',
+    source: 'CNBC-TV18',
+    publishedAt: '12 hours ago',
+    category: 'Stock Market',
+    newsCategory: 'Stock Market',
+    relevantStockOrSector: 'Broad Market (NIFTY 50, SENSEX, Midcap 150)',
+    marketSentiment: 'Bullish',
+    whatHappened: 'The benchmark NIFTY 50 index crossed the historic 24,000 level for the first time, propelled by continuous domestic retail SIP inflows and sustained political continuity following general elections.',
+    whyDidItHappen: 'Domestic institutional investors (DIIs), supported by over ₹21,000 Crore in monthly SIP subscriptions from retail Indian citizens, absorbed foreign selling and drove valuations to fresh milestones.',
+    whatDoesItMean: 'India has cemented its position as the fourth-largest equity market globally. However, the price-to-earnings (P/E) ratio has climbed above historical long-term averages, indicating that expectations for corporate earnings growth are very high.',
+    learnTheConcept: {
+      conceptName: 'Price-to-Earnings (P/E) Ratio & Valuation',
+      definition: 'The Price-to-Earnings (P/E) ratio compares a company’s share price to its annual earnings per share. It tells investors how many rupees they are paying for every single rupee of company profit.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 3: Stock Valuation & Fundamental Multiples for Beginners',
+      keyTakeaway: 'A high P/E ratio means investors expect rapid future earnings growth; if that earnings growth fails to materialize, the stock is vulnerable to a sharp valuation contraction.'
+    },
+    understandTheRisk: 'Reaching milestone index levels often lures retail investors into speculative FOMO buying. When indices trade at stretched valuations, unexpected negative events can trigger sudden 5–10% corrections.',
+    knowledgeCheck: {
+      question: 'When an index trades at a significantly higher Price-to-Earnings (P/E) multiple than its 10-year historical average, what should a disciplined investor be cautious about?',
+      options: [
+        'Future earnings growth is already heavily priced in, leaving less margin of safety if companies miss profit estimates.',
+        'High P/E means all stocks are legally required to double in price within 30 days.',
+        'The stock exchange will automatically cancel all retail trading accounts.',
+        'It indicates that company profits have dropped to zero.'
+      ],
+      correctIndex: 0,
+      explanation: 'Elevated P/E ratios mean stocks are expensive relative to their current earnings. Any negative surprise in corporate profits can cause stock prices to tumble as valuations normalize.'
+    },
+    plainEnglishTranslation: 'Indian stock indices touched historic record highs, driven by millions of regular retail investors investing every month through mutual funds.',
+    whyItMattersToYou: 'Your portfolio may look attractive today, but caution and disciplined asset allocation are critical to avoid chasing overpriced momentum stocks.',
+    impactedSectors: [
+      { name: 'Broad Market', impact: 'neutral', rationale: 'Valuations are rich; stock selection and earnings delivery become crucial.' }
+    ]
+  },
+  {
+    id: 'news-6',
+    headline: 'Brent Crude Oil Falls to $72/bbl on Weak Global Manufacturing Demand',
+    source: 'Reuters Commodities Desk',
+    publishedAt: '14 hours ago',
+    category: 'Global Signals',
+    newsCategory: 'Global Signals',
+    relevantStockOrSector: 'Oil Marketing, Paints, Aviation (Asian Paints, IndiGo, Bharat Petroleum)',
+    marketSentiment: 'Bullish',
+    whatHappened: 'Brent crude oil prices declined below $72 per barrel as economic data from major developed manufacturing economies indicated subdued industrial fuel consumption, outweighing Middle East geopolitical tensions.',
+    whyDidItHappen: 'Global oil supply remained steady while demand projections in North America and East Asia were revised slightly downward by the International Energy Agency.',
+    whatDoesItMean: 'India imports more than 85% of its crude oil requirements. A $10 drop in crude prices saves India approximately $10–12 Billion in foreign exchange annually, reducing import bills and stabilizing the Indian Rupee.',
+    learnTheConcept: {
+      conceptName: 'Current Account Deficit (CAD) & Input Cost Inflation',
+      definition: 'The Current Account Deficit measures the gap between the value of goods and services a country imports versus what it exports. Cheaper crude dramatically narrows India’s trade deficit.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 2: Macroeconomics — How Global Commodities Dictate Dalal Street',
+      keyTakeaway: 'Crude oil is the single most critical global commodity for India; falling oil prices act as a direct tax cut for the Indian economy and corporate profit margins.'
+    },
+    understandTheRisk: 'Oil prices are notorious for sudden geopolitical volatility. A sudden supply disruption or production cut by OPEC+ can reverse crude oil prices back upward in hours, wiping out margin gains.',
+    knowledgeCheck: {
+      question: 'Why do paint manufacturing companies like Asian Paints benefit when crude oil prices decline significantly?',
+      options: [
+        'Petroleum derivatives comprise roughly 50% of the raw material cost required to manufacture paint products.',
+        'Paint companies sell crude oil directly to retail petrol pumps.',
+        'Customers are legally required to repaint their houses whenever oil prices fall.',
+        'Falling oil prices cause bank interest rates to disappear.'
+      ],
+      correctIndex: 0,
+      explanation: 'Solvents, resins, and packaging materials used in paint production are petroleum byproducts. Cheaper crude reduces production expenses, expanding gross operating margins.'
+    },
+    plainEnglishTranslation: 'International crude oil prices fell to $72, which is fantastic news for India’s economy and helps companies that manufacture paints, tyres, and airline flights.',
+    whyItMattersToYou: 'Falling fuel and import costs ease domestic inflation, supporting the Indian Rupee and boosting consumer sector balance sheets.',
+    impactedSectors: [
+      { name: 'Paints & Coatings', impact: 'positive', rationale: 'Direct cost reduction in titanium dioxide and solvent raw materials.' },
+      { name: 'Aviation', impact: 'positive', rationale: 'Aviation turbine fuel expenses decline directly.' },
+      { name: 'Upstream Oil Producers (ONGC)', impact: 'negative', rationale: 'Lower realized crude price per barrel extracted.' }
+    ]
+  },
+  {
+    id: 'news-7',
+    headline: 'India VIX Spikes 28% in a Week as Options Traders Hedge Ahead of Major Verdict',
+    source: 'National Stock Exchange / Bloomberg',
+    publishedAt: '18 hours ago',
+    category: 'Stock Market',
+    newsCategory: 'Stock Market',
+    relevantStockOrSector: 'Derivatives, High-Beta Shares (PSU Banks, Infrastructure)',
+    marketSentiment: 'Neutral',
+    whatHappened: 'The INDIA VIX index—often called the stock market’s "fear gauge"—surged 28% over five sessions to reach 21.4, indicating that institutional investors are paying steep premiums for options contracts to protect their portfolios against sudden price swings.',
+    whyDidItHappen: 'Upcoming political election results and Union Budget policy announcements created short-term uncertainty, prompting large fund managers to buy put options as insurance.',
+    whatDoesItMean: 'A high VIX means market participants expect significant daily percentage swings. It does not mean the market is doomed to fall, but rather that price volatility and intraday wild whipsaws will be pronounced.',
+    learnTheConcept: {
+      conceptName: 'India VIX & Market Volatility',
+      definition: 'The Volatility Index (VIX) measures the stock market’s expectation of 30-day forward volatility based on order prices in NIFTY options contracts. A higher VIX reflects elevated uncertainty.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 6: Managing Volatility — How to Protect Capital During Wild Swings',
+      keyTakeaway: 'Spikes in VIX often signal peak market anxiety. Historically, periods of extreme VIX spikes frequently coincided with prime buying opportunities for patient long-term investors.'
+    },
+    understandTheRisk: 'High volatility can easily trigger stop-loss orders in leveraged accounts. Trading aggressively during VIX spikes without strict risk limits is the fastest way beginners destroy capital.',
+    knowledgeCheck: {
+      question: 'What does a sharp surge in the INDIA VIX index primarily signify?',
+      options: [
+        'Market participants expect large price swings and are paying more for options insurance due to uncertainty.',
+        'The Indian economy has officially entered a guaranteed five-year recession.',
+        'Stock exchanges will reduce trading hours to 1 hour per day.',
+        'All listed companies are required to halt quarterly dividend payments.'
+      ],
+      correctIndex: 0,
+      explanation: 'VIX is derived from options pricing. When uncertainty rises, demand for insurance pushes up option premiums, causing the VIX to spike as expected price volatility increases.'
+    },
+    plainEnglishTranslation: 'The stock market\'s "fear gauge" surged, meaning traders expect roller-coaster price swings in the days ahead due to key upcoming political events.',
+    whyItMattersToYou: 'Expect sharp day-to-day fluctuations in your portfolio. Avoid panic selling during sudden intraday drops.',
+    impactedSectors: [
+      { name: 'High-Beta Sectors', impact: 'neutral', rationale: 'Heightened sensitivity to short-term headlines and policy shifts.' }
+    ]
+  },
+  {
+    id: 'news-8',
+    headline: 'Indian Rupee Depreciates to 83.55 Against US Dollar on Persistent Foreign Bond Yield Strength',
+    source: 'Financial Express',
+    publishedAt: '1 day ago',
+    category: 'Global Signals',
+    newsCategory: 'Global Signals',
+    relevantStockOrSector: 'IT Exporters, Pharma, Importers (TCS, Sun Pharma, Electronics)',
+    marketSentiment: 'Neutral',
+    whatHappened: 'The Indian Rupee touched 83.55 per US dollar in interbank currency trade before active foreign exchange intervention by the Reserve Bank of India stabilized the currency near 83.48.',
+    whyDidItHappen: 'Strong economic data in the United States pushed 10-year US Treasury bond yields above 4.40%, attracting global institutional capital back into US dollar-denominated assets.',
+    whatDoesItMean: 'A weaker Rupee is a double-edged sword: it boosts the profit realizations of Indian export companies like IT and Pharmaceuticals that earn in US dollars, while making imported goods like petroleum, electronics, and overseas education more costly.',
+    learnTheConcept: {
+      conceptName: 'Currency Depreciation & Export Hedging',
+      definition: 'Currency depreciation is the fall in the value of a nation’s currency relative to foreign currencies. When the USD/INR rises, one dollar buys more rupees.',
+      lessonRoute: '/learn',
+      lessonTitle: 'Module 2: Currency Dynamics — Exporters, Importers and Forex Reserves',
+      keyTakeaway: 'Export-heavy sectors (IT and Pharma) benefit from a weaker rupee because their dollar billings translate into higher rupee revenues without extra operational effort.'
+    },
+    understandTheRisk: 'While a weaker rupee benefits IT and Pharma, prolonged currency depreciation can trigger imported inflation in energy and fertilizer, prompting central banks to keep interest rates elevated.',
+    knowledgeCheck: {
+      question: 'Why does a depreciation of the Indian Rupee against the US Dollar generally benefit Indian IT service companies like Infosys and TCS?',
+      options: [
+        'They bill global clients in US Dollars, so every dollar of revenue converts into more Indian Rupees on their balance sheets.',
+        'They are exempted from paying employee salaries when the rupee falls.',
+        'American companies are forced to double their software contracts by law.',
+        'The Indian government pays IT companies a direct cash subsidy whenever the rupee drops.'
+      ],
+      correctIndex: 0,
+      explanation: 'Indian IT firms generate 80-90% of their revenues in foreign currencies (primarily USD and Euro) while incurring the majority of their salary expenses in Rupees, boosting profitability when the dollar strengthens.'
+    },
+    plainEnglishTranslation: 'The US Dollar strengthened globally, causing the Indian Rupee to soften slightly. This helps Indian IT companies that earn in dollars, but raises costs for imported fuel.',
+    whyItMattersToYou: 'If you invest in IT mutual funds, currency depreciation provides an earnings tailwind; for foreign travel or imported gadgets, expenses tick upward.',
+    impactedSectors: [
+      { name: 'IT & Software Exporters', impact: 'positive', rationale: 'Forex translation gains lift operating margins.' },
+      { name: 'Pharmaceutical Exporters', impact: 'positive', rationale: 'US generic drug sales convert to higher rupee revenues.' },
+      { name: 'Electronics & Mobile Importers', impact: 'negative', rationale: 'Higher component procurement costs in USD.' }
+    ]
   }
 ];
 
