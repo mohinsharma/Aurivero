@@ -144,49 +144,72 @@ const SimulatorContext = createContext<SimulatorContextType | undefined>(undefin
 
 export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [virtualCash, setVirtualCash] = useState<number>(() => {
-    const saved = localStorage.getItem('bullseye_cash');
-    return saved ? parseFloat(saved) : (DEFAULT_STARTING_CASH - 366500.00); // Remaining cash after mock initial buys
+    try {
+      const saved = localStorage.getItem('bullseye_cash');
+      const parsed = saved ? parseFloat(saved) : NaN;
+      return !isNaN(parsed) && parsed >= 0 ? parsed : 51300.00; // Remaining cash after mock initial buys (total ₹1,00,000)
+    } catch {
+      return 51300.00;
+    }
   });
 
   const [positions, setPositions] = useState<PortfolioPosition[]>(() => {
-    const saved = localStorage.getItem('bullseye_positions');
-    return saved ? JSON.parse(saved) : INITIAL_POSITIONS;
+    try {
+      const saved = localStorage.getItem('bullseye_positions');
+      return saved ? JSON.parse(saved) : INITIAL_POSITIONS;
+    } catch {
+      return INITIAL_POSITIONS;
+    }
   });
 
   const [orderHistory, setOrderHistory] = useState<TradeOrder[]>(() => {
-    const saved = localStorage.getItem('bullseye_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    try {
+      const saved = localStorage.getItem('bullseye_orders');
+      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    } catch {
+      return INITIAL_ORDERS;
+    }
   });
 
   const [stocks] = useState<StockQuote[]>(POPULAR_INDIAN_STOCKS);
   const [behavioralScore, setBehavioralScore] = useState<BehavioralScore>(INITIAL_BEHAVIORAL_SCORE);
   const [assessment, setAssessment] = useState<UserAssessment | null>(() => {
-    const saved = localStorage.getItem('bullseye_assessment');
-    return saved ? JSON.parse(saved) : {
-      experienceLevel: 'Beginner',
-      riskTolerance: 'Moderate',
-      investmentHorizon: 'Medium (1-3 Years)',
-      primaryGoal: 'Learn without losing real money',
-      completedAt: '2026-11-24'
-    };
+    try {
+      const saved = localStorage.getItem('bullseye_assessment');
+      return saved ? JSON.parse(saved) : {
+        experienceLevel: 'Level 1: Market Explorer',
+        riskTolerance: 'Moderate',
+        investmentHorizon: 'Medium (1-3 Years)',
+        primaryGoal: 'Learn without losing real money',
+        completedAt: '2026-11-24',
+        knowledgeScore: 75,
+        assignedPath: 'BEGINNER'
+      };
+    } catch {
+      return null;
+    }
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
-    localStorage.setItem('bullseye_cash', virtualCash.toString());
-    localStorage.setItem('bullseye_positions', JSON.stringify(positions));
-    localStorage.setItem('bullseye_orders', JSON.stringify(orderHistory));
+    try {
+      localStorage.setItem('bullseye_cash', virtualCash.toString());
+      localStorage.setItem('bullseye_positions', JSON.stringify(positions));
+      localStorage.setItem('bullseye_orders', JSON.stringify(orderHistory));
+    } catch (e) {
+      console.warn('Could not persist simulator state:', e);
+    }
   }, [virtualCash, positions, orderHistory]);
 
   const toggleSidebar = () => setSidebarCollapsed(prev => !prev);
 
-  const totalInvested = positions.reduce((acc, pos) => acc + pos.totalCost, 0);
-  const totalHoldingsValue = positions.reduce((acc, pos) => acc + (pos.quantity * pos.currentPrice), 0);
+  const totalInvested = positions.reduce((acc, pos) => acc + (pos.totalCost || 0), 0);
+  const totalHoldingsValue = positions.reduce((acc, pos) => acc + ((pos.quantity || 0) * (pos.currentPrice || 0)), 0);
   const totalPortfolioValue = virtualCash + totalHoldingsValue;
   const unrealizedPnL = totalHoldingsValue - totalInvested;
   const unrealizedPnLPercent = totalInvested > 0 ? (unrealizedPnL / totalInvested) * 100 : 0;
-  const dayPnL = 6745.50; // Mock current session gain
+  const dayPnL = 1245.50; // Mock current session gain
 
   const executeTrade = ({
     symbol,

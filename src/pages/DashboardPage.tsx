@@ -23,7 +23,8 @@ import {
   AlertTriangle,
   RotateCcw,
   Compass,
-  Award
+  Award,
+  Target
 } from 'lucide-react';
 import { useSimulator } from '../context/SimulatorContext';
 import { StatCard } from '../components/common/StatCard';
