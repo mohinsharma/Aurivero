@@ -22,8 +22,8 @@ interface SimulatorContextType {
     stopLoss?: number;
     targetPrice?: number;
     reasonTag: string;
-  }) => { success: boolean; message: string };
-  squareOffPosition: (positionId: string) => { success: boolean; message: string };
+  }) => { success: boolean; message: string; learningMoment?: string };
+  squareOffPosition: (positionId: string) => { success: boolean; message: string; learningMoment?: string };
   resetPortfolio: () => void;
   saveAssessment: (assessment: UserAssessment) => void;
   totalPortfolioValue: number;
@@ -33,19 +33,19 @@ interface SimulatorContextType {
   dayPnL: number;
 }
 
-const DEFAULT_STARTING_CASH = 1000000; // ₹10,00,000 (10 Lakhs Virtual INR)
+const DEFAULT_STARTING_CASH = 100000; // ₹1,00,000 (1 Lakh Virtual INR)
 
 const INITIAL_POSITIONS: PortfolioPosition[] = [
   {
     id: 'pos-1',
     symbol: 'RELIANCE',
     name: 'Reliance Industries Ltd.',
-    quantity: 50,
+    quantity: 10,
     averageBuyPrice: 2890.00,
     currentPrice: 2985.40,
-    totalCost: 144500.00,
-    currentValue: 149270.00,
-    unrealizedPnL: 4770.00,
+    totalCost: 28900.00,
+    currentValue: 29854.00,
+    unrealizedPnL: 954.00,
     unrealizedPnLPercent: 3.30,
     sector: 'Energy & Retail',
     purchaseDate: '2026-11-18',
@@ -55,32 +55,15 @@ const INITIAL_POSITIONS: PortfolioPosition[] = [
   },
   {
     id: 'pos-2',
-    symbol: 'TCS',
-    name: 'Tata Consultancy Services',
-    quantity: 30,
-    averageBuyPrice: 4050.00,
-    currentPrice: 4180.25,
-    totalCost: 121500.00,
-    currentValue: 125407.50,
-    unrealizedPnL: 3907.50,
-    unrealizedPnLPercent: 3.22,
-    sector: 'Information Tech',
-    purchaseDate: '2026-11-15',
-    stopLoss: 3950.00,
-    targetPrice: 4400.00,
-    tradeReason: 'Defensive cash cow with 3% dividend yield'
-  },
-  {
-    id: 'pos-3',
     symbol: 'HDFCBANK',
     name: 'HDFC Bank Ltd.',
-    quantity: 60,
-    averageBuyPrice: 1675.00,
+    quantity: 12,
+    averageBuyPrice: 1650.00,
     currentPrice: 1642.80,
-    totalCost: 100500.00,
-    currentValue: 98568.00,
-    unrealizedPnL: -1932.00,
-    unrealizedPnLPercent: -1.92,
+    totalCost: 19800.00,
+    currentValue: 19713.60,
+    unrealizedPnL: -86.40,
+    unrealizedPnLPercent: -0.44,
     sector: 'Banking & Financials',
     purchaseDate: '2026-11-20',
     stopLoss: 1610.00,
@@ -96,14 +79,16 @@ const INITIAL_ORDERS: TradeOrder[] = [
     name: 'HDFC Bank Ltd.',
     type: 'BUY',
     orderType: 'MARKET',
-    quantity: 60,
-    price: 1675.00,
+    quantity: 12,
+    price: 1650.00,
     status: 'EXECUTED',
     timestamp: '2026-11-20 10:14 IST',
-    totalValue: 100500.00,
+    totalValue: 19800.00,
+    charges: 9.90,
     reasonTag: 'Value Buy at Support',
     stopLoss: 1610.00,
-    targetPrice: 1800.00
+    targetPrice: 1800.00,
+    learningMoment: 'Your purchase increased your exposure to Banking & Financials.'
   },
   {
     id: 'ord-102',
@@ -111,29 +96,16 @@ const INITIAL_ORDERS: TradeOrder[] = [
     name: 'Reliance Industries Ltd.',
     type: 'BUY',
     orderType: 'MARKET',
-    quantity: 50,
+    quantity: 10,
     price: 2890.00,
     status: 'EXECUTED',
     timestamp: '2026-11-18 11:30 IST',
-    totalValue: 144500.00,
+    totalValue: 28900.00,
+    charges: 14.45,
     reasonTag: 'Structural Breakout',
     stopLoss: 2820.00,
-    targetPrice: 3150.00
-  },
-  {
-    id: 'ord-103',
-    symbol: 'TCS',
-    name: 'Tata Consultancy Services',
-    type: 'BUY',
-    orderType: 'MARKET',
-    quantity: 30,
-    price: 4050.00,
-    status: 'EXECUTED',
-    timestamp: '2026-11-15 14:02 IST',
-    totalValue: 121500.00,
-    reasonTag: 'Sector Rotation',
-    stopLoss: 3950.00,
-    targetPrice: 4400.00
+    targetPrice: 3150.00,
+    learningMoment: 'Your cash allocation is now lower. This reduces your flexibility for future simulated opportunities.'
   }
 ];
 
@@ -240,13 +212,31 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const executionPrice = orderType === 'LIMIT' && limitPrice ? limitPrice : stock.price;
     const tradeValue = executionPrice * quantity;
+    const simulatedCharges = Math.max(5, Math.round(tradeValue * 0.0005 * 100) / 100);
+
+    let learningMoment = '';
 
     if (type === 'BUY') {
-      if (tradeValue > virtualCash) {
-        return { success: false, message: `Insufficient virtual cash. Required: ₹${tradeValue.toLocaleString('en-IN')}, Available: ₹${virtualCash.toLocaleString('en-IN')}` };
+      const totalRequired = tradeValue + simulatedCharges;
+      if (totalRequired > virtualCash) {
+        return {
+          success: false,
+          message: `Insufficient virtual cash. Required: ₹${totalRequired.toLocaleString('en-IN', { minimumFractionDigits: 2 })}, Available: ₹${virtualCash.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+        };
       }
 
-      setVirtualCash(prev => prev - tradeValue);
+      setVirtualCash(prev => prev - totalRequired);
+
+      // Determine Educational Learning Moment
+      if (stock.changePercent > 1.5) {
+        learningMoment = `Buying after a sharp price increase (${stock.symbol} +${stock.changePercent.toFixed(2)}%) can expose you to momentum risk. Consider what information supports your decision.`;
+      } else if (!stopLoss) {
+        learningMoment = `You placed a trade without defining a stop-loss boundary. Pre-determining your maximum acceptable loss protects you from emotional paralysis if the stock drops.`;
+      } else if (tradeValue > virtualCash * 0.4) {
+        learningMoment = `Your cash allocation is now significantly lower. This reduces your flexibility for future simulated opportunities.`;
+      } else {
+        learningMoment = `Your purchase increased your exposure to the ${stock.sector} sector. Ensure your overall virtual portfolio maintains multi-sector diversification.`;
+      }
 
       // Add to or update positions
       setPositions(prev => {
@@ -311,10 +301,12 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       // SELL trade
       const existing = positions.find(p => p.symbol === symbol);
       if (!existing || existing.quantity < quantity) {
-        return { success: false, message: `Cannot sell ${quantity} shares. You only own ${existing ? existing.quantity : 0} shares.` };
+        return { success: false, message: `Cannot sell ${quantity} shares. You only own ${existing ? existing.quantity : 0} shares of ${symbol}.` };
       }
 
-      setVirtualCash(prev => prev + tradeValue);
+      setVirtualCash(prev => prev + (tradeValue - simulatedCharges));
+
+      learningMoment = `Position trimmed/closed. Review your trading journal to evaluate whether this exit aligned with your strategy or was triggered by short-term emotional impulses.`;
 
       setPositions(prev => {
         if (existing.quantity === quantity) {
@@ -346,14 +338,20 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       status: 'EXECUTED',
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST',
       totalValue: tradeValue,
+      charges: simulatedCharges,
       reasonTag,
       stopLoss,
-      targetPrice
+      targetPrice,
+      learningMoment
     };
 
     setOrderHistory(prev => [newOrder, ...prev]);
 
-    return { success: true, message: `Successfully executed virtual ${type} of ${quantity} shares of ${symbol} at ₹${executionPrice.toFixed(2)}` };
+    return {
+      success: true,
+      message: `Successfully executed virtual ${type} of ${quantity} shares of ${symbol} at ₹${executionPrice.toFixed(2)} (Simulated fees: ₹${simulatedCharges.toFixed(2)})`,
+      learningMoment
+    };
   };
 
   const squareOffPosition = (positionId: string) => {

@@ -49,9 +49,11 @@ export interface TradeOrder {
   status: 'EXECUTED' | 'PENDING' | 'CANCELLED';
   timestamp: string;
   totalValue: number;
+  charges?: number;
   reasonTag: string;
   stopLoss?: number;
   targetPrice?: number;
+  learningMoment?: string;
 }
 
 export interface MarketIndex {
