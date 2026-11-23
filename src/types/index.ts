@@ -145,4 +145,14 @@ export interface UserAssessment {
   investmentHorizon: string;
   primaryGoal: string;
   completedAt?: string;
+  knowledgeScore?: number;
+  totalQuestions?: number;
+  riskAwarenessScore?: number;
+  marketFamiliarityScore?: number;
+  emotionalAwarenessScore?: number;
+  diversificationScore?: number;
+  assignedPath?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  recommendedModule?: string;
+  estimatedTime?: string;
+  firstChallenge?: string;
 }
