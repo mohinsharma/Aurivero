@@ -201,12 +201,41 @@ export interface ChallengeQuest {
   id: string;
   title: string;
   category: 'Risk Management' | 'Analysis' | 'Mindset' | 'Execution';
+  frequency?: 'DAILY' | 'WEEKLY' | 'MILESTONE';
   rewardXP: number;
   badgeName: string;
   progress: number;
   maxProgress: number;
   completed: boolean;
+  claimed?: boolean;
   description: string;
+  actionRoute?: string;
+  actionLabel?: string;
+}
+
+export interface AchievementBadge {
+  id: string;
+  title: string;
+  description: string;
+  category: 'Risk' | 'Knowledge' | 'Discipline' | 'History' | 'Diversification';
+  unlocked: boolean;
+  unlockedAt?: string;
+  requirement: string;
+  rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary';
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  id: string;
+  name: string;
+  city: string;
+  levelName: string;
+  levelNumber: number;
+  xp: number;
+  disciplineScore: number;
+  badgesCount: number;
+  streakDays: number;
+  isCurrentUser?: boolean;
 }
 
 export interface UserAssessment {

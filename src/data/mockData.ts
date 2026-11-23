@@ -1,4 +1,4 @@
-import { StockQuote, MarketIndex, CourseModule, ReplayEvent, MarketNewsItem, ChallengeQuest } from '../types';
+import { StockQuote, MarketIndex, CourseModule, ReplayEvent, MarketNewsItem, ChallengeQuest, AchievementBadge, LeaderboardEntry } from '../types';
 
 export const INDIAN_INDICES: MarketIndex[] = [
   { name: 'NIFTY 50', value: 24842.15, change: 148.60, changePercent: 0.60, status: 'Open' },
@@ -995,59 +995,315 @@ export const MARKET_NEWS_ITEMS: MarketNewsItem[] = [
 ];
 
 export const CHALLENGE_QUESTS: ChallengeQuest[] = [
+  // Daily Quests
   {
-    id: 'quest-1',
+    id: 'quest-daily-1',
+    title: 'Daily Macro Event Drill',
+    category: 'Analysis',
+    frequency: 'DAILY',
+    rewardXP: 50,
+    badgeName: 'Curious Mind',
+    progress: 1,
+    maxProgress: 1,
+    completed: true,
+    claimed: false,
+    description: 'Read 1 plain-English market event in the AI News Explainer and complete the knowledge check.',
+    actionRoute: '/news-explainer',
+    actionLabel: 'Open News Explainer'
+  },
+  {
+    id: 'quest-daily-2',
+    title: 'Pre-Trade Reality Inspection',
+    category: 'Risk Management',
+    frequency: 'DAILY',
+    rewardXP: 60,
+    badgeName: 'Risk Aware',
+    progress: 1,
+    maxProgress: 1,
+    completed: true,
+    claimed: false,
+    description: 'Inspect a proposed simulated trade with the Risk Reality Check to examine hypothetical drawdown scenarios.',
+    actionRoute: '/simulator',
+    actionLabel: 'Launch Simulator'
+  },
+  {
+    id: 'quest-daily-3',
+    title: 'Decision Thesis Log',
+    category: 'Mindset',
+    frequency: 'DAILY',
+    rewardXP: 40,
+    badgeName: 'Thoughtful Trader',
+    progress: 0,
+    maxProgress: 1,
+    completed: false,
+    claimed: false,
+    description: 'Commit a structured reasoning tag to your trading journal before executing any virtual order.',
+    actionRoute: '/simulator',
+    actionLabel: 'Log Trade Thesis'
+  },
+
+  // Weekly Quests
+  {
+    id: 'quest-weekly-1',
+    title: 'Sector Diversification Master',
+    category: 'Execution',
+    frequency: 'WEEKLY',
+    rewardXP: 150,
+    badgeName: 'Balanced Portfolio',
+    progress: 4,
+    maxProgress: 4,
+    completed: true,
+    claimed: true,
+    description: 'Hold stocks across at least 4 distinct economic sectors without exceeding 35% in any single industry.',
+    actionRoute: '/portfolio',
+    actionLabel: 'Audit Portfolio'
+  },
+  {
+    id: 'quest-weekly-2',
+    title: 'Time Machine Crisis Survival',
+    category: 'Mindset',
+    frequency: 'WEEKLY',
+    rewardXP: 200,
+    badgeName: 'Crisis Veteran',
+    progress: 1,
+    maxProgress: 1,
+    completed: true,
+    claimed: false,
+    description: 'Complete 1 historical market replay scenario without liquidating into panic cash at the market trough.',
+    actionRoute: '/market-replay',
+    actionLabel: 'Replay Crisis'
+  },
+  {
+    id: 'quest-weekly-3',
+    title: 'Behavioral Bias Audit',
+    category: 'Mindset',
+    frequency: 'WEEKLY',
+    rewardXP: 100,
+    badgeName: 'Bias Hunter',
+    progress: 1,
+    maxProgress: 1,
+    completed: true,
+    claimed: true,
+    description: 'Examine your 5-pillar behavioral score and complete an educational practice drill on loss chasing or FOMO.',
+    actionRoute: '/behavioral-insights',
+    actionLabel: 'Review Radar'
+  },
+
+  // Special Milestones
+  {
+    id: 'quest-milestone-1',
     title: 'The Disciplined Investor',
     category: 'Risk Management',
+    frequency: 'MILESTONE',
     rewardXP: 250,
     badgeName: 'Risk Guardian',
     progress: 3,
     maxProgress: 5,
     completed: false,
-    description: 'Execute 5 simulated trades with a pre-configured stop-loss order.'
+    claimed: false,
+    description: 'Execute 5 simulated trades with a pre-configured stop-loss order.',
+    actionRoute: '/simulator',
+    actionLabel: 'Practice Stop-Loss'
   },
   {
-    id: 'quest-2',
-    title: 'Sector Diversification Master',
-    category: 'Execution',
-    rewardXP: 300,
-    badgeName: 'Balanced Portfolio',
-    progress: 4,
-    maxProgress: 4,
-    completed: true,
-    description: 'Hold stocks across at least 4 distinct economic sectors without exceeding 35% in any single industry.'
-  },
-  {
-    id: 'quest-3',
+    id: 'quest-milestone-2',
     title: 'Survivor of March 2020',
     category: 'Mindset',
+    frequency: 'MILESTONE',
     rewardXP: 400,
     badgeName: 'Diamond Nerves',
     progress: 1,
     maxProgress: 1,
     completed: true,
-    description: 'Complete the COVID-19 Historical Crash replay scenario without panic-selling at the bottom.'
+    claimed: false,
+    description: 'Complete the COVID-19 Historical Crash replay scenario without panic-selling at the bottom.',
+    actionRoute: '/market-replay',
+    actionLabel: 'Time Machine'
   },
   {
-    id: 'quest-4',
+    id: 'quest-milestone-3',
     title: 'Fundamental Sleuth',
     category: 'Analysis',
+    frequency: 'MILESTONE',
     rewardXP: 200,
     badgeName: 'Valuation Analyst',
     progress: 2,
     maxProgress: 4,
     completed: false,
-    description: 'Complete the Fundamental Analysis course module and pass the P/E Ratio interactive checkpoint.'
+    claimed: false,
+    description: 'Complete the Fundamental Analysis course module and pass the P/E Ratio interactive checkpoint.',
+    actionRoute: '/learn',
+    actionLabel: 'Start Module'
   },
   {
-    id: 'quest-5',
+    id: 'quest-milestone-4',
     title: 'FOMO Resistance Drill',
     category: 'Mindset',
+    frequency: 'MILESTONE',
     rewardXP: 350,
     badgeName: 'Stoic Mind',
     progress: 8,
     maxProgress: 10,
     completed: false,
-    description: 'Refrain from placing market orders on stocks that have already gapped up more than +3% on the day.'
+    claimed: false,
+    description: 'Refrain from placing market orders on stocks that have already gapped up more than +3% on the day.',
+    actionRoute: '/simulator',
+    actionLabel: 'Observe Discipline'
+  }
+];
+
+export const ACHIEVEMENT_BADGES: AchievementBadge[] = [
+  {
+    id: 'badge-1',
+    title: 'First Lesson',
+    description: 'Completed your first structured educational module in the Learn Center.',
+    category: 'Knowledge',
+    unlocked: true,
+    unlockedAt: '18 Nov 2026',
+    requirement: 'Finish Module 1: Market Foundations',
+    rarity: 'Common'
+  },
+  {
+    id: 'badge-2',
+    title: 'Risk Awareness',
+    description: 'Ran a Pre-Trade Risk Reality Check to evaluate hypothetical drawdowns before committing virtual capital.',
+    category: 'Risk',
+    unlocked: true,
+    unlockedAt: '20 Nov 2026',
+    requirement: 'Perform 1 Pre-Trade Stress Test',
+    rarity: 'Common'
+  },
+  {
+    id: 'badge-3',
+    title: 'Diversification Master',
+    description: 'Constructed an equity portfolio spanning 4+ sectors with no single stock exceeding 35% weight.',
+    category: 'Diversification',
+    unlocked: true,
+    unlockedAt: '22 Nov 2026',
+    requirement: 'Hold 4 sectors with <35% max weight',
+    rarity: 'Rare'
+  },
+  {
+    id: 'badge-4',
+    title: 'Market Historian',
+    description: 'Experienced past Dalal Street crashes in blind mode and completed post-scenario debriefs.',
+    category: 'History',
+    unlocked: true,
+    unlockedAt: '23 Nov 2026',
+    requirement: 'Complete 2 Historical Replay Scenarios',
+    rarity: 'Rare'
+  },
+  {
+    id: 'badge-5',
+    title: 'Disciplined Decision Maker',
+    description: 'Maintained an objective Behavioral Discipline Score above 80 points across 10 simulated sessions.',
+    category: 'Discipline',
+    unlocked: false,
+    requirement: 'Maintain 80+ Behavioral Discipline Score',
+    rarity: 'Epic'
+  },
+  {
+    id: 'badge-6',
+    title: 'Simulation Graduate',
+    description: 'Passed all curriculum assessments and executed 10 responsible paper trades with defined stop-losses.',
+    category: 'Knowledge',
+    unlocked: false,
+    requirement: 'Complete 6 Course Modules + 10 Stop-Loss Trades',
+    rarity: 'Legendary'
+  },
+  {
+    id: 'badge-7',
+    title: 'Bias Hunter',
+    description: 'Audited simulated ledger and recognized a loss-chasing or FOMO habit before it caused drawdowns.',
+    category: 'Discipline',
+    unlocked: true,
+    unlockedAt: '23 Nov 2026',
+    requirement: 'Resolve 1 behavioral risk pattern',
+    rarity: 'Rare'
+  },
+  {
+    id: 'badge-8',
+    title: 'Stoic Investor',
+    description: 'Avoided buying during 5 momentum breakout traps and waited for valuation pullback entries.',
+    category: 'Discipline',
+    unlocked: false,
+    requirement: 'Pass 5 FOMO resistance checkpoints',
+    rarity: 'Epic'
+  }
+];
+
+export const ETHICAL_LEADERBOARD: LeaderboardEntry[] = [
+  {
+    rank: 1,
+    id: 'user-1',
+    name: 'Priya M.',
+    city: 'Mumbai',
+    levelName: 'Portfolio Builder',
+    levelNumber: 4,
+    xp: 1840,
+    disciplineScore: 94,
+    badgesCount: 7,
+    streakDays: 14
+  },
+  {
+    rank: 2,
+    id: 'user-2',
+    name: 'Rohan S.',
+    city: 'Bengaluru',
+    levelName: 'Portfolio Builder',
+    levelNumber: 4,
+    xp: 1710,
+    disciplineScore: 91,
+    badgesCount: 6,
+    streakDays: 11
+  },
+  {
+    rank: 3,
+    id: 'user-3',
+    name: 'You (MINDMARK Explorer)',
+    city: 'New Delhi',
+    levelName: 'Risk Navigator',
+    levelNumber: 3,
+    xp: 1150,
+    disciplineScore: 86,
+    badgesCount: 5,
+    streakDays: 5,
+    isCurrentUser: true
+  },
+  {
+    rank: 4,
+    id: 'user-4',
+    name: 'Ananya V.',
+    city: 'Pune',
+    levelName: 'Risk Navigator',
+    levelNumber: 3,
+    xp: 1080,
+    disciplineScore: 88,
+    badgesCount: 4,
+    streakDays: 8
+  },
+  {
+    rank: 5,
+    id: 'user-5',
+    name: 'Karthik N.',
+    city: 'Hyderabad',
+    levelName: 'Financial Learner',
+    levelNumber: 2,
+    xp: 590,
+    disciplineScore: 82,
+    badgesCount: 3,
+    streakDays: 4
+  },
+  {
+    rank: 6,
+    id: 'user-6',
+    name: 'Deepak T.',
+    city: 'Chennai',
+    levelName: 'Financial Learner',
+    levelNumber: 2,
+    xp: 520,
+    disciplineScore: 79,
+    badgesCount: 3,
+    streakDays: 3
   }
 ];
