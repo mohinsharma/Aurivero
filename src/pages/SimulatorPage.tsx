@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   CandlestickChart,
   TrendingUp,
@@ -31,6 +31,7 @@ import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import { StockQuote, PortfolioPosition, TradeOrder } from '../types';
+import { RiskRealityCheckModal, ProposedTradeData, PortfolioRiskMetrics } from '../components/simulator/RiskRealityCheckModal';
 
 export const SimulatorPage: React.FC = () => {
   const {
@@ -65,12 +66,17 @@ export const SimulatorPage: React.FC = () => {
   // Trade form state
   const [tradeType, setTradeType] = useState<'BUY' | 'SELL'>('BUY');
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
+  const [productType, setProductType] = useState<'CNC' | 'MIS_LEVERAGED' | 'OPTIONS'>('CNC');
   const [limitPrice, setLimitPrice] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(5);
   const [stopLoss, setStopLoss] = useState<string>('');
   const [targetPrice, setTargetPrice] = useState<string>('');
   const [reasonTag, setReasonTag] = useState<string>('Long-term Fundamental Value');
   const [hasAcknowledgedVirtual, setHasAcknowledgedVirtual] = useState<boolean>(true);
+
+  // Risk Reality Check Engine State
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState<boolean>(false);
+  const [pendingTrade, setPendingTrade] = useState<ProposedTradeData | null>(null);
 
   // Active view tab below trading panel: HOLDINGS vs ORDER HISTORY
   const [activeBottomTab, setActiveBottomTab] = useState<'HOLDINGS' | 'ORDERS'>('HOLDINGS');
@@ -122,11 +128,21 @@ export const SimulatorPage: React.FC = () => {
     : selectedStock.price;
 
   const estimatedValue = effectivePrice * quantity;
+  const leverageMultiplier = productType === 'MIS_LEVERAGED' ? 5 : 1;
+  const marginRequired = productType === 'MIS_LEVERAGED'
+    ? estimatedValue / 5
+    : productType === 'OPTIONS'
+    ? Math.max(500, Math.round(estimatedValue * 0.05))
+    : estimatedValue;
+
   const simulatedCharges = Math.max(5, Math.round(estimatedValue * 0.0005 * 100) / 100); // 0.05% simulated STT/brokerage fees
-  const totalRequiredCapital = estimatedValue + simulatedCharges;
+  const totalRequiredCapital = marginRequired + simulatedCharges;
 
   // Max affordable shares calculation
-  const maxAffordableQty = Math.max(1, Math.floor(virtualCash / (selectedStock.price * 1.0005)));
+  const maxAffordableQty = Math.max(
+    1,
+    Math.floor((virtualCash * (productType === 'MIS_LEVERAGED' ? 5 : 1)) / (selectedStock.price * 1.0005))
+  );
 
   // Risk Reward calculation
   const parsedStopLoss = parseFloat(stopLoss);
@@ -138,36 +154,44 @@ export const SimulatorPage: React.FC = () => {
     riskRewardRatio = `1 : ${(reward / risk).toFixed(2)}`;
   }
 
-  // Handle Trade Execution
-  const handleTradeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Proposed Trade Object for Risk Reality Check
+  const proposedTrade: ProposedTradeData = useMemo(() => ({
+    symbol: selectedStock.symbol,
+    name: selectedStock.name,
+    type: tradeType,
+    orderType,
+    productType,
+    leverageMultiplier,
+    quantity,
+    price: effectivePrice,
+    totalValue: estimatedValue,
+    marginRequired,
+    charges: simulatedCharges,
+    stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
+    targetPrice: targetPrice ? parseFloat(targetPrice) : undefined,
+    sector: selectedStock.sector
+  }), [selectedStock, tradeType, orderType, productType, leverageMultiplier, quantity, effectivePrice, estimatedValue, marginRequired, simulatedCharges, stopLoss, targetPrice]);
 
-    if (quantity <= 0) {
-      setTradeNotification({ message: 'Quantity must be greater than zero.', isError: true });
-      return;
-    }
+  const existingStockVal = existingPosition ? existingPosition.currentValue : 0;
+  const existingSectorVal = positions.filter(p => p.sector === selectedStock.sector).reduce((acc, p) => acc + p.currentValue, 0);
 
-    if (tradeType === 'BUY' && totalRequiredCapital > virtualCash) {
-      setTradeNotification({
-        message: `Insufficient virtual funds. Required: ₹${totalRequiredCapital.toFixed(2)}, Available: ₹${virtualCash.toFixed(2)}`,
-        isError: true
-      });
-      return;
-    }
+  const portfolioRiskMetrics: PortfolioRiskMetrics = useMemo(() => ({
+    totalPortfolioValue,
+    virtualCash,
+    existingStockValue: existingStockVal,
+    existingSectorValue: existingSectorVal,
+    isAfterLosingTrade: orderHistory.length > 0 && orderHistory[0].type === 'SELL' && (orderHistory[0].learningMoment?.toLowerCase().includes('loss') || false)
+  }), [totalPortfolioValue, virtualCash, existingStockVal, existingSectorVal, orderHistory]);
 
-    if (tradeType === 'SELL' && (!existingPosition || existingPosition.quantity < quantity)) {
-      setTradeNotification({
-        message: `Cannot sell ${quantity} shares. You currently own ${existingPosition ? existingPosition.quantity : 0} shares of ${selectedStock.symbol}.`,
-        isError: true
-      });
-      return;
-    }
-
+  // Execute Trade Directly
+  const executeTradeDirectly = () => {
     const result = executeTrade({
       symbol: selectedStock.symbol,
       type: tradeType,
       quantity,
       orderType,
+      productType,
+      leverageMultiplier,
       limitPrice: orderType === 'LIMIT' && limitPrice ? parseFloat(limitPrice) : undefined,
       stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
       targetPrice: targetPrice ? parseFloat(targetPrice) : undefined,
@@ -192,6 +216,54 @@ export const SimulatorPage: React.FC = () => {
     setTimeout(() => {
       setTradeNotification(null);
     }, 5000);
+  };
+
+  // Handle Trade Execution with Pre-Trade Risk Reality Check Interception
+  const handleTradeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (quantity <= 0) {
+      setTradeNotification({ message: 'Quantity must be greater than zero.', isError: true });
+      return;
+    }
+
+    if (tradeType === 'BUY' && totalRequiredCapital > virtualCash) {
+      setTradeNotification({
+        message: `Insufficient virtual funds. Required: ₹${totalRequiredCapital.toFixed(2)}, Available: ₹${virtualCash.toFixed(2)}`,
+        isError: true
+      });
+      return;
+    }
+
+    if (tradeType === 'SELL' && (!existingPosition || existingPosition.quantity < quantity)) {
+      setTradeNotification({
+        message: `Cannot sell ${quantity} shares. You currently own ${existingPosition ? existingPosition.quantity : 0} shares of ${selectedStock.symbol}.`,
+        isError: true
+      });
+      return;
+    }
+
+    // Evaluate Risk Triggers
+    const positionRatio = (estimatedValue / totalPortfolioValue) * 100;
+    const postStockConc = ((existingStockVal + (tradeType === 'BUY' ? estimatedValue : 0)) / totalPortfolioValue) * 100;
+    const postSectorConc = ((existingSectorVal + (tradeType === 'BUY' ? estimatedValue : 0)) / totalPortfolioValue) * 100;
+    const postCashRatio = ((virtualCash - (tradeType === 'BUY' ? totalRequiredCapital : 0)) / totalPortfolioValue) * 100;
+
+    const isLargePosition = positionRatio > 25;
+    const isConcentrated = postStockConc > 35;
+    const isSectorHeavy = postSectorConc > 45;
+    const isLowCash = tradeType === 'BUY' && postCashRatio < 15;
+    const isLeveragedOrOptions = productType !== 'CNC';
+    const isAfterLoss = portfolioRiskMetrics.isAfterLosingTrade && positionRatio > 20;
+
+    // Trigger Risk Reality Check if any educational risk threshold is met
+    if (isLargePosition || isConcentrated || isSectorHeavy || isLowCash || isLeveragedOrOptions || isAfterLoss) {
+      setPendingTrade(proposedTrade);
+      setIsRiskModalOpen(true);
+      return;
+    }
+
+    executeTradeDirectly();
   };
 
   const handleConfirmReset = () => {
@@ -593,6 +665,51 @@ export const SimulatorPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleTradeSubmit} className="space-y-3.5 text-xs">
+            {/* Product Exposure Mode */}
+            <div>
+              <div className="flex justify-between text-[11px] font-mono text-text-muted mb-1">
+                <span>Product / Exposure Mode</span>
+                <span className="text-primary font-bold">
+                  {productType === 'CNC' ? '1x Delivery (Cash)' : productType === 'MIS_LEVERAGED' ? '5x Intraday Leverage' : 'F&O Options Sim'}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setProductType('CNC')}
+                  className={`py-1.5 px-1 rounded-md font-mono text-[10px] border transition-colors text-center ${
+                    productType === 'CNC'
+                      ? 'border-primary text-primary bg-primary/10 font-bold'
+                      : 'border-border text-text-muted hover:bg-surface'
+                  }`}
+                >
+                  Delivery 1x
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductType('MIS_LEVERAGED')}
+                  className={`py-1.5 px-1 rounded-md font-mono text-[10px] border transition-colors text-center ${
+                    productType === 'MIS_LEVERAGED'
+                      ? 'border-warning text-warning bg-warning/10 font-bold'
+                      : 'border-border text-text-muted hover:bg-surface'
+                  }`}
+                >
+                  5x Leverage
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductType('OPTIONS')}
+                  className={`py-1.5 px-1 rounded-md font-mono text-[10px] border transition-colors text-center ${
+                    productType === 'OPTIONS'
+                      ? 'border-danger text-danger bg-danger/10 font-bold'
+                      : 'border-border text-text-muted hover:bg-surface'
+                  }`}
+                >
+                  Options (F&O)
+                </button>
+              </div>
+            </div>
+
             {/* Order Type: Market vs Limit */}
             <div>
               <div className="flex justify-between text-[11px] font-mono text-text-muted mb-1">
@@ -768,6 +885,18 @@ export const SimulatorPage: React.FC = () => {
                 I understand this is a 100% virtual paper trade using simulated capital.
               </label>
             </div>
+
+            {/* Run Risk Reality Check Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setPendingTrade(proposedTrade);
+                setIsRiskModalOpen(true);
+              }}
+              className="w-full py-2 rounded-lg bg-surface hover:bg-surface-elevated border border-warning/40 text-warning text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <ShieldAlert size={14} /> Run Pre-Trade Risk Reality Check
+            </button>
 
             {/* Submit Trade Button */}
             <Button
@@ -1033,6 +1162,18 @@ export const SimulatorPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Pre-Trade Risk Reality Check Modal */}
+      {isRiskModalOpen && (
+        <RiskRealityCheckModal
+          isOpen={isRiskModalOpen}
+          onClose={() => setIsRiskModalOpen(false)}
+          onConfirmTrade={executeTradeDirectly}
+          onAdjustSize={(recommendedQty) => setQuantity(recommendedQty)}
+          trade={pendingTrade || proposedTrade}
+          portfolio={portfolioRiskMetrics}
+        />
+      )}
     </div>
   );
 };

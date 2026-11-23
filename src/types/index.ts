@@ -44,6 +44,10 @@ export interface TradeOrder {
   name: string;
   type: 'BUY' | 'SELL';
   orderType: 'MARKET' | 'LIMIT';
+  productType?: 'CNC' | 'MIS_LEVERAGED' | 'OPTIONS';
+  leverageMultiplier?: number;
+  optionType?: 'CALL' | 'PUT';
+  strikePrice?: number;
   quantity: number;
   price: number;
   status: 'EXECUTED' | 'PENDING' | 'CANCELLED';
@@ -54,6 +58,7 @@ export interface TradeOrder {
   stopLoss?: number;
   targetPrice?: number;
   learningMoment?: string;
+  riskChecksTriggered?: string[];
 }
 
 export interface MarketIndex {

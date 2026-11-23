@@ -18,10 +18,13 @@ interface SimulatorContextType {
     type: 'BUY' | 'SELL';
     quantity: number;
     orderType: 'MARKET' | 'LIMIT';
+    productType?: 'CNC' | 'MIS_LEVERAGED' | 'OPTIONS';
+    leverageMultiplier?: number;
     limitPrice?: number;
     stopLoss?: number;
     targetPrice?: number;
     reasonTag: string;
+    riskChecksTriggered?: string[];
   }) => { success: boolean; message: string; learningMoment?: string };
   squareOffPosition: (positionId: string) => { success: boolean; message: string; learningMoment?: string };
   resetPortfolio: () => void;
@@ -216,31 +219,43 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     type,
     quantity,
     orderType,
+    productType = 'CNC',
+    leverageMultiplier = 1,
     limitPrice,
     stopLoss,
     targetPrice,
     reasonTag,
+    riskChecksTriggered,
   }: {
     symbol: string;
     type: 'BUY' | 'SELL';
     quantity: number;
     orderType: 'MARKET' | 'LIMIT';
+    productType?: 'CNC' | 'MIS_LEVERAGED' | 'OPTIONS';
+    leverageMultiplier?: number;
     limitPrice?: number;
     stopLoss?: number;
     targetPrice?: number;
     reasonTag: string;
+    riskChecksTriggered?: string[];
   }) => {
     const stock = stocks.find(s => s.symbol === symbol);
     if (!stock) return { success: false, message: 'Stock not found' };
 
     const executionPrice = orderType === 'LIMIT' && limitPrice ? limitPrice : stock.price;
-    const tradeValue = executionPrice * quantity;
+    const grossTradeValue = executionPrice * quantity;
+    // If educational leverage is applied (e.g. 5x), required margin is grossTradeValue / leverageMultiplier
+    const marginRequired = productType === 'MIS_LEVERAGED' && leverageMultiplier > 1
+      ? grossTradeValue / leverageMultiplier
+      : grossTradeValue;
+
+    const tradeValue = grossTradeValue;
     const simulatedCharges = Math.max(5, Math.round(tradeValue * 0.0005 * 100) / 100);
 
     let learningMoment = '';
 
     if (type === 'BUY') {
-      const totalRequired = tradeValue + simulatedCharges;
+      const totalRequired = marginRequired + simulatedCharges;
       if (totalRequired > virtualCash) {
         return {
           success: false,
@@ -356,6 +371,8 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       name: stock.name,
       type,
       orderType,
+      productType,
+      leverageMultiplier,
       quantity,
       price: executionPrice,
       status: 'EXECUTED',
@@ -365,7 +382,8 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       reasonTag,
       stopLoss,
       targetPrice,
-      learningMoment
+      learningMoment,
+      riskChecksTriggered
     };
 
     setOrderHistory(prev => [newOrder, ...prev]);
