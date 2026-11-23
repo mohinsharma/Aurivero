@@ -101,11 +101,42 @@ export interface BehavioralScore {
   }[];
 }
 
+export interface ReplayCheckpoint {
+  checkpointIndex: number;
+  date: string;
+  nifty: number;
+  sensex: number;
+  headline: string;
+  newsSource: string;
+  marketSentiment: 'Extreme Fear' | 'Fear' | 'Uncertainty' | 'Optimism' | 'Euphoria';
+  narrative: string;
+  whatHappenedNext: string;
+  historicalFact: string;
+}
+
+export interface ReplayUserDecision {
+  checkpointIndex: number;
+  date: string;
+  actionId: 'AGGRESSIVE_BUY' | 'MODERATE_BUY' | 'HOLD' | 'REDUCE_EXPOSURE' | 'PANIC_EXIT';
+  actionLabel: string;
+  reasoning: string;
+  portfolioValueBefore: number;
+  cashBefore: number;
+  unitsBefore: number;
+  portfolioValueAfter: number;
+  cashAfter: number;
+  unitsAfter: number;
+  indexPriceAtDecision: number;
+  nextIndexPrice?: number;
+  periodPnlPercent?: number;
+}
+
 export interface ReplayEvent {
   id: string;
   title: string;
   subtitle: string;
   period: string;
+  scenarioType: 'CRASH' | 'CRISIS' | 'RECOVERY' | 'VOLATILITY';
   severity: 'Extreme' | 'High' | 'Moderate';
   dropPercentage: string;
   recoveryDuration: string;
@@ -113,8 +144,12 @@ export interface ReplayEvent {
   context: string;
   totalSteps: number;
   benchmark: string;
+  initialCash: number;
+  initialUnits: number;
   priceSeries: { day: string; nifty: number; sensex: number; narrative: string }[];
+  checkpoints: ReplayCheckpoint[];
   keyLessons: string[];
+  historicalDisclaimer: string;
 }
 
 export interface MarketNewsItem {

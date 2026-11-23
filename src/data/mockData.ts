@@ -273,74 +273,417 @@ export const HISTORICAL_REPLAY_EVENTS: ReplayEvent[] = [
   {
     id: 'covid-crash-2020',
     title: 'March 2020: The COVID-19 Circuit Breaker Crash',
-    subtitle: 'NIFTY plunges from 12,400 to 7,500 amidst nationwide lockdowns and extreme fear.',
+    subtitle: 'NIFTY plunges from 12,200 to 7,500 amidst nationwide lockdowns before triggering an unprecedented V-shape recovery.',
     period: 'Feb 2020 — Nov 2020',
+    scenarioType: 'CRASH',
     severity: 'Extreme',
     dropPercentage: '-38.4%',
     recoveryDuration: '7 Months to all-time high',
-    background: 'World Health Organization declares pandemic, FIIs pull record ₹65,000 Cr in a single month.',
-    context: 'Trading was halted multiple times by lower circuit breakers on Dalal Street. The media declared the end of globalization.',
-    totalSteps: 5,
+    background: 'World Health Organization declares global pandemic; FIIs pull record ₹65,000 Cr from Indian equities in a single month.',
+    context: 'Trading was halted multiple times by 10% lower circuit breakers on Dalal Street. Media headlines declared the collapse of modern globalization.',
+    totalSteps: 6,
     benchmark: 'NIFTY 50 Index',
+    initialCash: 50000,
+    initialUnits: 50000 / 12113,
+    historicalDisclaimer: 'Historical closing price series sourced from verified National Stock Exchange (NSE India) NIFTY 50 benchmark data for 2020.',
     priceSeries: [
       { day: '15 Feb 2020', nifty: 12113, sensex: 41257, narrative: 'Markets trade calmly near all-time highs. Whispers of Wuhan virus are dismissed as temporary local disruption.' },
       { day: '06 Mar 2020', nifty: 10989, sensex: 37576, narrative: 'Cases emerge in Italy & India. Yes Bank moratorium shocks Indian financial sector. Volatility spikes.' },
       { day: '23 Mar 2020', nifty: 7610, sensex: 25981, narrative: 'Nationwide 21-day lockdown announced. NIFTY hits lower circuit in 45 minutes! Maximum panic selling.' },
       { day: '30 Apr 2020', nifty: 9859, sensex: 33717, narrative: 'Global central banks pump trillions in liquidity. Tech and pharma stocks lead unexpected sharp rebound.' },
-      { day: '10 Nov 2020', nifty: 12631, sensex: 43277, narrative: 'Pfizer vaccine announcement. NIFTY crosses pre-COVID peak. Panic sellers who exited in March locked in massive permanent losses.' }
+      { day: '10 Jul 2020', nifty: 10768, sensex: 36594, narrative: 'Reliance raises ₹1.5L Cr from global investors; millions of new retail demat accounts open in India.' },
+      { day: '10 Nov 2020', nifty: 12631, sensex: 43277, narrative: 'Pfizer vaccine announcement. NIFTY crosses pre-COVID peak. Panic sellers who exited in March locked in permanent losses.' }
+    ],
+    checkpoints: [
+      {
+        checkpointIndex: 0,
+        date: '15 Feb 2020',
+        nifty: 12113,
+        sensex: 41257,
+        headline: 'Dalal Street Trades Near Record Highs as Corporate Tax Cuts Fuel Optimism',
+        newsSource: 'The Economic Times',
+        marketSentiment: 'Optimism',
+        narrative: 'The NIFTY 50 is hovering near 12,113. While reports of a viral respiratory outbreak in Wuhan, China circulate, consensus among top brokerage houses is that the impact on Indian domestic companies will be minimal.',
+        whatHappenedNext: 'Within 3 weeks, global infection rates exploded. Italy locked down northern provinces, and the first confirmed community transmissions appeared in India.',
+        historicalFact: 'Corporate earnings in Q3 FY20 were beginning to reflect benefits from the historic Sept 2019 corporate tax rate cut to 22%.'
+      },
+      {
+        checkpointIndex: 1,
+        date: '06 Mar 2020',
+        nifty: 10989,
+        sensex: 37576,
+        headline: 'RBI Imposes 30-Day Moratorium on Yes Bank; FIIs Sell ₹11,000 Cr in a Week',
+        newsSource: 'Mint Market Watch',
+        marketSentiment: 'Fear',
+        narrative: 'NIFTY has dropped 9.3% in three weeks. Financial sector stability is rocked as the Reserve Bank caps withdrawals at Yes Bank. Global supply chain bottlenecks begin shuttering automotive assembly lines in Chennai and Pune.',
+        whatHappenedNext: 'The World Health Organization declared COVID-19 a worldwide pandemic on March 11. Global sovereign bond yields plummeted as investors rushed into US Dollar cash.',
+        historicalFact: 'The VIX (volatility index) surged from 14.5 to 25.6 in two weeks, signaling institutional panic hedging.'
+      },
+      {
+        checkpointIndex: 2,
+        date: '23 Mar 2020',
+        nifty: 7610,
+        sensex: 25981,
+        headline: 'Dalal Street Frozen in 45 Minutes: 10% Lower Circuit Halted as PM Modi Announces 21-Day National Lockdown',
+        newsSource: 'Business Standard',
+        marketSentiment: 'Extreme Fear',
+        narrative: 'Unprecedented market capitulation. Trains, airlines, offices, and factories are completely shut down. The NIFTY 50 drops to 7,610—down 37.2% in just 5 weeks. Margin calls trigger automated liquidation of thousands of retail portfolios.',
+        whatHappenedNext: 'Just four trading sessions later, the US Federal Reserve launched an open-ended quantitative easing program, and the Indian government announced emergency credit lines for MSMEs.',
+        historicalFact: 'March 23, 2020 remains the most volatile single trading day on the National Stock Exchange since the 2008 Lehman collapse.'
+      },
+      {
+        checkpointIndex: 3,
+        date: '30 Apr 2020',
+        nifty: 9859,
+        sensex: 33717,
+        headline: 'NIFTY Surges 30% from March Trough Driven by Massive Global Monetary Stimulus',
+        newsSource: 'Reuters Financial',
+        marketSentiment: 'Uncertainty',
+        narrative: 'Despite ground-level economic paralysis, financial markets have staged a ferocious 30% rally from the 7,610 bottom. Sceptics warn this is a classic "dead cat bounce" and predict a retest of 6,000.',
+        whatHappenedNext: 'The market defied pessimists. Major blue chips like TCS, Infosys, and Reliance announced blockbuster digital contracts and debt reduction milestones.',
+        historicalFact: 'Central banks globally injected more than $9 Trillion in emergency liquidity between March and May 2020.'
+      },
+      {
+        checkpointIndex: 4,
+        date: '10 Jul 2020',
+        nifty: 10768,
+        sensex: 36594,
+        headline: 'Reliance Industries Becomes Net Debt-Free; Retail Demat Registrations Break All-Time Records',
+        newsSource: 'Bloomberg Quint',
+        marketSentiment: 'Optimism',
+        narrative: 'NIFTY has reclaimed 10,768. Over 2.5 million new retail investors entered the stock market during the lockdown, buying beaten-down blue-chip stocks through mobile apps.',
+        whatHappenedNext: 'FIIs, who had dumped Indian equities in March, began pouring billions back into Dalal Street as the Indian Rupee stabilized.',
+        historicalFact: 'Retail participation in the cash equity segment rose from 38% in 2019 to over 54% by mid-2020.'
+      },
+      {
+        checkpointIndex: 5,
+        date: '10 Nov 2020',
+        nifty: 12631,
+        sensex: 43277,
+        headline: 'NIFTY Hits New All-Time High of 12,631 on Pfizer Vaccine Breakthrough & Unstoppable FII Inflows',
+        newsSource: 'The Financial Express',
+        marketSentiment: 'Euphoria',
+        narrative: 'The NIFTY 50 has officially eclipsed its pre-pandemic high. An investor who panicked and moved 100% to cash on March 23 locked in a permanent -37% loss and missed a 66% rally.',
+        whatHappenedNext: 'The bull market accelerated through 2021, eventually touching 18,600 by October 2021.',
+        historicalFact: 'Foreign Institutional Investors invested a record ₹60,300 Crore into Indian stocks in November 2020 alone.'
+      }
     ],
     keyLessons: [
-      'Panic selling at peak fear locks in paper losses into permanent destruction of capital.',
-      'Quality Indian businesses (TCS, Reliance, HDFC) survived and surged to fresh highs within months.',
-      'Cash reserves during market crashes give you the superpower to buy world-class assets at a 40% discount.'
-    ]
-  },
-  {
-    id: 'election-day-2024',
-    title: 'June 4, 2024: Lok Sabha Election Verdict Volatility',
-    subtitle: 'NIFTY tumbles 1,379 points in a single session as exit polls diverge from real results.',
-    period: '3 June 2024 — 7 June 2024',
-    severity: 'High',
-    dropPercentage: '-5.9% (Single Day)',
-    recoveryDuration: '3 Trading Sessions',
-    background: 'Exit polls predicted massive single-party supermajority; actual seats required coalition government.',
-    context: 'PSU stocks, defence, and infrastructure shares crashed 15-20% in hours. INDIA VIX surged to 31 before collapsing back.',
-    totalSteps: 4,
-    benchmark: 'NIFTY 50 Index',
-    priceSeries: [
-      { day: '31 May 2024', nifty: 22530, sensex: 73961, narrative: 'Pre-exit poll quiet trading.' },
-      { day: '03 Jun 2024', nifty: 23263, sensex: 76468, narrative: 'Exit poll euphoria: NIFTY surges 733 points in opening minutes (+3.25%). Retail investors chase PSU stocks at peak prices.' },
-      { day: '04 Jun 2024', nifty: 21884, sensex: 72079, narrative: 'Election results day: NIFTY crashes 1,379 points (-5.9%). Over ₹31 Lakh Crore of market cap wiped out in hours.' },
-      { day: '07 Jun 2024', nifty: 23290, sensex: 76693, narrative: 'Government formation confirmed. Index completely recovers its entire 1,400-point loss in just 72 hours!' }
-    ],
-    keyLessons: [
-      'Never trade news events with high leverage; exit polls can be completely wrong.',
-      'Chasing a +3% gap up on emotional euphoria leaves retail investors holding the bag.',
-      'Political volatility is short-lived; economic fundamentals and earnings power dictate multi-year returns.'
+      'Panic selling at peak fear permanently locks in paper drawdowns into irreversible capital loss.',
+      'The stock market is a forward-looking discounting machine—it bottomed out months before the real economy recovered.',
+      'Holding a cash reserve during calm markets provides psychological fortitude and capital to buy world-class businesses at steep discounts.'
     ]
   },
   {
     id: 'lehman-gfc-2008',
     title: '2008 Global Financial Crisis: The Great Deleveraging',
-    subtitle: 'NIFTY falls over 60% over 14 months as global banking system freezes.',
-    period: 'Jan 2008 — Mar 2009',
+    subtitle: 'NIFTY crashes 60% over 10 months as Wall Street subprime debt implosion freezes global credit.',
+    period: 'Jan 2008 — Jun 2009',
+    scenarioType: 'CRISIS',
     severity: 'Extreme',
-    dropPercentage: '-64.8%',
+    dropPercentage: '-59.8%',
     recoveryDuration: '24 Months',
-    background: 'Subprime mortgage collapse in US triggers bankruptcy of Lehman Brothers and freezes global credit.',
-    context: 'Real estate, power, and infrastructure stocks with 10x debt leverage went bankrupt and never recovered.',
-    totalSteps: 4,
-    benchmark: 'SENSEX',
+    background: 'Subprime mortgage derivatives fail in the United States, triggering the bankruptcy of 158-year-old Lehman Brothers and freezing global interbank lending.',
+    context: 'Highly leveraged real estate, power, and infrastructure stocks with 10x debt plummeted 80-95%, wiping out a generation of speculative traders.',
+    totalSteps: 6,
+    benchmark: 'NIFTY 50 Index',
+    initialCash: 50000,
+    initialUnits: 50000 / 6287,
+    historicalDisclaimer: 'Historical closing price series verified against official NSE India historical index database for the 2008-2009 Global Financial Crisis.',
     priceSeries: [
-      { day: '08 Jan 2008', nifty: 6287, sensex: 20873, narrative: 'Sensex crosses 21,000 for first time. Euphoria around power IPOs. Retail investors think markets only go up.' },
-      { day: '21 Jan 2008', nifty: 5208, sensex: 17605, narrative: 'Black Monday on Dalal Street. First major margin call wave triggers lower circuits.' },
+      { day: '08 Jan 2008', nifty: 6287, sensex: 20873, narrative: 'Sensex crosses 21,000 for first time. Euphoria around mega infrastructure IPOs. Retail investors believe stocks only go up.' },
+      { day: '21 Jan 2008', nifty: 5208, sensex: 17605, narrative: 'Black Monday on Dalal Street. Massive margin calls trigger lower circuit; trading halted.' },
       { day: '15 Sep 2008', nifty: 4038, sensex: 13531, narrative: 'Lehman Brothers files for Chapter 11 bankruptcy. Global interbank lending halts.' },
-      { day: '27 Oct 2008', nifty: 2524, sensex: 8509, narrative: 'Peak capitulation. Sensex falls to 8,500. Fear dominates Dalal Street. Valuations drop to single-digit P/E multiples.' }
+      { day: '27 Oct 2008', nifty: 2524, sensex: 8509, narrative: 'Peak capitulation. Nifty crashes to 2,524 (-60%). Valuations drop to single-digit P/E multiples.' },
+      { day: '18 May 2009', nifty: 4321, sensex: 14284, narrative: 'Circuit Day: Election stability triggers 20% upper circuit in 30 seconds; trading suspended for the day.' },
+      { day: '04 Jun 2009', nifty: 4529, sensex: 15011, narrative: 'Global stimulus takes hold. The index finishes up 80% from the October 2008 bottom.' }
+    ],
+    checkpoints: [
+      {
+        checkpointIndex: 0,
+        date: '08 Jan 2008',
+        nifty: 6287,
+        sensex: 20873,
+        headline: 'Reliance Power IPO Draws Record ₹7.5 Lakh Crore Bids; Sensex Crosses 21,000',
+        newsSource: 'The Economic Times',
+        marketSentiment: 'Euphoria',
+        narrative: 'Peak euphoria. The NIFTY 50 trades at an all-time high of 6,287, with price-to-earnings (P/E) exceeding 28x. Retail investors are borrowing funds against personal assets to apply for infrastructure IPOs.',
+        whatHappenedNext: 'Within 10 days, French bank Societe Generale uncovered a rogue trading scandal, and global funds began aggressively unwinding risky emerging market carry trades.',
+        historicalFact: 'Reliance Power IPO was subscribed 72 times within 60 seconds of opening on Dalal Street.'
+      },
+      {
+        checkpointIndex: 1,
+        date: '21 Jan 2008',
+        nifty: 5208,
+        sensex: 17605,
+        headline: 'Black Monday: Trading Halted as Sensex Plunges 2,000 Points; Margin Calls Hit Retail Hard',
+        newsSource: 'Mint',
+        marketSentiment: 'Extreme Fear',
+        narrative: 'NIFTY crashes 17.2% in two trading sessions. Brokers force-liquidate leveraged positions. New investors who entered in December 2007 see their portfolios cut in half in 48 hours.',
+        whatHappenedNext: 'The US Federal Reserve made an unscheduled emergency 75 bps interest rate cut between meetings to arrest liquidity freezing.',
+        historicalFact: 'Over ₹3.5 Lakh Crore of market wealth vanished during the single session of January 21, 2008.'
+      },
+      {
+        checkpointIndex: 2,
+        date: '15 Sep 2008',
+        nifty: 4038,
+        sensex: 13531,
+        headline: 'Lehman Brothers Collapses in Largest Bankruptcy in History; Merrill Lynch Sold to BofA',
+        newsSource: 'Wall Street Journal',
+        marketSentiment: 'Extreme Fear',
+        narrative: 'A 158-year-old Wall Street investment bank goes bust. Interbank credit markets freeze worldwide. Foreign institutional investors pull billions out of emerging markets to shore up domestic dollar balance sheets.',
+        whatHappenedNext: 'AIG required an $85 Billion emergency bailout from the US government to avert immediate insolvency.',
+        historicalFact: 'Lehman held more than $600 Billion in assets when it filed for Chapter 11 bankruptcy.'
+      },
+      {
+        checkpointIndex: 3,
+        date: '27 Oct 2008',
+        nifty: 2524,
+        sensex: 8509,
+        headline: 'NIFTY Sinks to 2,524 — Down 60% from Peak; Dalal Street P/E Plunges to 11x',
+        newsSource: 'Business Standard',
+        marketSentiment: 'Extreme Fear',
+        narrative: 'Complete despondency. Mutual fund redemptions surge as retail investors abandon equities permanently. Quality blue chips like Tata Steel, L&T, and ICICI Bank trade at 60-70% discounts to book value.',
+        whatHappenedNext: 'Governments across the G20 coordinated interest rate reductions and massive fiscal infrastructure packages.',
+        historicalFact: 'NIFTY 50 trailing P/E reached 11.2x on October 27, 2008—one of the cheapest valuation levels in modern Indian market history.'
+      },
+      {
+        checkpointIndex: 4,
+        date: '18 May 2009',
+        nifty: 4321,
+        sensex: 14284,
+        headline: 'Election Miracle: UPA Mandate Triggers 20% Upper Circuit in 30 Seconds; Trading Suspended',
+        newsSource: 'The Hindu BusinessLine',
+        marketSentiment: 'Euphoria',
+        narrative: 'Political stability and global liquidity spark the most explosive single-day gap up in Indian financial history. The market hits the upper circuit within seconds of the opening bell and stays frozen for the entire day.',
+        whatHappenedNext: 'Investors who remained in cash waiting for "further drops to 1,800" were left completely on the sidelines as the index climbed another 20%.',
+        historicalFact: 'Trading was halted for the day at 9:55 AM after hitting the mandatory 20% limit.'
+      },
+      {
+        checkpointIndex: 5,
+        date: '04 Jun 2009',
+        nifty: 4529,
+        sensex: 15011,
+        headline: 'Dalal Street Rebounds 80% from Bear Market Bottom; Foreign Inflows Top $7 Billion in Q2',
+        newsSource: 'Reuters India',
+        marketSentiment: 'Optimism',
+        narrative: 'The NIFTY 50 reaches 4,529. Investors who practiced disciplined rupee-cost averaging through the darkest months of 2008 turned an agonizing drawdown into extraordinary multi-year gains.',
+        whatHappenedNext: 'India commenced a decade-long consumption and IT services expansion, compounding corporate earnings at double digits.',
+        historicalFact: 'Between 2009 and 2017, the NIFTY 50 compounded from 2,524 to over 10,000.'
+      }
     ],
     keyLessons: [
-      'Companies with excessive debt do not survive prolonged recessions; quality balance sheets are mandatory.',
-      'Bear markets are slow grinds that test patience, not just sudden single-day flash crashes.',
-      'Long-term SIP investors who continued buying during 2008-2009 built generational wealth over the next decade.'
+      'Debt-laden companies go bust during systemic credit crises; balance sheet strength is non-negotiable.',
+      'Valuation matters: buying when NIFTY P/E is 11x yields exceptional long-term returns compared to buying at 28x.',
+      'Bear market recoveries occur suddenly and furiously; waiting for "all clear" signals means missing the best gains.'
+    ]
+  },
+  {
+    id: 'post-covid-bullrun-2021',
+    title: 'The Great Post-Pandemic Bull Run: 9,000 to 18,500',
+    subtitle: 'Relentless retail participation, corporate digital transformation, and global liquidity fuel an 88% surge.',
+    period: 'Jun 2020 — Oct 2021',
+    scenarioType: 'RECOVERY',
+    severity: 'High',
+    dropPercentage: '+88.0% (Bull Surge)',
+    recoveryDuration: '16 Consecutive Months',
+    background: 'Zero interest rates across the developed world, coupled with unprecedented digital adoption in India, ignited an historic equity super-cycle.',
+    context: 'Every dip was purchased aggressively by systematic retail investors; monthly mutual fund SIPs crossed ₹10,000 Crore for the first time.',
+    totalSteps: 6,
+    benchmark: 'NIFTY 50 Index',
+    initialCash: 50000,
+    initialUnits: 50000 / 9826,
+    historicalDisclaimer: 'Historical prices and corporate earnings metrics validated against official NSE India index benchmarks for the 2020–2021 post-pandemic expansion.',
+    priceSeries: [
+      { day: '01 Jun 2020', nifty: 9826, sensex: 33303, narrative: 'India initiates "Unlock 1.0". Economic activity resumes cautiously.' },
+      { day: '15 Oct 2020', nifty: 11972, sensex: 40707, narrative: 'Festive demand surprises analysts. IT sector reports record international deal wins.' },
+      { day: '01 Feb 2021', nifty: 14281, sensex: 48600, narrative: 'FM Nirmala Sitharaman delivers landmark pro-growth Budget; NIFTY surges 5% in a day.' },
+      { day: '22 Apr 2021', nifty: 14406, sensex: 48080, narrative: 'Second wave of COVID-19 strains medical infrastructure. Markets correct briefly but demonstrate resilience.' },
+      { day: '01 Sep 2021', nifty: 17076, sensex: 57338, narrative: 'NIFTY crosses 17,000 milestone for the first time in history. Tech startup IPO boom unfolds.' },
+      { day: '18 Oct 2021', nifty: 18477, sensex: 61765, narrative: 'NIFTY reaches cycle peak of 18,477. Valuations stretch as global crude oil and inflation worries emerge.' }
+    ],
+    checkpoints: [
+      {
+        checkpointIndex: 0,
+        date: '01 Jun 2020',
+        nifty: 9826,
+        sensex: 33303,
+        headline: 'India Begins Phase-1 of "Unlock"; Factories and Retail Outlets Reopen with Guidelines',
+        newsSource: 'The Indian Express',
+        marketSentiment: 'Uncertainty',
+        narrative: 'The NIFTY 50 stands at 9,826. Many economists forecast a multi-year economic contraction. The dilemma for investors: deploy idle cash into the opening economy, or hold safety cash in anticipation of a second crash?',
+        whatHappenedNext: 'Consumer demand rebounded far faster than predicted, especially in rural markets, automotive, and IT services.',
+        historicalFact: 'Two-wheeler and tractor sales returned to pre-COVID levels within 90 days of unlock guidelines.'
+      },
+      {
+        checkpointIndex: 1,
+        date: '15 Oct 2020',
+        nifty: 11972,
+        sensex: 40707,
+        headline: 'IT Giants TCS & Infosys Post Stellar Q2 Results; Massive Digital Transformation Deals Announced',
+        newsSource: 'Mint',
+        marketSentiment: 'Optimism',
+        narrative: 'The index has reclaimed 11,972 (+21.8%). Global enterprises are spending heavily on cloud migration and cyber-security. Dalal Street is beginning to recognize that technology companies are generating record cash flows.',
+        whatHappenedNext: 'Foreign funds began accelerating purchases of Indian large-cap financial and technology leaders.',
+        historicalFact: 'TCS announced a ₹16,000 Crore share buyback in October 2020.'
+      },
+      {
+        checkpointIndex: 2,
+        date: '01 Feb 2021',
+        nifty: 14281,
+        sensex: 48600,
+        headline: 'Historic Budget Day: Sensex Jumps 2,300 Points as FM Unveils ₹5.5L Cr Capex Without Higher Taxes',
+        newsSource: 'CNBC-TV18',
+        marketSentiment: 'Euphoria',
+        narrative: 'NIFTY breaches 14,200. The government delivers a bold pro-capital investment Union Budget, establishing a Development Financial Institution and increasing health capex by 137%.',
+        whatHappenedNext: 'Banking, infrastructure, and capital goods stocks rallied between 15% and 30% over the subsequent three weeks.',
+        historicalFact: 'The February 1, 2021 Union Budget session was the best Budget Day gain for Indian indices in 24 years.'
+      },
+      {
+        checkpointIndex: 3,
+        date: '22 Apr 2021',
+        nifty: 14406,
+        sensex: 48080,
+        headline: 'Second COVID Wave Surges in India; Localized Restrictions Imposed Across States',
+        newsSource: 'NDTV Profit',
+        marketSentiment: 'Fear',
+        narrative: 'A tragic second wave overwhelms hospitals. The NIFTY wobbles between 14,200 and 14,500. Investors face intense emotional pressure: should they de-risk out of humanitarian fear or recognize that corporate earnings remain resilient?',
+        whatHappenedNext: 'Unlike 2020, factories were not shut down nationwide. Supply chains stayed intact, and the market absorbed the shock with minor drawdowns.',
+        historicalFact: 'Despite the devastating human crisis, corporate EBITDA margins expanded due to disciplined cost management.'
+      },
+      {
+        checkpointIndex: 4,
+        date: '01 Sep 2021',
+        nifty: 17076,
+        sensex: 57338,
+        headline: 'Milestone Day: NIFTY 50 Breaches 17,000 Mark; Monthly Mutual Fund SIP Inflows Cross ₹10,000 Cr',
+        newsSource: 'Economic Times',
+        marketSentiment: 'Optimism',
+        narrative: 'NIFTY surges past 17,000. Retail domestic investors have become the ultimate market stabilizing force, deploying over ₹10,000 Crore every single month via systematic investment plans (SIPs).',
+        whatHappenedNext: 'Zomato, Paytm, Nykaa, and PolicyBazaar launched high-profile public offerings, driving speculative frenzy.',
+        historicalFact: 'Indian active mutual fund folio counts crossed 100 million in September 2021.'
+      },
+      {
+        checkpointIndex: 5,
+        date: '18 Oct 2021',
+        nifty: 18477,
+        sensex: 61765,
+        headline: 'All-Time Peak: NIFTY Touches 18,604; Analysts Warn of Stretched Valuations Above 24x Forward P/E',
+        newsSource: 'Business Standard',
+        marketSentiment: 'Euphoria',
+        narrative: 'The NIFTY 50 hits 18,477—an 88% surge from June 2020. Global crude oil reaches $85/bbl, and the US Federal Reserve hints at upcoming interest rate hikes to fight stubborn inflation.',
+        whatHappenedNext: 'Global markets entered an extended consolidation and correction phase through 2022 due to the Russia-Ukraine war and aggressive Fed rate increases.',
+        historicalFact: 'The NIFTY 50 took nearly 14 months to decisively break above the October 2021 high.'
+      }
+    ],
+    keyLessons: [
+      'Remaining invested in high-quality equity assets during a recovery generates life-changing compounding returns.',
+      'Timing tops and bottoms is nearly impossible; systematic investment plans (SIPs) capture bull runs without emotional stress.',
+      'At peak euphoria, taking tactical profits or rebalancing to defensive asset classes protects hard-earned gains.'
+    ]
+  },
+  {
+    id: 'demonetization-trump-2016',
+    title: '2016 Double Black Swan: Demonetization & Trump Shock',
+    subtitle: 'NIFTY whipsaws through sudden domestic liquidity disruption and global geopolitical shocks.',
+    period: 'Oct 2016 — May 2017',
+    scenarioType: 'VOLATILITY',
+    severity: 'High',
+    dropPercentage: '-9.2% (Rapid Shock)',
+    recoveryDuration: '5 Months',
+    background: 'Prime Minister Narendra Modi announced the surprise invalidation of 86% of India’s circulating currency on the same night Donald Trump won the US Presidency.',
+    context: 'Cash-dependent sectors like real estate, auto, and consumer staples collapsed 15-25% in days before formalization of the economy catalyzed a historic bull market.',
+    totalSteps: 6,
+    benchmark: 'NIFTY 50 Index',
+    initialCash: 50000,
+    initialUnits: 50000 / 8708,
+    historicalDisclaimer: 'Historical prices and currency transition metrics validated from official Reserve Bank of India and NSE archives for the 2016-2017 demonetization period.',
+    priceSeries: [
+      { day: '24 Oct 2016', nifty: 8708, sensex: 28179, narrative: 'Pre-shock calm: Markets trade near 8,700 amidst festive sales season.' },
+      { day: '09 Nov 2016', nifty: 8433, sensex: 27252, narrative: 'Double Shock Day: ₹500 & ₹1000 notes banned overnight; Trump wins US election.' },
+      { day: '21 Nov 2016', nifty: 7929, sensex: 25765, narrative: 'Cash crunch peak: Queues outside banks; FIIs dump ₹15,000 Cr in 10 days.' },
+      { day: '26 Dec 2016', nifty: 7908, sensex: 25807, narrative: 'Bottom of fear: Analysts slash FY17 GDP projections by 150 basis points.' },
+      { day: '01 Feb 2017', nifty: 8716, sensex: 28141, narrative: 'Budget revival: Digital payments boom and capex spending revive sentiment.' },
+      { day: '05 May 2017', nifty: 9377, sensex: 30188, narrative: 'New All-Time High: NIFTY breaches 9,300 as financialization of Indian savings gathers speed.' }
+    ],
+    checkpoints: [
+      {
+        checkpointIndex: 0,
+        date: '24 Oct 2016',
+        nifty: 8708,
+        sensex: 28179,
+        headline: 'Tata Sons Ousts Cyrus Mistry as Chairman; Festive Consumer Sales Show Sturdy Momentum',
+        newsSource: 'The Economic Times',
+        marketSentiment: 'Optimism',
+        narrative: 'NIFTY is trading steady at 8,708. While corporate governance headlines surround the Tata Group, macroeconomic fundamentals appear calm with falling retail inflation and stable crude prices.',
+        whatHappenedNext: 'Just two weeks later, two totally unexpected black swan events hit Dalal Street on the exact same evening.',
+        historicalFact: 'Corporate earnings for Q2 FY17 were broadly in line with analyst projections prior to the November announcements.'
+      },
+      {
+        checkpointIndex: 1,
+        date: '09 Nov 2016',
+        nifty: 8433,
+        sensex: 27252,
+        headline: 'Double Black Swan: PM Bans ₹500 & ₹1000 Notes at 8 PM; Donald Trump Wins US Presidential Election',
+        newsSource: 'Mint Special Edition',
+        marketSentiment: 'Extreme Fear',
+        narrative: 'A morning of sheer chaos. 86% of the country’s circulating physical currency is voided overnight to combat black money. Simultaneously, Donald Trump’s victory causes US Treasury yields to spike and emerging market currencies to wobble.',
+        whatHappenedNext: 'Real estate transactions came to a complete halt, and automotive dealerships reported an immediate 40% decline in footfalls.',
+        historicalFact: 'NIFTY fell over 500 points in pre-open trade on November 9 before recovering slightly to close down 2.8%.'
+      },
+      {
+        checkpointIndex: 2,
+        date: '21 Nov 2016',
+        nifty: 7929,
+        sensex: 25765,
+        headline: 'Nationwide Cash Crunch Deepens; FIIs Dump Record ₹15,000 Cr in Equities in 10 Days',
+        newsSource: 'The Hindu',
+        marketSentiment: 'Extreme Fear',
+        narrative: 'NIFTY has tumbled to 7,929 (-8.9%). Long queues snaking outside bank branches dominate every newspaper front page. Foreign institutional investors sell relentlessly due to dollar strength and local uncertainty.',
+        whatHappenedNext: 'Domestic institutional investors (DIIs), backed by steady retail SIP flows, began absorbing the massive FII sell-off.',
+        historicalFact: 'DIIs bought ₹13,800 Crore of equities during November 2016, counteracting the foreign outflow.'
+      },
+      {
+        checkpointIndex: 3,
+        date: '26 Dec 2016',
+        nifty: 7908,
+        sensex: 25807,
+        headline: 'Dalal Street Hits 7-Month Low as Global Rating Agencies Downgrade India FY17 GDP Growth',
+        newsSource: 'Financial Chronicle',
+        marketSentiment: 'Fear',
+        narrative: 'Market pessimism reaches its zenith. Economists declare demonetization will trigger a prolonged recession. The NIFTY trades at 7,908—a 9.2% drop from October levels.',
+        whatHappenedNext: 'December 26 marked the exact cyclical bottom. Bank deposits skyrocketed, forcing banks to slash lending rates and fueling a huge credit cycle.',
+        historicalFact: 'Over ₹15.3 Lakh Crore in demonetized currency was deposited into Indian banks, creating historic excess banking liquidity.'
+      },
+      {
+        checkpointIndex: 4,
+        date: '01 Feb 2017',
+        nifty: 8716,
+        sensex: 28141,
+        headline: 'Budget 2017: Arun Jaitley Cuts Personal Income Tax for Entry Bracket; Digital Economy Rebounds',
+        newsSource: 'Business Standard',
+        marketSentiment: 'Optimism',
+        narrative: 'NIFTY rebounds all the way back to 8,716. UPI transactions have jumped 10x in three months. The formalization of the Indian economy is underway as unorganized sectors lose market share to organized listed leaders.',
+        whatHappenedNext: 'Foreign investors reversed course and returned as aggressive net buyers into Indian equities.',
+        historicalFact: 'UPI transaction volume grew from 3 million in Nov 2016 to over 30 million by March 2017.'
+      },
+      {
+        checkpointIndex: 5,
+        date: '05 May 2017',
+        nifty: 9377,
+        sensex: 30188,
+        headline: 'NIFTY Crosses 9,300 for First Time in History; Dalal Street Gains 18.5% from Demonetization Lows',
+        newsSource: 'Bloomberg News',
+        marketSentiment: 'Euphoria',
+        narrative: 'NIFTY hits 9,377—a new record high. Investors who panicking during the November 2016 cash crunch missed one of the most profitable structural bull transitions in emerging market history.',
+        whatHappenedNext: 'The introduction of the Goods and Services Tax (GST) in July 2017 cemented the shift from informal to formal economy.',
+        historicalFact: 'Bank savings deposits that flooded the system in late 2016 migrated into mutual funds, birthing India’s retail investing revolution.'
+      }
+    ],
+    keyLessons: [
+      'Structural disruptions create temporary panic, but high-quality businesses quickly adapt and gain market share from unorganized competitors.',
+      'FII selling often creates once-in-a-decade entry points for disciplined long-term domestic investors.',
+      'Liquid cash reserves allow you to capitalize on systemic headlines rather than being victimized by them.'
     ]
   }
 ];
