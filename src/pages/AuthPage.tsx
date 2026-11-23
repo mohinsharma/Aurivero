@@ -37,7 +37,7 @@ export const AuthPage: React.FC = () => {
               </svg>
             </div>
             <span className="font-extrabold text-2xl font-mono tracking-wider text-text-primary">
-              BULLSEYE
+              MINDMARK
             </span>
           </Link>
           <p className="text-xs text-text-secondary font-mono">

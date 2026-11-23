@@ -96,7 +96,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
                       <circle cx="12" cy="12" r="2" />
                     </svg>
                   </div>
-                  <span className="font-mono font-bold text-text-primary tracking-wider">BULLSEYE</span>
+                  <span className="font-mono font-bold text-text-primary tracking-wider">MINDMARK</span>
                 </div>
                 <button
                   onClick={onCloseMenu}

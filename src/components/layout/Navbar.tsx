@@ -94,10 +94,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
                   <span className="font-extrabold text-lg tracking-wider text-text-primary font-mono group-hover:text-primary transition-colors">
-                    BULLSEYE
+                    MINDMARK
                   </span>
                   <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">
-                    AI SIM
+                    SIMULATOR
                   </span>
                 </div>
                 <span className="text-[10px] text-text-muted hidden sm:inline -mt-0.5">
