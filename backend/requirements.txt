@@ -1,8 +1,23 @@
-fastapi>=0.110.0
-uvicorn>=0.28.0
-pydantic>=2.7.0
-pydantic-settings>=2.2.0
-pyjwt>=2.8.0
-httpx>=0.27.0
-google-generativeai>=0.4.0
-python-dotenv>=1.0.0
+# ==============================================================================
+# MINDMARK Backend Dependencies (Python)
+# ==============================================================================
+
+# Core Web Framework & Server
+fastapi>=0.110.0            # Async REST API framework for high-throughput endpoints
+uvicorn>=0.28.0             # Lightning-fast ASGI web server implementation
+
+# Data Validation & Typed Settings
+pydantic>=2.7.0             # Strict data schemas, serialization, and type validation
+pydantic-settings>=2.2.0    # Environment variable parsing and typed application settings
+
+# Authentication & Security
+pyjwt>=2.8.0                # JSON Web Tokens (JWT) for secure user session management
+
+# HTTP Client & External Integrations
+httpx>=0.27.0               # Async HTTP client for Supabase REST queries & market feeds
+
+# Artificial Intelligence
+google-generativeai>=0.4.0  # Official Google Gemini 1.5 Flash SDK (with deterministic fallback)
+
+# Configuration Management
+python-dotenv>=1.0.0        # Automatic loading of .env environment files

@@ -1,5 +1,137 @@
-# Logs
-logs
+# ==============================================================================
+# MINDMARK (BULLSEYE) — .gitignore
+# AI-Powered Financial Market Learning & Paper Trading Platform
+# ==============================================================================
+#
+# ==============================================================================
+# 📦 REQUIRED DEPENDENCIES TO RUN THIS PROJECT
+# ==============================================================================
+# The files and directories ignored below (such as node_modules/, venv/, dist/,
+# and .env) must NOT be committed to git. Instead, install them as follows:
+#
+# 1. SYSTEM PREREQUISITES:
+#    - Node.js: >= 18.0.0 (Recommended: v20.x or v22.x LTS)
+#    - npm: >= 9.0.0 (or yarn / pnpm)
+#    - Python: >= 3.10 (Tested on Python 3.10 - 3.14)
+#    - pip: Python package installer
+#
+# 2. FRONTEND DEPENDENCIES (Installed via: `npm install`):
+#    Production:
+#      - react (^18.3.1): Core UI library
+#      - react-dom (^18.3.1): DOM rendering for React
+#      - react-router-dom (^6.28.0): Client-side routing and page navigation
+#      - lucide-react (^1.16.0): Modern fintech & trading icon suite
+#      - clsx (^2.1.1): Utility for conditional class names
+#      - tailwind-merge (^2.5.5): Utility to merge Tailwind CSS classes safely
+#    Development:
+#      - vite (^6.0.1): Next-generation frontend build tool and dev server
+#      - typescript (^5.6.3): Type safety across components and services
+#      - @vitejs/plugin-react (^4.3.4): React Fast Refresh plugin for Vite
+#      - tailwindcss (^3.4.16): Utility-first CSS framework
+#      - postcss (^8.4.49): CSS transformations
+#      - autoprefixer (^10.4.20): Vendor prefixes for CSS rules
+#      - jsdom (^29.1.1) & @types/jsdom (^30.0.0): Headless DOM emulation
+#      - @types/react (^18.3.12) & @types/react-dom (^18.3.1): TypeScript definitions
+#
+# 3. BACKEND DEPENDENCIES (Installed via: `pip install -r backend/requirements.txt`):
+#    - fastapi (>=0.110.0): High-performance async REST API framework
+#    - uvicorn (>=0.28.0): Lightning-fast ASGI web server implementation
+#    - pydantic (>=2.7.0): Data validation and parsing using Python type hints
+#    - pydantic-settings (>=2.2.0): Typed configuration and environment management
+#    - pyjwt (>=2.8.0): JWT token generation, encoding, and authentication
+#    - httpx (>=0.27.0): Async HTTP client for external APIs & market feeds
+#    - google-generativeai (>=0.4.0): Google Gemini 1.5 Flash AI integration
+#    - python-dotenv (>=1.0.0): Load environment variables from .env files
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. DEPENDENCY DIRECTORIES (Do NOT commit — restore with npm install / pip install)
+# ------------------------------------------------------------------------------
+node_modules/
+jspm_packages/
+web_modules/
+.npm/
+.yarn/
+.pnp
+.pnp.js
+
+# Python Virtual Environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 2. BUILD ARTIFACTS & COMPILED OUTPUT (Generated via build scripts)
+# ------------------------------------------------------------------------------
+# Frontend Vite / React outputs
+dist/
+dist-ssr/
+build/
+.output/
+
+# Python Bytecode & Packaging artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ------------------------------------------------------------------------------
+# 3. ENVIRONMENT & SECRETS (Keep secret credentials and API keys local)
+# ------------------------------------------------------------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+*.env
+!*.env.example
+
+# ------------------------------------------------------------------------------
+# 4. DATABASE & LOCAL STORAGE (Generated at runtime)
+# ------------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+mindmark.db
+backend/mindmark.db
+
+# ------------------------------------------------------------------------------
+# 5. TESTING & CODE COVERAGE
+# ------------------------------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.nyc_output/
+coverage/
+
+# ------------------------------------------------------------------------------
+# 6. LOGS & RUNTIME DIAGNOSTICS
+# ------------------------------------------------------------------------------
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,19 +139,31 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
+# ------------------------------------------------------------------------------
+# 7. IDE & EDITOR SETTINGS
+# ------------------------------------------------------------------------------
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json
+.idea/
+*.sublime-project
+*.sublime-workspace
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-mindmark.db
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# 8. OPERATING SYSTEM ARTIFACTS
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
