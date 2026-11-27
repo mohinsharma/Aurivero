@@ -41,6 +41,7 @@ interface LazySectionProps {
   subtitle: string;
   fullRoute: string;
   fullLabel: string;
+  quickLinks?: Array<{ label: string; to: string }>;
   forceMount?: boolean;
   children: React.ReactNode;
 }
@@ -58,6 +59,7 @@ const LazySectionWrapper: React.FC<LazySectionProps> = ({
   subtitle,
   fullRoute,
   fullLabel,
+  quickLinks = [],
   forceMount = false,
   children,
 }) => {
@@ -97,13 +99,24 @@ const LazySectionWrapper: React.FC<LazySectionProps> = ({
           </h2>
           <p className="text-xs sm:text-sm text-text-secondary mt-0.5">{subtitle}</p>
         </div>
-        <Link
-          to={fullRoute}
-          className="inline-flex items-center gap-1 text-xs font-mono text-gold hover:text-gold-hover shrink-0"
-        >
-          <span>{fullLabel}</span>
-          <ArrowUpRight size={13} />
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {quickLinks.map((ql) => (
+            <Link
+              key={ql.to}
+              to={ql.to}
+              className="px-2.5 py-1 rounded-lg bg-surface-elevated border border-border hover:border-gold/40 text-[11px] font-mono text-text-secondary hover:text-text-primary transition-colors"
+            >
+              {ql.label}
+            </Link>
+          ))}
+          <Link
+            to={fullRoute}
+            className="inline-flex items-center gap-1 text-xs font-mono text-gold hover:text-gold-hover ml-1"
+          >
+            <span>{fullLabel}</span>
+            <ArrowUpRight size={13} />
+          </Link>
+        </div>
       </div>
 
       {hasEntered ? (
@@ -172,10 +185,23 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
     return () => observer.disconnect();
   }, [isAdminUser]);
 
+  // Support deep links via #section-* hash
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && hash.startsWith('section-')) {
+      setForcedSections((prev) => ({ ...prev, [hash]: true }));
+      setActiveSection(hash);
+      window.setTimeout(() => {
+        document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, []);
+
   const scrollToSection = (id: string) => {
     setForcedSections((prev) => ({ ...prev, [id]: true }));
     setActiveSection(id);
     programmaticScrollRef.current = true;
+    window.history.replaceState(null, '', `#${id}`);
     window.setTimeout(() => {
       const el = document.getElementById(id);
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -227,6 +253,12 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
         subtitle="Indian equities (NSE/BSE), global crypto, forex, heatmaps, and multi-factor screeners."
         fullRoute="/markets"
         fullLabel="Open Full Markets"
+        quickLinks={[
+          { label: 'Heatmap', to: '/markets/heatmap' },
+          { label: 'Screener', to: '/markets/screener' },
+          { label: 'Pro Charting', to: '/markets/terminal' },
+          { label: 'Crypto & FX', to: '/market-intelligence' },
+        ]}
         forceMount={Boolean(forcedSections['section-market'])}
       >
         <MarketsPage />
@@ -239,6 +271,10 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
         subtitle="Learning Overview, Scenario Lab, Daily Training, and Weekly Process Reports."
         fullRoute="/learning"
         fullLabel="Open Full Learning Studio"
+        quickLinks={[
+          { label: 'Visual Diagrams', to: '/learn' },
+          { label: 'Academy', to: '/academy' },
+        ]}
         forceMount={Boolean(forcedSections['section-learning'])}
       >
         <LearningHubPage />
@@ -251,6 +287,10 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
         subtitle="Correlated portfolio VaR/CVaR, N×N correlation matrix, ML volatility, and stress testing."
         fullRoute="/markets/risk"
         fullLabel="Open Full Risk & ML Lab"
+        quickLinks={[
+          { label: 'Portfolio Analytics', to: '/portfolio' },
+          { label: 'Behavioral Insights', to: '/behavioral-insights' },
+        ]}
         forceMount={Boolean(forcedSections['section-risk'])}
       >
         <RiskCalculatorPage />
@@ -263,6 +303,10 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
         subtitle="Order placement, position sizing, stop-loss controls, and order history."
         fullRoute="/simulator"
         fullLabel="Open Full Simulator"
+        quickLinks={[
+          { label: 'Watchlists', to: '/markets/watchlists' },
+          { label: 'Portfolio', to: '/portfolio' },
+        ]}
         forceMount={Boolean(forcedSections['section-trading'])}
       >
         <SimulatorPage />
