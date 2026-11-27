@@ -375,6 +375,12 @@ class ApiClient {
     getSession: () => this.request<any>('/api/markets/session'),
     getFundamentals: (symbol: string) =>
       this.request<any>(`/api/markets/fundamentals/${encodeURIComponent(symbol)}`),
+    getRiskAnalytics: (assetClass: string, symbol: string, confidence = 0.95, lookbackDays = 252) =>
+      this.request<any>(
+        `/api/markets/risk/analytics/${assetClass}/${encodeURIComponent(symbol)}?confidence=${confidence}&lookback_days=${lookbackDays}`
+      ),
+    getMlRisk: (assetClass: string, symbol: string) =>
+      this.request<any>(`/api/markets/risk/ml/${assetClass}/${encodeURIComponent(symbol)}`),
     getScreener: (params?: Record<string, string | number | undefined>) => {
       const sp = new URLSearchParams();
       if (params) {

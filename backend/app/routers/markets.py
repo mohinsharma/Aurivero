@@ -21,6 +21,8 @@ from backend.app.services.providers import (
 from backend.app.services.providers.cache_and_limiter import api_rate_limiter
 from backend.app.services.heatmap_service import get_stocks_heatmap
 from backend.app.services.screener_service import run_stock_screener
+from backend.app.services.risk_analytics_service import compute_historical_risk_analytics
+from backend.app.services.ml_risk_service import evaluate_ml_risk_intelligence
 from backend.app.services.providers.indian_vendors import bharatstock_adapter, tejhq_adapter
 from backend.app.services.providers.stocks_provider import get_indian_market_session_details
 from backend.app.services.stream_manager import stream_manager
@@ -300,6 +302,37 @@ async def get_stock_screener(
 async def get_stock_fundamentals(request: Request, symbol: str):
     _enforce_rate_limit(request, "fundamentals")
     data = await bharatstock_adapter.get_fundamentals(symbol)
+    return StandardAPIResponse(success=True, data=data)
+
+
+@router.get("/risk/analytics/{asset_class}/{symbol}", response_model=StandardAPIResponse)
+async def get_risk_analytics(
+    request: Request,
+    asset_class: str,
+    symbol: str,
+    confidence: float = Query(0.95, ge=0.80, le=0.99),
+    lookback_days: int = Query(252, ge=30, le=500),
+):
+    _enforce_rate_limit(request, "risk_analytics")
+    try:
+        data = await compute_historical_risk_analytics(
+            asset_class=asset_class,
+            symbol=symbol,
+            confidence=confidence,
+            lookback_days=lookback_days,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return StandardAPIResponse(success=True, data=data)
+
+
+@router.get("/risk/ml/{asset_class}/{symbol}", response_model=StandardAPIResponse)
+async def get_ml_risk_insights(request: Request, asset_class: str, symbol: str):
+    _enforce_rate_limit(request, "risk_ml")
+    try:
+        data = await evaluate_ml_risk_intelligence(asset_class=asset_class, symbol=symbol)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     return StandardAPIResponse(success=True, data=data)
 
 

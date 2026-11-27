@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SimulatorProvider } from './context/SimulatorContext';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -23,18 +23,21 @@ import { PersonalHubPage } from './pages/PersonalHubPage';
 import { AdminPage } from './pages/AdminPage';
 import { MarketsPage } from './pages/MarketsPage';
 import { InstrumentDetailPage } from './pages/InstrumentDetailPage';
-import { HeatmapPage } from './pages/HeatmapPage';
-import { ChartTerminalPage } from './pages/ChartTerminalPage';
-import { ScreenerPage } from './pages/ScreenerPage';
-import { FinancialNewsPage } from './pages/FinancialNewsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+
+const HeatmapPage = lazy(() => import('./pages/HeatmapPage').then((m) => ({ default: m.HeatmapPage })));
+const ChartTerminalPage = lazy(() => import('./pages/ChartTerminalPage').then((m) => ({ default: m.ChartTerminalPage })));
+const ScreenerPage = lazy(() => import('./pages/ScreenerPage').then((m) => ({ default: m.ScreenerPage })));
+const FinancialNewsPage = lazy(() => import('./pages/FinancialNewsPage').then((m) => ({ default: m.FinancialNewsPage })));
+const RiskCalculatorPage = lazy(() => import('./pages/RiskCalculatorPage').then((m) => ({ default: m.RiskCalculatorPage })));
 
 export const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <SimulatorProvider>
         <BrowserRouter>
-          <Routes>
+          <Suspense fallback={<div className="p-8 text-xs font-mono text-text-muted">Loading module...</div>}>
+            <Routes>
             {/* Public / Fullscreen standalone routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<AuthPage />} />
@@ -57,6 +60,7 @@ export const App: React.FC = () => {
               <Route path="/markets/terminal" element={<ChartTerminalPage />} />
               <Route path="/markets/screener" element={<ScreenerPage />} />
               <Route path="/markets/news" element={<FinancialNewsPage />} />
+              <Route path="/markets/risk" element={<RiskCalculatorPage />} />
               <Route path="/markets/:tab" element={<MarketsPage />} />
               <Route path="/markets/:assetClass/:symbol" element={<InstrumentDetailPage />} />
 
@@ -73,7 +77,8 @@ export const App: React.FC = () => {
 
             {/* Catch-all */}
             <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </SimulatorProvider>
     </ErrorBoundary>

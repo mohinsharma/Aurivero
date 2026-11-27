@@ -31,18 +31,19 @@ export const Sidebar: React.FC = () => {
 
   const primaryNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Markets', path: '/markets', icon: Coins, badge: 'NEW' },
+    { name: 'Markets Hub', path: '/markets', icon: Coins, badge: 'LIVE' },
     { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: Sparkles, badge: 'MAP' },
     { name: 'Market Screener', path: '/markets/screener', icon: Compass, badge: 'FILTER' },
-    { name: 'Financial News', path: '/markets/news', icon: Newspaper, badge: 'RSS' },
     { name: 'Pro Charting', path: '/markets/terminal', icon: CandlestickChart, badge: 'PRO' },
-    { name: 'Paper Simulator', path: '/simulator', icon: CandlestickChart, badge: 'LIVE' },
+    { name: 'Risk & ML Lab', path: '/markets/risk', icon: ShieldCheck, badge: 'RISK' },
+    { name: 'Paper Simulator', path: '/simulator', icon: CandlestickChart },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
   ];
 
   const intelligenceNavItems = [
-    { name: 'Market Intelligence', path: '/market-intelligence', icon: Coins, badge: 'CRYPTO/FX' },
-    { name: 'Hot Topics & News', path: '/hot-topics', icon: Flame, badge: 'LIVE' },
+    { name: 'Financial News', path: '/markets/news', icon: Newspaper, badge: 'RSS' },
+    { name: 'Crypto & FX Hub', path: '/market-intelligence', icon: Coins },
+    { name: 'Hot Topics & News', path: '/hot-topics', icon: Flame },
     { name: 'Community Forums', path: '/forums', icon: MessageSquare, badge: 'ACTIVE' },
   ];
 

@@ -22,6 +22,8 @@ import {
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { FreshnessBadge } from '../components/markets/FreshnessBadge';
+import { InstrumentSearchInput } from '../components/markets/InstrumentSearchInput';
+import { IstMarketClock } from '../components/markets/IstMarketClock';
 import { WatchlistPanel } from '../components/markets/WatchlistPanel';
 import { formatCompactNumber, formatInstrumentPrice } from '../components/markets/formatters';
 
@@ -46,11 +48,6 @@ export const MarketsPage: React.FC = () => {
   const [directoryItems, setDirectoryItems] = useState<NormalizedQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Global search
-  const [globalQuery, setGlobalQuery] = useState('');
-  const [globalResults, setGlobalResults] = useState<InstrumentMeta[]>([]);
-  const [searchingGlobal, setSearchingGlobal] = useState(false);
 
   // Tab-specific filter
   const [dirSearch, setDirSearch] = useState('');
@@ -112,24 +109,6 @@ export const MarketsPage: React.FC = () => {
       setLoading(false);
     }
   }, [activeTab, dirSearch, exchangeFilter, loadOverview, loadDirectory]);
-
-  // Debounced global search
-  useEffect(() => {
-    const q = globalQuery.trim();
-    if (!q) {
-      setGlobalResults([]);
-      return;
-    }
-    const timer = window.setTimeout(async () => {
-      setSearchingGlobal(true);
-      const res = await api.markets.search(q, undefined, 8);
-      if (res.success && res.data?.results) {
-        setGlobalResults(res.data.results);
-      }
-      setSearchingGlobal(false);
-    }, 220);
-    return () => window.clearTimeout(timer);
-  }, [globalQuery]);
 
   const renderQuoteCard = (q: NormalizedQuote) => {
     const isUp = (q.changePercent ?? 0) >= 0;
@@ -230,47 +209,13 @@ export const MarketsPage: React.FC = () => {
           </Button>
         </div>
 
-        {/* Global Search Bar */}
-        <div className="relative max-w-2xl">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-          <input
-            type="text"
-            value={globalQuery}
-            onChange={(e) => setGlobalQuery(e.target.value)}
-            placeholder="Search any Indian stock (RELIANCE, NIFTY 50), crypto (BTC, SOL), or forex pair (USD/INR)..."
-            className="w-full bg-background/80 border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary"
+        {/* Shared Global Search Bar & IST Clock */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <InstrumentSearchInput
+            className="w-full max-w-2xl"
+            onSelect={(item) => openInstrument(item.assetClass, item.symbol)}
           />
-
-          {globalQuery.trim() && (
-            <div className="absolute left-0 right-0 mt-2 rounded-xl border border-border bg-surface-elevated shadow-2xl z-30 max-h-80 overflow-y-auto divide-y divide-border/50">
-              {searchingGlobal ? (
-                <div className="p-4 text-xs text-text-muted font-mono">Searching instruments...</div>
-              ) : globalResults.length === 0 ? (
-                <div className="p-4 text-xs text-text-muted">No matching instruments found.</div>
-              ) : (
-                globalResults.map((item) => (
-                  <button
-                    key={`${item.assetClass}-${item.symbol}`}
-                    onClick={() => {
-                      setGlobalQuery('');
-                      openInstrument(item.assetClass, item.symbol);
-                    }}
-                    className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-surface text-left transition-colors"
-                  >
-                    <div>
-                      <div className="font-mono font-bold text-xs text-text-primary">
-                        {item.displaySymbol}
-                      </div>
-                      <div className="text-[11px] text-text-muted">{item.name}</div>
-                    </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-background border border-border text-text-secondary">
-                      {item.assetClass} • {item.exchange}
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          )}
+          <IstMarketClock compact />
         </div>
 
         {/* Navigation Tabs */}

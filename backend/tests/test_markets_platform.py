@@ -399,3 +399,24 @@ def test_real_financial_news_rss_and_instrument_matching():
     inst = client.get("/api/financial-news/instrument/STOCK/RELIANCE?name=Reliance%20Industries")
     assert inst.status_code == 200
     assert isinstance(inst.json()["data"]["articles"], list)
+
+
+def test_historical_risk_analytics_and_ml_walk_forward():
+    ra = client.get("/api/markets/risk/analytics/STOCK/RELIANCE?confidence=0.95&lookback_days=252")
+    assert ra.status_code == 200
+    rdata = ra.json()["data"]
+    assert rdata["available"] is True
+    assert rdata["historicalVolatilityPct"] > 0
+    assert rdata["atr14"] > 0
+    assert rdata["maxDrawdownPct"] >= 0
+    assert rdata["var"]["dailyCvarPct"] >= rdata["var"]["dailyVarPct"]
+
+    ml = client.get("/api/markets/risk/ml/CRYPTO/BTCUSDT")
+    assert ml.status_code == 200
+    mdata = ml.json()["data"]
+    assert mdata["available"] is True
+    assert mdata["volatilityRegime"] in ("LOW", "MODERATE", "HIGH")
+    assert mdata["evaluation"]["trainSamples"] > 0
+    assert mdata["evaluation"]["testSamples"] > 0
+    assert mdata["evaluation"]["modelMaePct"] >= 0
+    assert mdata["evaluation"]["baselineMaePct"] >= 0
