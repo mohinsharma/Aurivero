@@ -118,32 +118,32 @@ export const MyProgressPage: React.FC = () => {
       )}
 
       {/* Header & Level Card */}
-      <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-white/10 p-8 space-y-6">
+      <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-border p-8 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#45D6B5]/15 text-[#45D6B5] text-xs font-semibold">
               <Trophy className="w-3.5 h-3.5" /> MY PROGRESS • REWARD BETTER DECISIONS
             </div>
-            <h1 className="text-3xl font-extrabold text-white">
+            <h1 className="text-3xl font-extrabold text-text-primary">
               Level {lvl.current_level || 1}: {lvl.level_title || 'Beginner'}
             </h1>
             <p className="text-sm text-slate-300 max-w-2xl">{profile?.coach_summary}</p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 shrink-0">
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Total XP</div>
               <div className="text-2xl font-bold text-[#45D6B5]">{lvl.total_xp || 0}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Learning Streak</div>
               <div className="text-2xl font-bold text-amber-400 flex items-center gap-1">
                 <Flame className="w-5 h-5" /> {streak.current_streak || 0}d
               </div>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Badges</div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-text-primary">
                 {badgesData.unlocked_count || 0}/{badgesData.total_count || 0}
               </div>
             </div>
@@ -156,7 +156,7 @@ export const MyProgressPage: React.FC = () => {
             <span>Progress to Level {lvl.next_level} ({lvl.next_level_title})</span>
             <span>{lvl.progress_pct || 0}% • {lvl.xp_needed_for_next || 0} XP needed</span>
           </div>
-          <div className="h-3 rounded-full bg-[#0B1017] overflow-hidden border border-white/10">
+          <div className="h-3 rounded-full bg-background overflow-hidden border border-border">
             <div
               className="h-full bg-gradient-to-r from-[#45D6B5] to-[#78A9FF] transition-all duration-500"
               style={{ width: `${lvl.progress_pct || 0}%` }}
@@ -166,7 +166,7 @@ export const MyProgressPage: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
+      <div className="flex flex-wrap gap-2 border-b border-border pb-3">
         {[
           { id: 'overview', label: 'Missions, Streak & Season', icon: Calendar },
           { id: 'skill-tree', label: `Skill Tree (${skillTree.completed_count || 0}/${skillTree.total_skills || 0})`, icon: GitBranch },
@@ -181,7 +181,7 @@ export const MyProgressPage: React.FC = () => {
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
                 activeTab === t.id
                   ? 'bg-[#45D6B5] text-[#0B1017]'
-                  : 'bg-[#141C25] text-slate-300 border border-white/10 hover:text-white'
+                  : 'bg-surface text-slate-300 border border-border hover:text-text-primary'
               }`}
             >
               <Icon className="w-4 h-4" /> {t.label}
@@ -195,9 +195,9 @@ export const MyProgressPage: React.FC = () => {
           {/* Recommended Next Skill + Streak + Season */}
           <div className="grid lg:grid-cols-3 gap-5">
             {skillTree.recommended_next_skill && (
-              <div className="p-5 rounded-2xl bg-[#141C25] border border-[#45D6B5]/30 space-y-3">
+              <div className="p-5 rounded-2xl bg-surface border border-[#45D6B5]/30 space-y-3">
                 <div className="text-[11px] font-mono uppercase text-[#45D6B5]">Recommended Next Skill</div>
-                <h3 className="text-base font-bold text-white">{skillTree.recommended_next_skill.name}</h3>
+                <h3 className="text-base font-bold text-text-primary">{skillTree.recommended_next_skill.name}</h3>
                 <p className="text-xs text-slate-300">{skillTree.recommended_next_skill.description}</p>
                 <div className="flex items-center justify-between pt-2">
                   <Link
@@ -218,9 +218,9 @@ export const MyProgressPage: React.FC = () => {
             )}
 
             {/* Learning Streak Calendar */}
-            <div className="p-5 rounded-2xl bg-[#141C25] border border-white/10 space-y-3">
+            <div className="p-5 rounded-2xl bg-surface border border-border space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white uppercase">Weekly Learning Streak</span>
+                <span className="text-xs font-bold text-text-primary uppercase">Weekly Learning Streak</span>
                 <span className="text-xs font-mono text-amber-400">Best: {streak.longest_streak || 0}d</span>
               </div>
               <div className="grid grid-cols-7 gap-1.5">
@@ -230,7 +230,7 @@ export const MyProgressPage: React.FC = () => {
                     className={`p-2 rounded-lg text-center border text-[10px] font-mono ${
                       day.completed
                         ? 'bg-[#45D6B5]/20 border-[#45D6B5]/50 text-[#45D6B5]'
-                        : 'bg-[#0B1017] border-white/10 text-slate-500'
+                        : 'bg-background border-border text-slate-500'
                     }`}
                   >
                     <div>{day.date.slice(5)}</div>
@@ -245,9 +245,9 @@ export const MyProgressPage: React.FC = () => {
 
             {/* Active Season */}
             {activeSeason && (
-              <div className="p-5 rounded-2xl bg-[#141C25] border border-white/10 space-y-3">
+              <div className="p-5 rounded-2xl bg-surface border border-border space-y-3">
                 <div className="text-[11px] font-mono uppercase text-[#78A9FF]">{activeSeason.duration} • ACTIVE SEASON</div>
-                <h3 className="text-base font-bold text-white">{activeSeason.name}</h3>
+                <h3 className="text-base font-bold text-text-primary">{activeSeason.name}</h3>
                 <p className="text-xs text-slate-300">{activeSeason.theme}</p>
                 <div className="text-xs font-mono text-[#45D6B5]">Season XP: {activeSeason.user_season_xp}</div>
                 <p className="text-[11px] text-slate-400">{seasons.reset_policy}</p>
@@ -262,14 +262,14 @@ export const MyProgressPage: React.FC = () => {
               { title: 'Weekly Missions', items: missions.weekly_missions || [] },
             ].map((group) => (
               <div key={group.title} className="space-y-3">
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">{group.title}</h2>
+                <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">{group.title}</h2>
                 <div className="space-y-3">
                   {group.items.map((m: any) => (
-                    <div key={m.id} className="p-4 rounded-2xl bg-[#141C25] border border-white/10 space-y-2">
+                    <div key={m.id} className="p-4 rounded-2xl bg-surface border border-border space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-white">{m.title}</span>
+                            <span className="text-sm font-bold text-text-primary">{m.title}</span>
                             {m.is_personalized && (
                               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#45D6B5]/15 text-[#45D6B5] font-mono">
                                 Personalized
@@ -282,7 +282,7 @@ export const MyProgressPage: React.FC = () => {
                         <span className="text-xs font-mono font-bold text-amber-400 shrink-0">+{m.xp_reward} XP</span>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
                         <span className="text-[11px] text-slate-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {m.difficulty} • {m.status}
                         </span>
@@ -290,7 +290,7 @@ export const MyProgressPage: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleSkipOrDismiss(m.id, 'skip')}
-                              className="p-1.5 rounded-lg bg-[#0B1017] text-slate-400 hover:text-white"
+                              className="p-1.5 rounded-lg bg-background text-slate-400 hover:text-text-primary"
                               title="Skip mission"
                             >
                               <SkipForward className="w-3.5 h-3.5" />
@@ -298,7 +298,7 @@ export const MyProgressPage: React.FC = () => {
                             {m.is_personalized && (
                               <button
                                 onClick={() => handleSkipOrDismiss(m.id, 'dismiss')}
-                                className="p-1.5 rounded-lg bg-[#0B1017] text-slate-400 hover:text-white"
+                                className="p-1.5 rounded-lg bg-background text-slate-400 hover:text-text-primary"
                                 title="Dismiss suggestion"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -326,8 +326,8 @@ export const MyProgressPage: React.FC = () => {
       {activeTab === 'skill-tree' && (
         <div className="grid md:grid-cols-2 gap-6">
           {(skillTree.branches || []).map((b: any) => (
-            <div key={b.branch} className="p-5 rounded-2xl bg-[#141C25] border border-white/10 space-y-4">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <div key={b.branch} className="p-5 rounded-2xl bg-surface border border-border space-y-4">
+              <h2 className="text-base font-bold text-text-primary flex items-center gap-2">
                 <GitBranch className="w-4 h-4 text-[#45D6B5]" /> {b.branch}
               </h2>
               <div className="space-y-3">
@@ -338,13 +338,13 @@ export const MyProgressPage: React.FC = () => {
                       s.status === 'COMPLETED'
                         ? 'bg-[#45D6B5]/10 border-[#45D6B5]/40'
                         : s.status === 'UNLOCKED'
-                        ? 'bg-[#0B1017] border-white/15'
-                        : 'bg-[#0B1017]/50 border-white/5 opacity-70'
+                        ? 'bg-background border-border'
+                        : 'bg-background/50 border-border/50 opacity-70'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="text-sm font-bold text-white flex items-center gap-2">
+                        <div className="text-sm font-bold text-text-primary flex items-center gap-2">
                           {s.status === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 text-[#45D6B5]" />}
                           {s.status === 'LOCKED' && <Lock className="w-4 h-4 text-slate-500" />}
                           {s.name}
@@ -359,7 +359,7 @@ export const MyProgressPage: React.FC = () => {
                       <span className="text-xs font-mono text-[#45D6B5] shrink-0">+{s.xp_reward} XP</span>
                     </div>
 
-                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
                       <Link to={s.route} className="text-xs text-[#78A9FF] hover:underline">
                         {s.activity_label} →
                       </Link>
@@ -388,8 +388,8 @@ export const MyProgressPage: React.FC = () => {
               key={b.badge_id}
               className={`p-5 rounded-2xl border space-y-2 ${
                 b.unlocked
-                  ? 'bg-[#141C25] border-[#45D6B5]/40'
-                  : 'bg-[#141C25]/50 border-white/10 opacity-75'
+                  ? 'bg-surface border-[#45D6B5]/40'
+                  : 'bg-surface/50 border-border opacity-75'
               }`}
             >
               <div className="flex items-center justify-between text-[11px] font-mono">
@@ -398,7 +398,7 @@ export const MyProgressPage: React.FC = () => {
                   {b.unlocked ? 'UNLOCKED' : 'LOCKED'} • {b.rarity}
                 </span>
               </div>
-              <div className="text-base font-bold text-white">{b.name}</div>
+              <div className="text-base font-bold text-text-primary">{b.name}</div>
               <p className="text-xs text-slate-300">{b.description}</p>
               <div className="text-[11px] text-amber-400 pt-1">
                 {b.unlocked ? `Unlocked: ${b.date_unlocked?.slice(0, 10)}` : `How to unlock: ${b.unlock_condition}`}
@@ -409,9 +409,9 @@ export const MyProgressPage: React.FC = () => {
       )}
 
       {activeTab === 'rewards' && (
-        <div className="rounded-2xl bg-[#141C25] border border-white/10 overflow-hidden">
+        <div className="rounded-2xl bg-surface border border-border overflow-hidden">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#0B1017] text-slate-400 uppercase font-mono">
+            <thead className="bg-background text-slate-400 uppercase font-mono">
               <tr>
                 <th className="p-4">Reward</th>
                 <th className="p-4">Activity</th>

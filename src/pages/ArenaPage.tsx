@@ -359,16 +359,16 @@ export const ArenaPage: React.FC = () => {
           <ArrowLeft className="w-4 h-4" /> Back to MINDMARK Arena
         </button>
 
-        <div className="rounded-2xl bg-[#141C25] border border-white/10 p-6 space-y-4">
+        <div className="rounded-2xl bg-surface border border-border p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span className="text-[11px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#45D6B5]/15 text-[#45D6B5]">
                 {ctype.replace('_', ' ')} • {selectedContest.difficulty}
               </span>
-              <h1 className="text-2xl font-bold text-white mt-2">{selectedContest.title}</h1>
+              <h1 className="text-2xl font-bold text-text-primary mt-2">{selectedContest.title}</h1>
               <p className="text-xs text-slate-400 mt-1">{selectedContest.data_source_label}</p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#0B1017] border border-white/10 text-xs font-mono text-slate-200">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-border text-xs font-mono text-slate-200">
               <Timer className="w-4 h-4 text-[#45D6B5]" />
               <span>Elapsed: {contestElapsedSec}s</span>
               {ctype === 'DECISION_PRESSURE' && (
@@ -381,7 +381,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ public_leaderboard_opt_in: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Public Rank: {publicOptIn ? 'Visible' : 'Opted Out'}
               </button>
@@ -392,7 +392,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ share_university: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Share Uni: {shareUni ? 'On' : 'Private'}
               </button>
@@ -408,11 +408,11 @@ export const ArenaPage: React.FC = () => {
         )}
 
         {submitResult ? (
-          <div className="rounded-2xl bg-[#141C25] border border-[#45D6B5]/30 p-6 space-y-5">
+          <div className="rounded-2xl bg-surface border border-[#45D6B5]/30 p-6 space-y-5">
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-6 h-6 text-[#45D6B5]" />
               <div>
-                <h2 className="text-lg font-bold text-white">Official Arena Score Recorded</h2>
+                <h2 className="text-lg font-bold text-text-primary">Official Arena Score Recorded</h2>
                 <p className="text-xs text-slate-400">
                   Evaluated on decision quality, risk discipline, evidence, and consistency.
                 </p>
@@ -420,23 +420,23 @@ export const ArenaPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-[11px] text-slate-400">Decision Score</div>
                 <div className="text-2xl font-bold text-[#45D6B5]">{submitResult.total_score}/100</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-[11px] text-slate-400">Reasoning</div>
-                <div className="text-lg font-semibold text-white">{submitResult.reasoning_score}</div>
+                <div className="text-lg font-semibold text-text-primary">{submitResult.reasoning_score}</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-[11px] text-slate-400">Risk Discipline</div>
-                <div className="text-lg font-semibold text-white">{submitResult.risk_score}</div>
+                <div className="text-lg font-semibold text-text-primary">{submitResult.risk_score}</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-[11px] text-slate-400">Evidence</div>
-                <div className="text-lg font-semibold text-white">{submitResult.evidence_score}</div>
+                <div className="text-lg font-semibold text-text-primary">{submitResult.evidence_score}</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-[11px] text-slate-400">Rewards</div>
                 <div className="text-sm font-semibold text-amber-400">
                   +{submitResult.arena_points_awarded} Pts • +{submitResult.xp_awarded} XP
@@ -445,7 +445,7 @@ export const ArenaPage: React.FC = () => {
             </div>
 
             {duelResult && (
-              <div className="p-4 rounded-xl bg-[#0B1017] border border-white/10 space-y-2">
+              <div className="p-4 rounded-xl bg-background border border-border space-y-2">
                 <div className="text-xs font-semibold text-[#45D6B5] uppercase">Analyst Duel Comparison</div>
                 <div className="text-sm text-slate-200">
                   Your Score: <span className="font-bold">{duelResult.challenger_score}</span> vs Benchmark Analyst:{' '}
@@ -457,7 +457,7 @@ export const ArenaPage: React.FC = () => {
               </div>
             )}
 
-            <div className="p-4 rounded-xl bg-[#0B1017] border border-white/10 text-sm text-slate-200">
+            <div className="p-4 rounded-xl bg-background border border-border text-sm text-slate-200">
               <div className="text-xs font-semibold text-slate-400 mb-1">
                 Coach Feedback ({submitResult.ai_source})
               </div>
@@ -465,37 +465,37 @@ export const ArenaPage: React.FC = () => {
             </div>
 
             {postReview && (
-              <div className="p-4 rounded-xl bg-[#0B1017] border border-white/10 space-y-2 text-xs text-slate-300">
+              <div className="p-4 rounded-xl bg-background border border-border space-y-2 text-xs text-slate-300">
                 <div className="font-semibold text-[#45D6B5] uppercase">Post-Contest Performance Review</div>
                 <div>
-                  Rank: <span className="font-bold text-white">#{postReview.final_rank}</span> of {postReview.total_participants}
+                  Rank: <span className="font-bold text-text-primary">#{postReview.final_rank}</span> of {postReview.total_participants}
                   {postReview.contest_average_score != null && (
-                    <span> • Contest Avg: <span className="font-bold text-white">{postReview.contest_average_score}/100</span></span>
+                    <span> • Contest Avg: <span className="font-bold text-text-primary">{postReview.contest_average_score}/100</span></span>
                   )}
                 </div>
-                <div>Strongest Decision: <span className="text-white">{postReview.strongest_decision}</span></div>
+                <div>Strongest Decision: <span className="text-text-primary">{postReview.strongest_decision}</span></div>
                 <div>Area to Improve: <span className="text-amber-300">{postReview.decision_needing_improvement}</span></div>
                 <div>Recommended Practice: <span className="text-[#45D6B5]">{postReview.learning_recommendation}</span></div>
               </div>
             )}
           </div>
         ) : (
-          <div className="rounded-2xl bg-[#141C25] border border-white/10 p-6 space-y-5">
+          <div className="rounded-2xl bg-surface border border-border p-6 space-y-5">
             {/* Multi-stage Crash Survivor / Decision Pressure */}
             {(ctype === 'CRASH_SURVIVOR' || ctype === 'DECISION_PRESSURE') && currentStage && (
               <div className="space-y-4">
                 <div className="text-xs font-mono text-[#45D6B5]">
                   STAGE {stageIdx + 1} OF {stages.length}
                 </div>
-                <h2 className="text-lg font-bold text-white">{currentStage.headline}</h2>
+                <h2 className="text-lg font-bold text-text-primary">{currentStage.headline}</h2>
                 <p className="text-sm text-slate-300">{currentStage.summary}</p>
               </div>
             )}
 
             {/* FOMO Trap */}
             {ctype === 'FOMO_TRAP' && (
-              <div className="p-4 rounded-xl bg-[#0B1017] border border-white/10">
-                <div className="text-sm font-semibold text-white">
+              <div className="p-4 rounded-xl bg-background border border-border">
+                <div className="text-sm font-semibold text-text-primary">
                   Simulated Asset: {selectedContest.scenario?.asset_symbol} (+{selectedContest.scenario?.recent_move_pct}%)
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
@@ -521,11 +521,11 @@ export const ArenaPage: React.FC = () => {
                         className={`text-left p-4 rounded-xl border transition ${
                           checked
                             ? 'bg-[#45D6B5]/10 border-[#45D6B5]/50'
-                            : 'bg-[#0B1017] border-white/10 hover:border-white/25'
+                            : 'bg-background border-border hover:border-white/25'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-white">{p.title}</span>
+                          <span className="text-sm font-semibold text-text-primary">{p.title}</span>
                           <span className="text-[11px] font-mono text-[#45D6B5]">
                             {checked ? 'REVIEWED' : 'CLICK TO REVIEW'}
                           </span>
@@ -551,7 +551,7 @@ export const ArenaPage: React.FC = () => {
                       className={`px-4 py-2 rounded-xl text-xs font-semibold border transition ${
                         stageAction === act
                           ? 'bg-[#45D6B5] text-[#0B1017] border-[#45D6B5]'
-                          : 'bg-[#0B1017] text-slate-200 border-white/10 hover:border-white/30'
+                          : 'bg-background text-slate-200 border-border hover:border-white/30'
                       }`}
                     >
                       {act.replace(/_/g, ' ')}
@@ -563,7 +563,7 @@ export const ArenaPage: React.FC = () => {
                   onChange={(e) => setStageReasoning(e.target.value)}
                   rows={3}
                   placeholder="Explain your reasoning, risk check, and what evidence guided your decision..."
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white focus:outline-none focus:border-[#45D6B5]"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary focus:outline-none focus:border-[#45D6B5]"
                 />
               </div>
             )}
@@ -573,9 +573,9 @@ export const ArenaPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-3">
                   {(selectedContest.scenario?.assets || []).map((a: any) => (
-                    <div key={a.symbol} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 flex items-center justify-between">
+                    <div key={a.symbol} className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-semibold text-white">{a.symbol}</div>
+                        <div className="text-sm font-semibold text-text-primary">{a.symbol}</div>
                         <div className="text-xs text-slate-400">
                           {a.sector} • {a.volatility} Vol (β {a.beta})
                         </div>
@@ -589,7 +589,7 @@ export const ArenaPage: React.FC = () => {
                           onChange={(e) =>
                             setAllocation({ ...allocation, [a.symbol]: Number(e.target.value) })
                           }
-                          className="w-16 rounded-lg bg-[#141C25] border border-white/15 px-2 py-1 text-right text-sm text-white"
+                          className="w-16 rounded-lg bg-surface border border-border px-2 py-1 text-right text-sm text-text-primary"
                         />
                         <span className="text-xs text-slate-400">%</span>
                       </div>
@@ -604,7 +604,7 @@ export const ArenaPage: React.FC = () => {
                   onChange={(e) => setStageReasoning(e.target.value)}
                   rows={3}
                   placeholder="Explain your sector diversification, concentration cap, and risk balance..."
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary"
                 />
               </div>
             )}
@@ -612,7 +612,7 @@ export const ArenaPage: React.FC = () => {
             {/* Bias Buster */}
             {ctype === 'BIAS_BUSTER' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-[#0B1017] border border-white/10 text-sm text-slate-200 italic">
+                <div className="p-4 rounded-xl bg-background border border-border text-sm text-slate-200 italic">
                   "{selectedContest.scenario?.vignette}"
                 </div>
                 <div className="grid sm:grid-cols-2 gap-2">
@@ -623,8 +623,8 @@ export const ArenaPage: React.FC = () => {
                       onClick={() => setSelectedBias(opt)}
                       className={`p-3 rounded-xl text-left text-xs font-semibold border ${
                         selectedBias === opt
-                          ? 'bg-[#45D6B5]/20 border-[#45D6B5] text-white'
-                          : 'bg-[#0B1017] border-white/10 text-slate-300'
+                          ? 'bg-[#45D6B5]/20 border-[#45D6B5] text-text-primary'
+                          : 'bg-background border-border text-slate-300'
                       }`}
                     >
                       {opt}
@@ -636,7 +636,7 @@ export const ArenaPage: React.FC = () => {
                   onChange={(e) => setMitigationPlan(e.target.value)}
                   rows={3}
                   placeholder="How should the trader prevent this bias next time? (e.g., cooling-off rule, max position cap)"
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary"
                 />
               </div>
             )}
@@ -644,8 +644,8 @@ export const ArenaPage: React.FC = () => {
             {/* Analyst Duel */}
             {ctype === 'ANALYST_DUEL' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-[#0B1017] border border-white/10 space-y-2">
-                  <div className="text-sm font-bold text-white">{selectedContest.scenario?.case_title}</div>
+                <div className="p-4 rounded-xl bg-background border border-border space-y-2">
+                  <div className="text-sm font-bold text-text-primary">{selectedContest.scenario?.case_title}</div>
                   <ul className="list-disc pl-5 text-xs text-slate-300 space-y-1">
                     {(selectedContest.scenario?.case_facts || []).map((f: string, idx: number) => (
                       <li key={idx}>{f}</li>
@@ -657,21 +657,21 @@ export const ArenaPage: React.FC = () => {
                   onChange={(e) => setDuelArg(e.target.value)}
                   rows={2}
                   placeholder="Your core investment thesis / argument..."
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary"
                 />
                 <textarea
                   value={duelEv}
                   onChange={(e) => setDuelEv(e.target.value)}
                   rows={2}
                   placeholder="Supporting evidence from the case facts..."
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary"
                 />
                 <textarea
                   value={duelRisks}
                   onChange={(e) => setDuelRisks(e.target.value)}
                   rows={2}
                   placeholder="Key downside risks and invalidation triggers..."
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary"
                 />
               </div>
             )}
@@ -687,7 +687,7 @@ export const ArenaPage: React.FC = () => {
                   onChange={(e) => setReflectionText(e.target.value)}
                   rows={2}
                   placeholder="What did you learn about your decision discipline in this scenario?"
-                  className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-3 text-sm text-white"
+                  className="w-full rounded-xl bg-background border border-border p-3 text-sm text-text-primary"
                 />
               </div>
             )}
@@ -717,13 +717,13 @@ export const ArenaPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Hero Section */}
-      <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-white/10 p-8">
+      <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-border p-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#45D6B5]/15 text-[#45D6B5] text-xs font-semibold">
               <Swords className="w-3.5 h-3.5" /> MINDMARK ARENA • EDUCATIONAL COMPETITION
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
               {dashboard?.hero_headline || 'Your decisions. Your competition. Your rank.'}
             </h1>
             <p className="text-sm text-slate-300 max-w-2xl">
@@ -733,21 +733,21 @@ export const ArenaPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Global Rank</div>
               <div className="text-2xl font-bold text-[#45D6B5]">#{stats.global_rank || 1}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Arena Points</div>
-              <div className="text-2xl font-bold text-white">{stats.arena_points || 0}</div>
+              <div className="text-2xl font-bold text-text-primary">{stats.arena_points || 0}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Current League</div>
               <div className="text-xl font-bold text-amber-400">{stats.league || 'Bronze'}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-[#0B1017]/80 border border-white/10">
+            <div className="p-4 rounded-2xl bg-background/80 border border-border">
               <div className="text-[11px] text-slate-400">Achievements</div>
-              <div className="text-2xl font-bold text-white">{(stats.achievements || []).length}</div>
+              <div className="text-2xl font-bold text-text-primary">{(stats.achievements || []).length}</div>
               <button
                 onClick={async () => {
                   const next = !publicOptIn;
@@ -755,7 +755,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ public_leaderboard_opt_in: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Public Rank: {publicOptIn ? 'Visible' : 'Opted Out'}
               </button>
@@ -766,7 +766,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ share_university: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Share Uni: {shareUni ? 'On' : 'Private'}
               </button>
@@ -776,7 +776,7 @@ export const ArenaPage: React.FC = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
+      <div className="flex flex-wrap gap-2 border-b border-border pb-3">
         {[
           { id: 'overview', label: 'Overview', icon: Sparkles },
           { id: 'contests', label: 'Contests', icon: Trophy },
@@ -797,7 +797,7 @@ export const ArenaPage: React.FC = () => {
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
                 active
                   ? 'bg-[#45D6B5] text-[#0B1017]'
-                  : 'bg-[#141C25] text-slate-300 hover:text-white border border-white/10'
+                  : 'bg-surface text-slate-300 hover:text-text-primary border border-border'
               }`}
             >
               <Icon className="w-4 h-4" /> {tab.label}
@@ -811,20 +811,20 @@ export const ArenaPage: React.FC = () => {
           {/* Recommended Contests */}
           {dashboard?.recommended_contests?.length > 0 && (
             <section className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-white">
+              <div className="flex items-center gap-2 text-sm font-bold text-text-primary">
                 <Sparkles className="w-4 h-4 text-[#45D6B5]" /> Recommended for Your Skill & Decision Profile
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 {dashboard.recommended_contests.map((c: any) => (
                   <div
                     key={c.id}
-                    className="p-5 rounded-2xl bg-[#141C25] border border-[#45D6B5]/25 flex flex-col justify-between space-y-4"
+                    className="p-5 rounded-2xl bg-surface border border-[#45D6B5]/25 flex flex-col justify-between space-y-4"
                   >
                     <div className="space-y-2">
                       <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[#45D6B5]/15 text-[#45D6B5]">
                         {c.is_personalized ? 'Personalized Match' : 'Skill Match'}
                       </span>
-                      <h3 className="text-base font-bold text-white">{c.title}</h3>
+                      <h3 className="text-base font-bold text-text-primary">{c.title}</h3>
                       <p className="text-xs text-slate-300">{c.why_recommended}</p>
                     </div>
                     <button
@@ -841,31 +841,31 @@ export const ArenaPage: React.FC = () => {
 
           {/* Active Contests */}
           <section className="space-y-3">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">
               Active Contests ({dashboard?.active_contests?.length || 0})
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {(dashboard?.active_contests || []).map((c: any) => (
-                <div key={c.id} className="p-5 rounded-2xl bg-[#141C25] border border-white/10 flex flex-col justify-between space-y-4">
+                <div key={c.id} className="p-5 rounded-2xl bg-surface border border-border flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
                       <span>{c.contest_type.replace('_', ' ')}</span>
                       <span className="text-[#45D6B5]">{c.difficulty}</span>
                     </div>
-                    <h3 className="text-base font-bold text-white">{c.title}</h3>
+                    <h3 className="text-base font-bold text-text-primary">{c.title}</h3>
                     <p className="text-xs text-slate-300">{c.description}</p>
                     <div className="text-[11px] text-slate-500 font-mono">{c.data_source_label}</div>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => openContest(c.id, false)}
-                      className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-[#45D6B5] hover:text-[#0B1017] text-white text-xs font-bold transition"
+                      className="flex-1 py-2.5 rounded-xl bg-surface-elevated hover:bg-[#45D6B5] hover:text-[#0B1017] text-text-primary text-xs font-bold transition"
                     >
                       {c.user_submitted ? 'View Submission' : 'Compete Now'}
                     </button>
                     <button
                       onClick={() => openContest(c.id, true)}
-                      className="px-3 py-2.5 rounded-xl bg-[#0B1017] border border-white/10 hover:border-[#45D6B5]/50 text-slate-300 text-xs font-semibold transition"
+                      className="px-3 py-2.5 rounded-xl bg-background border border-border hover:border-[#45D6B5]/50 text-slate-300 text-xs font-semibold transition"
                     >
                       Practice
                     </button>
@@ -877,16 +877,16 @@ export const ArenaPage: React.FC = () => {
 
           {/* Upcoming Contests with Real Server Countdown */}
           <section className="space-y-3">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Upcoming Contests</h2>
+            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Upcoming Contests</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {(dashboard?.upcoming_contests || []).map((c: any) => (
-                <div key={c.id} className="p-5 rounded-2xl bg-[#141C25] border border-white/10 flex items-center justify-between gap-4">
+                <div key={c.id} className="p-5 rounded-2xl bg-surface border border-border flex items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="text-[11px] font-mono text-amber-400">{c.league_scope} LEAGUE</div>
-                    <h3 className="text-base font-bold text-white">{c.title}</h3>
+                    <h3 className="text-base font-bold text-text-primary">{c.title}</h3>
                     <p className="text-xs text-slate-400">{c.description}</p>
                   </div>
-                  <div className="shrink-0 text-right px-4 py-2 rounded-xl bg-[#0B1017] border border-white/10">
+                  <div className="shrink-0 text-right px-4 py-2 rounded-xl bg-background border border-border">
                     <div className="text-[10px] text-slate-400 flex items-center gap-1 justify-end">
                       <Clock className="w-3 h-3 text-[#45D6B5]" /> Starts In
                     </div>
@@ -902,12 +902,12 @@ export const ArenaPage: React.FC = () => {
           {/* Completed Contests */}
           {dashboard?.completed_contests?.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Completed Benchmarks</h2>
+              <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Completed Benchmarks</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 {dashboard.completed_contests.map((c: any) => (
-                  <div key={c.id} className="p-4 rounded-2xl bg-[#141C25]/70 border border-white/10">
+                  <div key={c.id} className="p-4 rounded-2xl bg-surface/70 border border-border">
                     <div className="text-xs font-mono text-slate-400">{c.data_source_label}</div>
-                    <div className="text-sm font-bold text-white mt-1">{c.title}</div>
+                    <div className="text-sm font-bold text-text-primary mt-1">{c.title}</div>
                     <p className="text-xs text-slate-400 mt-1">{c.description}</p>
                   </div>
                 ))}
@@ -918,22 +918,22 @@ export const ArenaPage: React.FC = () => {
       )}
 
       {activeTab === 'mirror' && (
-        <div className="rounded-2xl bg-[#0B1017]/60 border border-white/10 overflow-hidden">
+        <div className="rounded-2xl bg-background/60 border border-border overflow-hidden">
           <MirrorModePage />
         </div>
       )}
 
       {activeTab === 'practice' && (
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-[#141C25] border border-[#45D6B5]/25 text-xs text-slate-300">
+          <div className="p-4 rounded-2xl bg-surface border border-[#45D6B5]/25 text-xs text-slate-300">
             <span className="font-bold text-[#45D6B5]">Practice Arena:</span> Ungraded practice runs let you rehearse any contest scenario without affecting your official Arena rank or XP.
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {(dashboard?.active_contests || []).map((c: any) => (
-              <div key={c.id} className="p-5 rounded-2xl bg-[#141C25] border border-white/10 flex flex-col justify-between space-y-4">
+              <div key={c.id} className="p-5 rounded-2xl bg-surface border border-border flex flex-col justify-between space-y-4">
                 <div className="space-y-2">
                   <div className="text-[11px] font-mono text-slate-400">{c.contest_type.replace('_', ' ')} • {c.difficulty}</div>
-                  <h3 className="text-base font-bold text-white">{c.title}</h3>
+                  <h3 className="text-base font-bold text-text-primary">{c.title}</h3>
                   <p className="text-xs text-slate-300">{c.description}</p>
                 </div>
                 <button
@@ -967,7 +967,7 @@ export const ArenaPage: React.FC = () => {
                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold ${
                       lbScope === s.id
                         ? 'bg-[#45D6B5] text-[#0B1017]'
-                        : 'bg-[#141C25] text-slate-300 border border-white/10'
+                        : 'bg-surface text-slate-300 border border-border'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" /> {s.label}
@@ -981,7 +981,7 @@ export const ArenaPage: React.FC = () => {
                 value={uniInput}
                 onChange={(e) => setUniInput(e.target.value)}
                 placeholder="Your University"
-                className="rounded-xl bg-[#141C25] border border-white/10 px-3 py-1.5 text-xs text-white"
+                className="rounded-xl bg-surface border border-border px-3 py-1.5 text-xs text-text-primary"
               />
               <button
                 onClick={async () => {
@@ -991,7 +991,7 @@ export const ArenaPage: React.FC = () => {
                   loadDashboard();
                   if (lbScope === 'university') loadLeaderboard('university');
                 }}
-                className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-semibold text-white hover:bg-white/20"
+                className="px-3 py-1.5 rounded-xl bg-surface-elevated text-xs font-semibold text-text-primary hover:bg-white/20"
               >
                 Save University
               </button>
@@ -1000,7 +1000,7 @@ export const ArenaPage: React.FC = () => {
                 value={friendEmail}
                 onChange={(e) => setFriendEmail(e.target.value)}
                 placeholder="Friend's email"
-                className="rounded-xl bg-[#141C25] border border-white/10 px-3 py-1.5 text-xs text-white"
+                className="rounded-xl bg-surface border border-border px-3 py-1.5 text-xs text-text-primary"
               />
               <button
                 onClick={async () => {
@@ -1025,7 +1025,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ public_leaderboard_opt_in: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Public Rank: {publicOptIn ? 'Visible' : 'Opted Out'}
               </button>
@@ -1036,7 +1036,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ share_university: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Share Uni: {shareUni ? 'On' : 'Private'}
               </button>
@@ -1045,9 +1045,9 @@ export const ArenaPage: React.FC = () => {
 
           {socialMsg && <div className="text-xs text-[#45D6B5]">{socialMsg}</div>}
 
-          <div className="rounded-2xl bg-[#141C25] border border-white/10 overflow-hidden">
+          <div className="rounded-2xl bg-surface border border-border overflow-hidden">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#0B1017] text-slate-400 uppercase font-mono">
+              <thead className="bg-background text-slate-400 uppercase font-mono">
                 <tr>
                   <th className="p-4">Rank</th>
                   <th className="p-4">Competitor</th>
@@ -1086,16 +1086,16 @@ export const ArenaPage: React.FC = () => {
       {activeTab === 'history' && (
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-3">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Contest Participation History</h2>
+            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Contest Participation History</h2>
             {(dashboard?.participation_history || []).length === 0 ? (
-              <div className="p-6 rounded-2xl bg-[#141C25] border border-white/10 text-sm text-slate-400">
+              <div className="p-6 rounded-2xl bg-surface border border-border text-sm text-slate-400">
                 No contests completed yet. Enter an active contest to record your first official score.
               </div>
             ) : (
               dashboard.participation_history.map((h: any) => (
-                <div key={h.entry_id} className="p-4 rounded-2xl bg-[#141C25] border border-white/10 space-y-2">
+                <div key={h.entry_id} className="p-4 rounded-2xl bg-surface border border-border space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="font-bold text-white text-sm">{h.contest_title}</div>
+                    <div className="font-bold text-text-primary text-sm">{h.contest_title}</div>
                     <div className="text-sm font-mono font-bold text-[#45D6B5]">{h.total_score}/100</div>
                   </div>
                   <div className="text-xs text-slate-400">
@@ -1108,15 +1108,15 @@ export const ArenaPage: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Recent Achievements</h2>
-            <div className="p-5 rounded-2xl bg-[#141C25] border border-white/10 space-y-3">
+            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Recent Achievements</h2>
+            <div className="p-5 rounded-2xl bg-surface border border-border space-y-3">
               {(stats.achievements || []).length === 0 ? (
                 <div className="text-xs text-slate-400">Complete contests to unlock Arena badges.</div>
               ) : (
                 stats.achievements.map((badge: string) => (
-                  <div key={badge} className="flex items-center gap-3 p-3 rounded-xl bg-[#0B1017] border border-white/10">
+                  <div key={badge} className="flex items-center gap-3 p-3 rounded-xl bg-background border border-border">
                     <ShieldCheck className="w-5 h-5 text-[#45D6B5]" />
-                    <span className="text-sm font-semibold text-white">{badge}</span>
+                    <span className="text-sm font-semibold text-text-primary">{badge}</span>
                   </div>
                 ))
               )}
@@ -1127,7 +1127,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ public_leaderboard_opt_in: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Public Rank: {publicOptIn ? 'Visible' : 'Opted Out'}
               </button>
@@ -1138,7 +1138,7 @@ export const ArenaPage: React.FC = () => {
                   await api.arena.updateProfile({ share_university: next });
                   loadLeaderboard(lbScope);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#141C25] border border-white/10 text-xs text-slate-300"
+                className="px-3 py-1.5 rounded-xl bg-surface border border-border text-xs text-slate-300"
               >
                 Share Uni: {shareUni ? 'On' : 'Private'}
               </button>

@@ -1,4 +1,4 @@
-/* AURIVERO — Light & Dark Semantic Design Tokens (Groww-Inspired Financial Palette) */
+/* AURIVERO — Centralized Light & Dark Semantic Design Tokens */
 :root,
 [data-theme="light"] {
   --rgb-background: 247 249 247;       /* #F7F9F7 */
@@ -9,23 +9,40 @@
 
   --rgb-primary: 0 179 134;            /* #00B386 */
   --rgb-primary-hover: 0 155 117;      /* #009B75 */
-  --rgb-gold: 168 128 58;              /* Restrained warm bronze/gold for light contrast */
+  --rgb-gold: 168 128 58;
   --rgb-gold-hover: 145 108 45;
   --rgb-secondary: 0 155 117;
   --rgb-secondary-hover: 0 132 100;
-  --rgb-warning: 217 119 6;            /* #D97706 */
-  --rgb-danger: 220 38 38;             /* #DC2626 */
+  --rgb-warning: 217 119 6;
+  --rgb-danger: 220 38 38;
 
   --rgb-text-primary: 23 33 29;        /* #17211D */
   --rgb-text-secondary: 104 117 110;   /* #68756E */
-  --rgb-text-muted: 133 148 140;       /* #85948C */
+  --rgb-text-muted: 137 150 142;       /* #89968E */
 
   --rgb-border: 227 234 229;           /* #E3EAE5 */
   --rgb-border-subtle: 237 242 238;
 
-  --aurivero-glass-bg: rgba(255, 255, 255, 0.82);
-  --aurivero-glass-elevated: rgba(255, 255, 255, 0.92);
-  --aurivero-glass-border: rgba(23, 33, 29, 0.08);
+  /* Semantic aliases */
+  --background: #F7F9F7;
+  --surface: #FFFFFF;
+  --surface-secondary: #F0F4F1;
+  --card: #FFFFFF;
+  --text-primary: #17211D;
+  --text-secondary: #68756E;
+  --text-muted: #89968E;
+  --border: #E3EAE5;
+  --accent: #00B386;
+  --accent-hover: #009B75;
+  --positive: #00B386;
+  --negative: #DC2626;
+  --warning: #D97706;
+  --input-background: #FFFFFF;
+  --shadow: 0 6px 20px rgba(23, 33, 29, 0.06);
+
+  --aurivero-glass-bg: rgba(255, 255, 255, 0.85);
+  --aurivero-glass-elevated: rgba(255, 255, 255, 0.94);
+  --aurivero-glass-border: rgba(23, 33, 29, 0.09);
   --aurivero-shadow-glass: 0 10px 30px rgba(23, 33, 29, 0.08);
 }
 
@@ -33,8 +50,8 @@
 [data-theme="dark"] {
   --rgb-background: 13 21 18;          /* #0D1512 */
   --rgb-surface: 18 30 25;             /* #121E19 */
-  --rgb-surface-elevated: 27 43 35;    /* #1B2B23 */
-  --rgb-surface-card: 24 37 30;        /* #18251E */
+  --rgb-surface-elevated: 24 37 30;    /* #18251E */
+  --rgb-surface-card: 27 43 35;        /* #1B2B23 */
   --rgb-subtle-green: 25 56 44;        /* #19382C */
 
   --rgb-primary: 0 200 150;            /* #00C896 */
@@ -53,8 +70,25 @@
   --rgb-border: 41 59 49;              /* #293B31 */
   --rgb-border-subtle: 30 45 37;
 
-  --aurivero-glass-bg: rgba(18, 30, 25, 0.80);
-  --aurivero-glass-elevated: rgba(24, 39, 32, 0.90);
+  /* Semantic aliases */
+  --background: #0D1512;
+  --surface: #121E19;
+  --surface-secondary: #18251E;
+  --card: #1B2B23;
+  --text-primary: #F0F5F1;
+  --text-secondary: #9AAEA2;
+  --text-muted: #6F8579;
+  --border: #293B31;
+  --accent: #00C896;
+  --accent-hover: #24D6A5;
+  --positive: #00C896;
+  --negative: #EB5757;
+  --warning: #F5B942;
+  --input-background: #121E19;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.36);
+
+  --aurivero-glass-bg: rgba(18, 30, 25, 0.82);
+  --aurivero-glass-elevated: rgba(24, 37, 30, 0.92);
   --aurivero-glass-border: rgba(240, 245, 241, 0.08);
   --aurivero-shadow-glass: 0 12px 36px rgba(0, 0, 0, 0.42);
 }

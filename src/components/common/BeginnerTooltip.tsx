@@ -56,12 +56,12 @@ export const BeginnerTooltip: React.FC<BeginnerTooltipProps> = ({
       {open && (
         <div
           role="tooltip"
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 sm:w-72 p-3.5 rounded-xl bg-[#1A2531] border border-primary/30 shadow-2xl z-50 text-left space-y-1.5"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 sm:w-72 p-3.5 rounded-xl bg-surface-elevated border border-primary/30 shadow-2xl z-50 text-left space-y-1.5"
         >
           <div className="text-xs font-bold text-[#45D6B5]">{term}</div>
-          <p className="text-xs text-[#F3F6F8] leading-relaxed">{definition}</p>
+          <p className="text-xs text-text-primary leading-relaxed">{definition}</p>
           {example && (
-            <p className="text-[11px] text-[#93A2B4] leading-relaxed border-t border-white/10 pt-1.5">
+            <p className="text-[11px] text-text-secondary leading-relaxed border-t border-border pt-1.5">
               Example: {example}
             </p>
           )}

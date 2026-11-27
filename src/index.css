@@ -13,12 +13,21 @@
   }
 
   body {
-    background-color: rgb(var(--rgb-background));
-    color: rgb(var(--rgb-text-primary));
+    background-color: var(--background);
+    color: var(--text-primary);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  input, select, textarea {
+    color: var(--text-primary);
+  }
+
+  select option {
+    background-color: var(--surface);
+    color: var(--text-primary);
   }
 
   /* Custom theme-aware scrollbar */
@@ -96,7 +105,7 @@
 
 /* Accessibility: clear keyboard focus indicators & reduced motion support */
 :focus-visible {
-  outline: 2px solid var(--aurivero-gold);
+  outline: 2px solid rgb(var(--rgb-gold));
   outline-offset: 2px;
 }
 

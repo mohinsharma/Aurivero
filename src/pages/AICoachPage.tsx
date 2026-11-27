@@ -108,12 +108,12 @@ export const AICoachPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-white/10 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-border p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#45D6B5]/15 text-[#45D6B5] text-xs font-semibold">
             <Bot className="w-3.5 h-3.5" /> PERSONALIZED GEMINI AI COACH
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">MINDMARK AI Coach</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary mt-2">MINDMARK AI Coach</h1>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
             Your decisions. Your learning journey. Your AI coach.
           </p>
@@ -128,23 +128,23 @@ export const AICoachPage: React.FC = () => {
 
       {/* Optional Decision Review Panel */}
       {showReview && (
-        <div className="rounded-2xl bg-[#141C25] border border-[#45D6B5]/30 p-6 space-y-4">
+        <div className="rounded-2xl bg-surface border border-[#45D6B5]/30 p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-white uppercase">Ask AI to Review My Decision (At-Decision-Time Evaluation)</h2>
-            <button onClick={() => setShowReview(false)} className="text-slate-400 hover:text-white">
+            <h2 className="text-sm font-bold text-text-primary uppercase">Ask AI to Review My Decision (At-Decision-Time Evaluation)</h2>
+            <button onClick={() => setShowReview(false)} className="text-slate-400 hover:text-text-primary">
               <X className="w-4 h-4" />
             </button>
           </div>
           <div className="grid sm:grid-cols-4 gap-3">
-            <input value={revSymbol} onChange={(e) => setRevSymbol(e.target.value)} placeholder="Symbol" className="rounded-xl bg-[#0B1017] border border-white/10 p-2.5 text-xs text-white" />
-            <select value={revAction} onChange={(e) => setRevAction(e.target.value)} className="rounded-xl bg-[#0B1017] border border-white/10 p-2.5 text-xs text-white">
+            <input value={revSymbol} onChange={(e) => setRevSymbol(e.target.value)} placeholder="Symbol" className="rounded-xl bg-background border border-border p-2.5 text-xs text-text-primary" />
+            <select value={revAction} onChange={(e) => setRevAction(e.target.value)} className="rounded-xl bg-background border border-border p-2.5 text-xs text-text-primary">
               {['BUY', 'SELL', 'HOLD', 'REDUCE'].map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
-            <input type="number" value={revPosPct} onChange={(e) => setRevPosPct(Number(e.target.value))} placeholder="Position %" className="rounded-xl bg-[#0B1017] border border-white/10 p-2.5 text-xs text-white" />
-            <input type="number" value={revLimitPct} onChange={(e) => setRevLimitPct(Number(e.target.value))} placeholder="Risk Limit %" className="rounded-xl bg-[#0B1017] border border-white/10 p-2.5 text-xs text-white" />
+            <input type="number" value={revPosPct} onChange={(e) => setRevPosPct(Number(e.target.value))} placeholder="Position %" className="rounded-xl bg-background border border-border p-2.5 text-xs text-text-primary" />
+            <input type="number" value={revLimitPct} onChange={(e) => setRevLimitPct(Number(e.target.value))} placeholder="Risk Limit %" className="rounded-xl bg-background border border-border p-2.5 text-xs text-text-primary" />
           </div>
-          <textarea value={revReasoning} onChange={(e) => setRevReasoning(e.target.value)} rows={2} placeholder="Your stated reasoning at decision time..." className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-2.5 text-xs text-white" />
-          <input value={revContext} onChange={(e) => setRevContext(e.target.value)} placeholder="Market/fundamental info available at decision time (optional)..." className="w-full rounded-xl bg-[#0B1017] border border-white/10 p-2.5 text-xs text-white" />
+          <textarea value={revReasoning} onChange={(e) => setRevReasoning(e.target.value)} rows={2} placeholder="Your stated reasoning at decision time..." className="w-full rounded-xl bg-background border border-border p-2.5 text-xs text-text-primary" />
+          <input value={revContext} onChange={(e) => setRevContext(e.target.value)} placeholder="Market/fundamental info available at decision time (optional)..." className="w-full rounded-xl bg-background border border-border p-2.5 text-xs text-text-primary" />
           <button
             onClick={async () => {
               if (revReasoning.trim().length < 3) return;
@@ -174,7 +174,7 @@ export const AICoachPage: React.FC = () => {
                 ['What Could Change Your View', revResult.invalidation_info],
                 ['Practical Lesson', revResult.practical_lesson],
               ].map(([title, body]) => (
-                <div key={title} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 space-y-1">
+                <div key={title} className="p-3 rounded-xl bg-background border border-border space-y-1">
                   <div className="font-bold text-[#45D6B5]">{title}</div>
                   <p className="text-slate-300">{body}</p>
                 </div>
@@ -187,8 +187,8 @@ export const AICoachPage: React.FC = () => {
       {/* Main Split Layout: Chat + Personal Intelligence Panel */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Chat Area */}
-        <div className="lg:col-span-2 rounded-2xl bg-[#141C25] border border-white/10 flex flex-col min-h-[540px]">
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
+        <div className="lg:col-span-2 rounded-2xl bg-surface border border-border flex flex-col min-h-[540px]">
+          <div className="p-4 border-b border-border flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-300">Finance-Only Educational Coach</span>
             <button
               onClick={clearConversation}
@@ -209,7 +209,7 @@ export const AICoachPage: React.FC = () => {
                     <button
                       key={q}
                       onClick={() => sendMessage(q)}
-                      className="text-left px-3 py-2 rounded-xl bg-[#0B1017] border border-white/10 hover:border-[#45D6B5]/50 text-xs text-slate-200 transition"
+                      className="text-left px-3 py-2 rounded-xl bg-background border border-border hover:border-[#45D6B5]/50 text-xs text-slate-200 transition"
                     >
                       {q}
                     </button>
@@ -223,12 +223,12 @@ export const AICoachPage: React.FC = () => {
                     className={`max-w-[85%] rounded-2xl p-4 text-xs space-y-2 ${
                       m.role === 'user'
                         ? 'bg-[#45D6B5] text-[#0B1017] font-medium'
-                        : 'bg-[#0B1017] border border-white/10 text-slate-200'
+                        : 'bg-background border border-border text-slate-200'
                     }`}
                   >
                     <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     {m.evidence && m.evidence.length > 0 && (
-                      <div className="pt-2 border-t border-white/10 text-[11px] text-[#78A9FF]">
+                      <div className="pt-2 border-t border-border text-[11px] text-[#78A9FF]">
                         Evidence: {m.evidence.join(' • ')}
                       </div>
                     )}
@@ -264,13 +264,13 @@ export const AICoachPage: React.FC = () => {
               e.preventDefault();
               sendMessage();
             }}
-            className="p-4 border-t border-white/10 flex gap-2"
+            className="p-4 border-t border-border flex gap-2"
           >
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about your risk discipline, NIFTY 50, P/E ratio, or next lesson..."
-              className="flex-1 rounded-xl bg-[#0B1017] border border-white/10 px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#45D6B5]"
+              className="flex-1 rounded-xl bg-background border border-border px-4 py-2.5 text-xs text-text-primary focus:outline-none focus:border-[#45D6B5]"
             />
             <button
               type="submit"
@@ -284,57 +284,57 @@ export const AICoachPage: React.FC = () => {
 
         {/* Personal Intelligence Panel */}
         <div className="space-y-4">
-          <div className="p-5 rounded-2xl bg-[#141C25] border border-white/10 space-y-3">
-            <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
+          <div className="p-5 rounded-2xl bg-surface border border-border space-y-3">
+            <div className="text-xs font-bold text-text-primary uppercase flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#45D6B5]" /> Personal Intelligence
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-slate-400">Level & XP</div>
-                <div className="font-bold text-white">Lv {uctx.level || 1} • {uctx.total_xp || 0} XP</div>
+                <div className="font-bold text-text-primary">Lv {uctx.level || 1} • {uctx.total_xp || 0} XP</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="p-3 rounded-xl bg-background border border-border">
                 <div className="text-slate-400">Arena League</div>
                 <div className="font-bold text-amber-400">{uctx.arena_league || 'Bronze'}</div>
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10 text-xs space-y-1">
+            <div className="p-3 rounded-xl bg-background border border-border text-xs space-y-1">
               <div className="text-slate-400">Investor Archetype</div>
               <div className="font-bold text-[#45D6B5]">
                 {archetype?.name || 'Not enough data yet'}
               </div>
             </div>
             {strong && (
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10 text-xs">
+              <div className="p-3 rounded-xl bg-background border border-border text-xs">
                 <div className="text-slate-400">Strongest Dimension</div>
-                <div className="font-semibold text-white">{strong.name}: {strong.score}/100</div>
+                <div className="font-semibold text-text-primary">{strong.name}: {strong.score}/100</div>
               </div>
             )}
             {weak && (
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10 text-xs">
+              <div className="p-3 rounded-xl bg-background border border-border text-xs">
                 <div className="text-slate-400">Needs Improvement</div>
                 <div className="font-semibold text-amber-300">{weak.name}: {weak.score}/100</div>
               </div>
             )}
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#141C25] border border-white/10 space-y-3">
-            <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
+          <div className="p-5 rounded-2xl bg-surface border border-border space-y-3">
+            <div className="text-xs font-bold text-text-primary uppercase flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#45D6B5]" /> Adaptive Recommendations
             </div>
             {recs.length === 0 ? (
               <div className="text-xs text-slate-400">All current recommendations completed or dismissed.</div>
             ) : (
               recs.map((r) => (
-                <div key={r.id} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 space-y-1.5 text-xs">
+                <div key={r.id} className="p-3 rounded-xl bg-background border border-border space-y-1.5 text-xs">
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-bold text-white">{r.title}</span>
+                    <span className="font-bold text-text-primary">{r.title}</span>
                     <button
                       onClick={async () => {
                         await api.aiCoach.dismissRecommendation(r.id);
                         loadIntelligence();
                       }}
-                      className="text-slate-500 hover:text-white"
+                      className="text-slate-500 hover:text-text-primary"
                       title="Dismiss"
                     >
                       <X className="w-3.5 h-3.5" />

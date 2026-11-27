@@ -84,22 +84,22 @@ export const NewsCommunityPage: React.FC = () => {
   const showDiscussions = overviewFilter === 'All' || overviewFilter === 'Discussions';
 
   return (
-    <div className="min-h-screen bg-[#0B1017]">
+    <div className="min-h-screen bg-background">
       {/* Unified Header & Navigation Bar */}
       <div className="max-w-7xl mx-auto px-6 pt-6 pb-2 space-y-4">
-        <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-white/10 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="rounded-3xl bg-gradient-to-br from-[#141C25] via-[#101822] to-[#0B1017] border border-border p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#45D6B5]/15 text-[#45D6B5] text-xs font-semibold">
               <Layers className="w-3.5 h-3.5" /> NEWS &amp; COMMUNITY HUB
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F3F6F8] mt-2">News &amp; Community</h1>
-            <p className="text-xs sm:text-sm text-[#93A2B4] mt-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary mt-2">News &amp; Community</h1>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1">
               Verified market news, trending topics, AI insights, social discussions, and structured Q&amp;A forums in one place.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
+        <div className="flex flex-wrap gap-2 border-b border-border pb-3">
           {[
             { id: 'overview', label: 'Overview', icon: Layers },
             { id: 'news', label: 'Financial News', icon: Newspaper },
@@ -116,7 +116,7 @@ export const NewsCommunityPage: React.FC = () => {
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
                   active
                     ? 'bg-[#45D6B5] text-[#0B1017]'
-                    : 'bg-[#141C25] text-[#93A2B4] border border-white/10 hover:text-white'
+                    : 'bg-surface text-text-secondary border border-border hover:text-text-primary'
                 }`}
               >
                 <Icon className="w-4 h-4" /> {t.label}
@@ -138,7 +138,7 @@ export const NewsCommunityPage: React.FC = () => {
                   className={`px-3 py-1.5 rounded-lg text-xs font-mono transition ${
                     overviewFilter === f
                       ? 'bg-[#78A9FF] text-[#0B1017] font-bold'
-                      : 'bg-[#141C25] text-[#93A2B4] border border-white/10 hover:text-white'
+                      : 'bg-surface text-text-secondary border border-border hover:text-text-primary'
                   }`}
                 >
                   {f}
@@ -150,9 +150,9 @@ export const NewsCommunityPage: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Financial News Card */}
             {showMarkets && (
-              <div className="rounded-2xl bg-[#141C25] border border-white/10 p-5 space-y-4">
+              <div className="rounded-2xl bg-surface border border-border p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-[#F3F6F8] flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
                     <Newspaper className="w-4 h-4 text-[#45D6B5]" /> Verified Financial News
                   </h2>
                   <button onClick={() => selectTab('news')} className="text-xs text-[#45D6B5] hover:underline font-semibold">
@@ -160,18 +160,18 @@ export const NewsCommunityPage: React.FC = () => {
                   </button>
                 </div>
                 {loadingOverview && overviewNews.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">Loading market headlines...</div>
+                  <div className="text-xs text-text-secondary">Loading market headlines...</div>
                 ) : overviewNews.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">No recent headlines available.</div>
+                  <div className="text-xs text-text-secondary">No recent headlines available.</div>
                 ) : (
                   <div className="space-y-3">
                     {overviewNews.map((a: any) => (
-                      <div key={a.id} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 space-y-1">
+                      <div key={a.id} className="p-3 rounded-xl bg-background border border-border space-y-1">
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="px-2 py-0.5 rounded bg-[#45D6B5]/15 text-[#45D6B5] font-bold">NEWS</span>
-                          <span className="text-[#93A2B4]">{a.source} • {a.category}</span>
+                          <span className="text-text-secondary">{a.source} • {a.category}</span>
                         </div>
-                        <div className="text-xs font-semibold text-[#F3F6F8] line-clamp-2">{a.title}</div>
+                        <div className="text-xs font-semibold text-text-primary line-clamp-2">{a.title}</div>
                       </div>
                     ))}
                   </div>
@@ -181,9 +181,9 @@ export const NewsCommunityPage: React.FC = () => {
 
             {/* Hot Topics & AI Insights Card */}
             {showTrending && (
-              <div className="rounded-2xl bg-[#141C25] border border-white/10 p-5 space-y-4">
+              <div className="rounded-2xl bg-surface border border-border p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-[#F3F6F8] flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
                     <Flame className="w-4 h-4 text-[#F5B942]" /> Hot Topics &amp; AI Insights
                   </h2>
                   <button onClick={() => selectTab('hot-topics')} className="text-xs text-[#45D6B5] hover:underline font-semibold">
@@ -191,20 +191,20 @@ export const NewsCommunityPage: React.FC = () => {
                   </button>
                 </div>
                 {loadingOverview && overviewTopics.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">Loading trending topics...</div>
+                  <div className="text-xs text-text-secondary">Loading trending topics...</div>
                 ) : overviewTopics.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">No trending topics right now.</div>
+                  <div className="text-xs text-text-secondary">No trending topics right now.</div>
                 ) : (
                   <div className="space-y-3">
                     {overviewTopics.map((t: any) => (
-                      <div key={t.id} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 space-y-1">
+                      <div key={t.id} className="p-3 rounded-xl bg-background border border-border space-y-1">
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="px-2 py-0.5 rounded bg-[#F5B942]/15 text-[#F5B942] font-bold inline-flex items-center gap-1">
                             <Sparkles className="w-2.5 h-2.5" /> TRENDING / AI INSIGHT
                           </span>
-                          <span className="text-[#93A2B4]">{t.category}</span>
+                          <span className="text-text-secondary">{t.category}</span>
                         </div>
-                        <div className="text-xs font-semibold text-[#F3F6F8] line-clamp-2">{t.title}</div>
+                        <div className="text-xs font-semibold text-text-primary line-clamp-2">{t.title}</div>
                       </div>
                     ))}
                   </div>
@@ -214,9 +214,9 @@ export const NewsCommunityPage: React.FC = () => {
 
             {/* Community Social Posts */}
             {showDiscussions && (
-              <div className="rounded-2xl bg-[#141C25] border border-white/10 p-5 space-y-4">
+              <div className="rounded-2xl bg-surface border border-border p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-[#F3F6F8] flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#78A9FF]" /> Community Posts &amp; Debates
                   </h2>
                   <button onClick={() => selectTab('community')} className="text-xs text-[#45D6B5] hover:underline font-semibold">
@@ -224,18 +224,18 @@ export const NewsCommunityPage: React.FC = () => {
                   </button>
                 </div>
                 {loadingOverview && overviewPosts.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">Loading community posts...</div>
+                  <div className="text-xs text-text-secondary">Loading community posts...</div>
                 ) : overviewPosts.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">No community posts yet. Share an insight or join a Squad!</div>
+                  <div className="text-xs text-text-secondary">No community posts yet. Share an insight or join a Squad!</div>
                 ) : (
                   <div className="space-y-3">
                     {overviewPosts.map((p: any) => (
-                      <div key={p.id} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 space-y-1">
+                      <div key={p.id} className="p-3 rounded-xl bg-background border border-border space-y-1">
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="px-2 py-0.5 rounded bg-[#78A9FF]/15 text-[#78A9FF] font-bold">COMMUNITY</span>
-                          <span className="text-[#93A2B4]">@{p.username} • {p.post_type}</span>
+                          <span className="text-text-secondary">@{p.username} • {p.post_type}</span>
                         </div>
-                        <div className="text-xs font-semibold text-[#F3F6F8] line-clamp-2">{p.title}</div>
+                        <div className="text-xs font-semibold text-text-primary line-clamp-2">{p.title}</div>
                       </div>
                     ))}
                   </div>
@@ -245,9 +245,9 @@ export const NewsCommunityPage: React.FC = () => {
 
             {/* Structured Forums Threads */}
             {showDiscussions && (
-              <div className="rounded-2xl bg-[#141C25] border border-white/10 p-5 space-y-4">
+              <div className="rounded-2xl bg-surface border border-border p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-[#F3F6F8] flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-[#45D6B5]" /> Structured Forum Threads
                   </h2>
                   <button onClick={() => selectTab('forums')} className="text-xs text-[#45D6B5] hover:underline font-semibold">
@@ -255,18 +255,18 @@ export const NewsCommunityPage: React.FC = () => {
                   </button>
                 </div>
                 {loadingOverview && overviewThreads.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">Loading forum threads...</div>
+                  <div className="text-xs text-text-secondary">Loading forum threads...</div>
                 ) : overviewThreads.length === 0 ? (
-                  <div className="text-xs text-[#93A2B4]">No forum threads yet.</div>
+                  <div className="text-xs text-text-secondary">No forum threads yet.</div>
                 ) : (
                   <div className="space-y-3">
                     {overviewThreads.map((th: any) => (
-                      <div key={th.id} className="p-3 rounded-xl bg-[#0B1017] border border-white/10 space-y-1">
+                      <div key={th.id} className="p-3 rounded-xl bg-background border border-border space-y-1">
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="px-2 py-0.5 rounded bg-[#45D6B5]/15 text-[#45D6B5] font-bold">FORUM</span>
-                          <span className="text-[#93A2B4]">{th.category} • {th.comment_count || 0} replies</span>
+                          <span className="text-text-secondary">{th.category} • {th.comment_count || 0} replies</span>
                         </div>
-                        <div className="text-xs font-semibold text-[#F3F6F8] line-clamp-2">{th.title}</div>
+                        <div className="text-xs font-semibold text-text-primary line-clamp-2">{th.title}</div>
                       </div>
                     ))}
                   </div>

@@ -401,19 +401,16 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
     const el = rsiWrapRef.current;
     if (!el || !indicators.rsi.enabled || rsiData.length === 0) return;
 
+    const ct = getLightweightChartTheme(resolvedTheme);
     const chart = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: '#0B1017' },
-        textColor: '#93A2B4',
+        ...ct.layout,
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 10,
       },
-      grid: {
-        vertLines: { color: 'rgba(34, 49, 66, 0.35)' },
-        horzLines: { color: 'rgba(34, 49, 66, 0.35)' },
-      },
-      rightPriceScale: { borderColor: '#223142' },
-      timeScale: { borderColor: '#223142', visible: !indicators.macd.enabled },
+      grid: ct.grid,
+      rightPriceScale: { borderColor: ct.borderColor },
+      timeScale: { borderColor: ct.borderColor, visible: !indicators.macd.enabled },
       width: el.clientWidth,
       height: 120,
     });
@@ -441,19 +438,16 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
     const el = macdWrapRef.current;
     if (!el || !indicators.macd.enabled || macdData.length === 0) return;
 
+    const ct = getLightweightChartTheme(resolvedTheme);
     const chart = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: '#0B1017' },
-        textColor: '#93A2B4',
+        ...ct.layout,
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 10,
       },
-      grid: {
-        vertLines: { color: 'rgba(34, 49, 66, 0.35)' },
-        horzLines: { color: 'rgba(34, 49, 66, 0.35)' },
-      },
-      rightPriceScale: { borderColor: '#223142' },
-      timeScale: { borderColor: '#223142' },
+      grid: ct.grid,
+      rightPriceScale: { borderColor: ct.borderColor },
+      timeScale: { borderColor: ct.borderColor },
       width: el.clientWidth,
       height: 130,
     });

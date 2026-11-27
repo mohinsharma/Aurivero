@@ -92,7 +92,7 @@ export const VisualLearningDiagrams: React.FC = () => {
             <text x="24" y="26" fill="#ef4444" fontSize="11" fontFamily="monospace">RESISTANCE (Supply Zone)</text>
             <line x1="20" y1="135" x2="540" y2="135" stroke="#10b981" strokeWidth="2" strokeDasharray="5 4" />
             <text x="24" y="153" fill="#10b981" fontSize="11" fontFamily="monospace">SUPPORT (Demand Zone)</text>
-            <polyline points="30,130 110,40 190,132 280,42 360,131 460,40 520,95" fill="none" stroke="#e2e8f0" strokeWidth="2.5" />
+            <polyline points="30,130 110,40 190,132 280,42 360,131 460,40 520,95" fill="none" stroke="rgb(var(--rgb-text-primary))" strokeWidth="2.5" />
           </svg>
         );
       case 'BREAKOUT_FAKEOUT':
@@ -111,8 +111,8 @@ export const VisualLearningDiagrams: React.FC = () => {
           <svg viewBox="0 0 560 170" className="w-full h-44">
             <rect x="60" y="25" width="440" height="65" fill="rgba(16,185,129,0.16)" stroke="#10b981" />
             <text x="72" y="55" fill="#10b981" fontSize="12" fontFamily="monospace">TARGET REWARD (+2.5R)</text>
-            <line x1="40" y1="90" x2="520" y2="90" stroke="#e2e8f0" strokeWidth="2" />
-            <text x="72" y="84" fill="#e2e8f0" fontSize="11" fontFamily="monospace">ENTRY</text>
+            <line x1="40" y1="90" x2="520" y2="90" stroke="rgb(var(--rgb-text-primary))" strokeWidth="2" />
+            <text x="72" y="84" fill="rgb(var(--rgb-text-primary))" fontSize="11" fontFamily="monospace">ENTRY</text>
             <rect x="60" y="90" width="440" height="30" fill="rgba(239,68,68,0.18)" stroke="#ef4444" />
             <text x="72" y="110" fill="#ef4444" fontSize="12" fontFamily="monospace">STOP-LOSS RISK (-1R) · Invalidation Level</text>
           </svg>
@@ -127,7 +127,7 @@ export const VisualLearningDiagrams: React.FC = () => {
             ].map((b) => (
               <g key={b.lbl}>
                 <rect x="20" y={b.y} width={b.w} height="24" rx="4" fill={b.col} opacity="0.85" />
-                <text x={b.w + 32} y={b.y + 16} fill="#e2e8f0" fontSize="12" fontFamily="monospace">{b.lbl}</text>
+                <text x={b.w + 32} y={b.y + 16} fill="rgb(var(--rgb-text-primary))" fontSize="12" fontFamily="monospace">{b.lbl}</text>
               </g>
             ))}
           </svg>

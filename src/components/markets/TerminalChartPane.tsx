@@ -597,16 +597,16 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
     const el = subPaneRef.current;
     if (!el || !activeOscillator || candles.length === 0) return;
 
+    const ct = getLightweightChartTheme(resolvedTheme);
     const sub = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: '#0B1017' },
-        textColor: '#93A2B4',
+        ...ct.layout,
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 10,
       },
-      grid: { vertLines: { color: 'rgba(34,49,66,0.3)' }, horzLines: { color: 'rgba(34,49,66,0.3)' } },
-      rightPriceScale: { borderColor: '#223142' },
-      timeScale: { borderColor: '#223142' },
+      grid: ct.grid,
+      rightPriceScale: { borderColor: ct.borderColor },
+      timeScale: { borderColor: ct.borderColor },
       width: el.clientWidth,
       height: 120,
     });

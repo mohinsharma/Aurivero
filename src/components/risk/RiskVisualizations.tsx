@@ -169,10 +169,10 @@ export const UnderwaterDrawdownChart: React.FC<UnderwaterDrawdownProps> = ({
                 y1={pad}
                 x2={points[hoverIdx].x}
                 y2={height - pad}
-                stroke="rgba(255,255,255,0.25)"
+                stroke="rgb(var(--rgb-border))"
                 strokeDasharray="2 2"
               />
-              <circle cx={points[hoverIdx].x} cy={points[hoverIdx].y} r="4" fill="#ef4444" stroke="#0f172a" strokeWidth="1.5" />
+              <circle cx={points[hoverIdx].x} cy={points[hoverIdx].y} r="4" fill="#ef4444" stroke="rgb(var(--rgb-surface))" strokeWidth="1.5" />
             </>
           )}
         </svg>
@@ -353,8 +353,8 @@ export const MlOutOfSampleChart: React.FC<MlOutOfSampleProps> = ({ series }) => 
           }}
         >
           <path d={makePath(basePts)} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4 3" />
-          <path d={makePath(actualPts)} fill="none" stroke="#e2e8f0" strokeWidth="1.8" />
-          <path d={makePath(mlPts)} fill="none" stroke="#10b981" strokeWidth="2.2" />
+          <path d={makePath(actualPts)} fill="none" stroke="rgb(var(--rgb-text-primary))" strokeWidth="1.8" />
+          <path d={makePath(mlPts)} fill="none" stroke="rgb(var(--rgb-primary))" strokeWidth="2.2" />
 
           {hoverIdx !== null && actualPts[hoverIdx] && (
             <line
@@ -362,7 +362,7 @@ export const MlOutOfSampleChart: React.FC<MlOutOfSampleProps> = ({ series }) => 
               y1={pad}
               x2={actualPts[hoverIdx].x}
               y2={height - pad}
-              stroke="rgba(255,255,255,0.25)"
+              stroke="rgb(var(--rgb-border))"
               strokeDasharray="2 2"
             />
           )}

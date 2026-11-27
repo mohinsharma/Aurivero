@@ -338,7 +338,7 @@ export const HeatmapPage: React.FC = () => {
           No stocks matched the current filter criteria.
         </Card>
       ) : (
-        <div className="relative w-full h-[600px] rounded-2xl border border-border bg-[#0B1017] overflow-hidden">
+        <div className="relative w-full h-[600px] rounded-2xl border border-border bg-background overflow-hidden">
           {sectorLayouts.map((secRect) => {
             const group = secRect.data;
             const tiles = layoutTreemap(
@@ -389,15 +389,15 @@ export const HeatmapPage: React.FC = () => {
                         }}
                         className="absolute border border-[#0B1017]/90 p-1.5 flex flex-col items-center justify-center text-center cursor-pointer hover:brightness-125 transition-all overflow-hidden select-none"
                       >
-                        <span className="font-mono font-extrabold text-[11px] sm:text-xs text-white leading-tight truncate max-w-full">
+                        <span className="font-mono font-extrabold text-[11px] sm:text-xs text-text-primary leading-tight truncate max-w-full">
                           {st.symbol}
                         </span>
-                        <span className="font-mono text-[10px] sm:text-[11px] font-bold text-white/95">
+                        <span className="font-mono text-[10px] sm:text-[11px] font-bold text-text-primary/95">
                           {st.changePercent >= 0 ? '+' : ''}
                           {st.changePercent.toFixed(2)}%
                         </span>
                         {showFull && (
-                          <span className="font-mono text-[9px] text-white/80 truncate max-w-full">
+                          <span className="font-mono text-[9px] text-text-primary/80 truncate max-w-full">
                             ₹{st.price.toLocaleString('en-IN')}
                           </span>
                         )}
