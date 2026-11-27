@@ -46,6 +46,7 @@
   --aurivero-shadow-glass: 0 10px 30px rgba(23, 33, 29, 0.08);
 }
 
+html.dark,
 .dark,
 [data-theme="dark"] {
   --rgb-background: 13 21 18;          /* #0D1512 */

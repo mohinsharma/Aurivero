@@ -991,7 +991,7 @@ export const ArenaPage: React.FC = () => {
                   loadDashboard();
                   if (lbScope === 'university') loadLeaderboard('university');
                 }}
-                className="px-3 py-1.5 rounded-xl bg-surface-elevated text-xs font-semibold text-text-primary hover:bg-white/20"
+                className="px-3 py-1.5 rounded-xl bg-surface-elevated text-xs font-semibold text-text-primary hover:bg-surface-card"
               >
                 Save University
               </button>

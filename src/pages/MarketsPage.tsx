@@ -175,10 +175,10 @@ export const MarketsPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header & Global Search */}
-      <div className="rounded-2xl liquid-glass p-6 space-y-5">
+      <div className="rounded-2xl bg-surface border border-border shadow-sm p-6 space-y-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-gold/10 border border-gold/30 text-gold text-[11px] font-mono font-semibold mb-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-subtle-green border border-primary/30 text-primary text-[11px] font-mono font-semibold mb-2">
               <Activity size={13} />
               MULTI-ASSET MARKETS TERMINAL
             </div>
