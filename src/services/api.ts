@@ -331,6 +331,77 @@ class ApiClient {
       method: 'POST'
     })
   };
+
+  // 15. Unified Multi-Asset Markets Endpoints
+  public markets = {
+    getOverview: () => this.request<any>('/api/markets/overview'),
+    search: (q: string, assetClass?: string, limit = 15) => {
+      const params = new URLSearchParams();
+      if (q) params.append('q', q);
+      if (assetClass) params.append('asset_class', assetClass);
+      params.append('limit', String(limit));
+      return this.request<any>(`/api/markets/search?${params.toString()}`);
+    },
+    listInstruments: (assetClass: 'STOCK' | 'CRYPTO' | 'FOREX', params?: { q?: string; exchange?: string; limit?: number; offset?: number; with_quotes?: boolean }) => {
+      const sp = new URLSearchParams();
+      if (params?.q) sp.append('q', params.q);
+      if (params?.exchange) sp.append('exchange', params.exchange);
+      if (params?.limit !== undefined) sp.append('limit', String(params.limit));
+      if (params?.offset !== undefined) sp.append('offset', String(params.offset));
+      if (params?.with_quotes !== undefined) sp.append('with_quotes', String(params.with_quotes));
+      const qs = sp.toString();
+      return this.request<any>(qs ? `/api/markets/instruments/${assetClass}?${qs}` : `/api/markets/instruments/${assetClass}`);
+    },
+    getQuote: (assetClass: 'STOCK' | 'CRYPTO' | 'FOREX', symbol: string, signal?: AbortSignal) =>
+      this.request<any>(`/api/markets/quote/${assetClass}/${encodeURIComponent(symbol)}`, { signal }),
+    getCandles: (
+      assetClass: 'STOCK' | 'CRYPTO' | 'FOREX',
+      symbol: string,
+      params?: { timeframe?: string; limit?: number; before?: number },
+      signal?: AbortSignal
+    ) => {
+      const sp = new URLSearchParams();
+      if (params?.timeframe) sp.append('timeframe', params.timeframe);
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.before) sp.append('before', String(params.before));
+      const qs = sp.toString();
+      return this.request<any>(
+        qs ? `/api/markets/candles/${assetClass}/${encodeURIComponent(symbol)}?${qs}` : `/api/markets/candles/${assetClass}/${encodeURIComponent(symbol)}`,
+        { signal }
+      );
+    },
+    getHealth: () => this.request<any>('/api/markets/health'),
+    getWsUrl: (assetClass: 'STOCK' | 'CRYPTO' | 'FOREX', symbol: string) => {
+      const wsBase = API_BASE_URL.replace(/^http/, 'ws');
+      return `${wsBase}/api/markets/ws/${assetClass}/${encodeURIComponent(symbol)}`;
+    }
+  };
+
+  // 16. Multi-Watchlist Management Endpoints
+  public watchlists = {
+    list: (includeQuotes = true) => this.request<any>(`/api/watchlists?include_quotes=${includeQuotes}`),
+    create: (payload: { name: string; description?: string }) => this.request<any>('/api/watchlists', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    update: (id: string, payload: { name?: string; description?: string; sort_order?: number }) => this.request<any>(`/api/watchlists/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    }),
+    delete: (id: string) => this.request<any>(`/api/watchlists/${id}`, { method: 'DELETE' }),
+    addItem: (watchlistId: string, payload: { asset_class: 'STOCK' | 'CRYPTO' | 'FOREX'; symbol: string; exchange?: string; name?: string; target_price?: number; alert_enabled?: boolean; notes?: string }) =>
+      this.request<any>(`/api/watchlists/${watchlistId}/items`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      }),
+    removeItem: (watchlistId: string, itemId: string) => this.request<any>(`/api/watchlists/${watchlistId}/items/${itemId}`, {
+      method: 'DELETE'
+    }),
+    reorder: (watchlistId: string, itemIds: string[]) => this.request<any>(`/api/watchlists/${watchlistId}/reorder`, {
+      method: 'PATCH',
+      body: JSON.stringify({ item_ids: itemIds })
+    })
+  };
 }
 
 export const api = new ApiClient();

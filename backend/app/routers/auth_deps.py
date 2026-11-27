@@ -26,7 +26,14 @@ def get_current_user_optional(authorization: Optional[str] = Header(None)) -> Di
             if user:
                 return dict(user)
         except Exception:
-            pass
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired authentication token."
+            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authenticated user not found."
+        )
 
     # Default to seed demo user
     conn = get_connection()

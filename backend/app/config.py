@@ -20,8 +20,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./mindmark.db"
 
     # Market Data
-    MARKET_DATA_PROVIDER: str = "verified_historical"
-    ENABLE_LIVE_DATA_REFRESH: bool = False
+    MARKET_DATA_PROVIDER: str = "multi_adapter"
+    ENABLE_LIVE_DATA_REFRESH: bool = True
+    TWELVE_DATA_API_KEY: str = ""
+    UPSTOX_ACCESS_TOKEN: str = ""
+    COINGECKO_API_KEY: str = ""
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://localhost:5173"

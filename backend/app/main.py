@@ -24,6 +24,8 @@ from backend.app.routers.forums import router as forums_router
 from backend.app.routers.academy import router as academy_router
 from backend.app.routers.personalization import router as personalization_router
 from backend.app.routers.admin import router as admin_router
+from backend.app.routers.markets import router as markets_router
+from backend.app.routers.watchlists import router as watchlists_router
 
 app = FastAPI(
     title="MINDMARK API — AI Financial Market Learning Simulator",
@@ -76,6 +78,8 @@ app.include_router(forums_router)
 app.include_router(academy_router)
 app.include_router(personalization_router)
 app.include_router(admin_router)
+app.include_router(markets_router)
+app.include_router(watchlists_router)
 
 @app.get("/")
 def root():

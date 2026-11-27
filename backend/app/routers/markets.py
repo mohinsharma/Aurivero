@@ -1,0 +1,235 @@
+from __future__ import annotations
+
+import asyncio
+import logging
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+
+from backend.app.models import StandardAPIResponse
+from backend.app.services.providers import (
+    SUPPORTED_TIMEFRAMES,
+    Timeframe,
+    crypto_provider,
+    forex_provider,
+    get_provider,
+    stocks_provider,
+)
+from backend.app.services.providers.cache_and_limiter import api_rate_limiter
+from backend.app.services.stream_manager import stream_manager
+
+logger = logging.getLogger("mindmark.routers.markets")
+
+router = APIRouter(prefix="/api/markets", tags=["Unified Multi-Asset Markets"])
+
+
+def _enforce_rate_limit(request: Request, scope: str) -> None:
+    client_ip = request.client.host if request.client else "unknown"
+    allowed, retry_after = api_rate_limiter.check(f"{scope}:{client_ip}")
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Rate limit exceeded. Retry after {retry_after}s.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+
+@router.get("/overview", response_model=StandardAPIResponse)
+async def get_market_overview(request: Request):
+    _enforce_rate_limit(request, "overview")
+
+    index_symbols = ["NIFTY50", "BANKNIFTY", "SENSEX"]
+    stock_symbols = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL", "ITC", "M&M", "LT"]
+    crypto_symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT", "AVAXUSDT", "DOGEUSDT"]
+    forex_symbols = ["EURUSD", "GBPUSD", "USDJPY", "USDINR", "AUDUSD", "EURINR"]
+
+    idx_quotes, stk_quotes, crp_quotes, fx_quotes = await asyncio.gather(
+        asyncio.gather(*(stocks_provider.get_quote(s) for s in index_symbols)),
+        asyncio.gather(*(stocks_provider.get_quote(s) for s in stock_symbols)),
+        asyncio.gather(*(crypto_provider.get_quote(s) for s in crypto_symbols)),
+        asyncio.gather(*(forex_provider.get_quote(s) for s in forex_symbols)),
+    )
+
+    valid_stocks = [q for q in stk_quotes if q.price is not None and q.changePercent is not None]
+    top_gainers = sorted(valid_stocks, key=lambda q: q.changePercent or 0.0, reverse=True)[:5]
+    top_losers = sorted(valid_stocks, key=lambda q: q.changePercent or 0.0)[:5]
+    most_active = sorted(valid_stocks, key=lambda q: q.volume or 0.0, reverse=True)[:5]
+
+    valid_crypto = [q for q in crp_quotes if q.price is not None]
+    trending_crypto = sorted(valid_crypto, key=lambda q: abs(q.changePercent or 0.0), reverse=True)[:6]
+
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "indices": [q.model_dump() for q in idx_quotes],
+            "stocks": {
+                "topGainers": [q.model_dump() for q in top_gainers],
+                "topLosers": [q.model_dump() for q in top_losers],
+                "mostActive": [q.model_dump() for q in most_active],
+                "all": [q.model_dump() for q in stk_quotes],
+            },
+            "crypto": {
+                "trending": [q.model_dump() for q in trending_crypto],
+                "all": [q.model_dump() for q in crp_quotes],
+            },
+            "forex": {
+                "popular": [q.model_dump() for q in fx_quotes],
+            },
+        },
+    )
+
+
+@router.get("/search", response_model=StandardAPIResponse)
+async def search_all_markets(
+    request: Request,
+    q: str = Query("", max_length=80),
+    asset_class: Optional[str] = Query(None),
+    limit: int = Query(15, ge=1, le=50),
+):
+    _enforce_rate_limit(request, "search")
+    ac = asset_class.upper().strip() if asset_class else None
+
+    tasks = []
+    if ac in (None, "ALL", "STOCK"):
+        tasks.append(stocks_provider.search_instruments(q, limit=limit))
+    if ac in (None, "ALL", "CRYPTO"):
+        tasks.append(crypto_provider.search_instruments(q, limit=limit))
+    if ac in (None, "ALL", "FOREX"):
+        tasks.append(forex_provider.search_instruments(q, limit=limit))
+
+    results_lists = await asyncio.gather(*tasks)
+    combined = [item.model_dump() for sublist in results_lists for item in sublist]
+    return StandardAPIResponse(
+        success=True,
+        data={"results": combined[: limit * 3], "total": len(combined)},
+    )
+
+
+@router.get("/instruments/{asset_class}", response_model=StandardAPIResponse)
+async def list_market_instruments(
+    request: Request,
+    asset_class: str,
+    q: Optional[str] = Query(None, max_length=80),
+    exchange: Optional[str] = Query(None, max_length=20),
+    limit: int = Query(24, ge=1, le=60),
+    offset: int = Query(0, ge=0),
+    with_quotes: bool = Query(True),
+):
+    _enforce_rate_limit(request, "instruments")
+    try:
+        provider = get_provider(asset_class)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    if q and q.strip():
+        metas = await provider.search_instruments(q.strip(), limit=limit + offset)
+        metas = metas[offset : offset + limit]
+    else:
+        metas = await provider.list_instruments(limit=limit, offset=offset)
+
+    if exchange and exchange.upper() != "ALL":
+        metas = [m for m in metas if m.exchange.upper() == exchange.upper()]
+
+    if with_quotes and metas:
+        quotes = await asyncio.gather(*(provider.get_quote(m.symbol) for m in metas))
+        items = [qt.model_dump() for qt in quotes]
+    else:
+        items = [m.model_dump() for m in metas]
+
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "assetClass": asset_class.upper(),
+            "items": items,
+            "count": len(items),
+            "offset": offset,
+            "limit": limit,
+        },
+    )
+
+
+@router.get("/quote/{asset_class}/{symbol}", response_model=StandardAPIResponse)
+async def get_instrument_quote(request: Request, asset_class: str, symbol: str):
+    _enforce_rate_limit(request, "quote")
+    try:
+        provider = get_provider(asset_class)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    meta = await provider.get_metadata(symbol)
+    quote = await provider.get_quote(symbol)
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "metadata": meta.model_dump() if meta else None,
+            "quote": quote.model_dump(),
+        },
+    )
+
+
+@router.get("/candles/{asset_class}/{symbol}", response_model=StandardAPIResponse)
+async def get_instrument_candles(
+    request: Request,
+    asset_class: str,
+    symbol: str,
+    timeframe: str = Query("1d"),
+    limit: int = Query(200, ge=10, le=500),
+    before: Optional[int] = Query(None),
+):
+    _enforce_rate_limit(request, "candles")
+    if timeframe not in SUPPORTED_TIMEFRAMES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported timeframe '{timeframe}'. Supported: {', '.join(SUPPORTED_TIMEFRAMES)}",
+        )
+    try:
+        provider = get_provider(asset_class)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    series = await provider.get_candles(
+        symbol=symbol,
+        timeframe=timeframe,  # type: ignore[arg-type]
+        limit=limit,
+        before=before,
+    )
+    return StandardAPIResponse(success=True, data=series.model_dump())
+
+
+@router.get("/health", response_model=StandardAPIResponse)
+async def get_markets_health():
+    healths = await asyncio.gather(
+        stocks_provider.health_check(),
+        crypto_provider.health_check(),
+        forex_provider.health_check(),
+    )
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "providers": [h.model_dump() for h in healths],
+            "activeStreams": stream_manager.active_subscriptions(),
+        },
+    )
+
+
+@router.websocket("/ws/{asset_class}/{symbol}")
+async def market_stream_ws(websocket: WebSocket, asset_class: str, symbol: str):
+    ac = asset_class.upper().strip()
+    if ac not in ("STOCK", "CRYPTO", "FOREX"):
+        await websocket.close(code=1008, reason="Unsupported asset class")
+        return
+
+    await websocket.accept()
+    await stream_manager.subscribe(ac, symbol.upper(), websocket)
+    try:
+        while True:
+            # Keep connection alive and allow client ping/heartbeat
+            msg = await websocket.receive_text()
+            if msg == "ping":
+                await websocket.send_text('{"type":"PONG"}')
+    except WebSocketDisconnect:
+        pass
+    except Exception as exc:
+        logger.debug("ws_closed asset=%s symbol=%s err=%s", ac, symbol, exc)
+    finally:
+        await stream_manager.unsubscribe(ac, symbol.upper(), websocket)

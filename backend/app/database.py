@@ -11,6 +11,7 @@ DB_FILE = "mindmark.db"
 def get_connection():
     conn = sqlite3.connect(DB_FILE, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
 def init_db():
@@ -927,6 +928,73 @@ def seed_ecosystem_data(conn):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, watchlists)
 
+    # --------------------------------------------------------------------------
+    # 6. MULTI-ASSET MARKETS, WATCHLISTS & CACHE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS market_instruments (
+        id TEXT PRIMARY KEY,
+        symbol TEXT NOT NULL,
+        display_symbol TEXT NOT NULL,
+        name TEXT NOT NULL,
+        asset_class TEXT NOT NULL,
+        exchange TEXT NOT NULL,
+        currency TEXT NOT NULL,
+        sector_or_category TEXT,
+        metadata_json TEXT,
+        updated_at TEXT NOT NULL,
+        UNIQUE (asset_class, symbol)
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_instruments_class_sym ON market_instruments(asset_class, symbol);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS watchlists (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        sort_order INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_watchlists_user_id ON watchlists(user_id);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS watchlist_items (
+        id TEXT PRIMARY KEY,
+        watchlist_id TEXT NOT NULL,
+        asset_class TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        exchange TEXT NOT NULL,
+        name TEXT NOT NULL,
+        sort_order INTEGER DEFAULT 0,
+        target_price REAL,
+        alert_enabled INTEGER DEFAULT 0,
+        notes TEXT,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (watchlist_id) REFERENCES watchlists (id) ON DELETE CASCADE,
+        UNIQUE (watchlist_id, asset_class, symbol)
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_watchlist_items_wl_id ON watchlist_items(watchlist_id);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS market_data_cache (
+        cache_key TEXT PRIMARY KEY,
+        asset_class TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        source TEXT NOT NULL,
+        provider_timestamp TEXT,
+        retrieved_at TEXT NOT NULL,
+        expires_at REAL NOT NULL
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_data_cache_sym ON market_data_cache(asset_class, symbol);")
+
     # 5. User Notifications Seeds
     cursor.execute("SELECT COUNT(*) FROM user_notifications")
     if cursor.fetchone()[0] == 0:
@@ -939,6 +1007,26 @@ def seed_ecosystem_data(conn):
         INSERT INTO user_notifications (id, user_id, title, message, category, action_url, is_read, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, notifications)
+
+    # 6. Multi-Watchlist Seeds for Demo User
+    cursor.execute("SELECT COUNT(*) FROM watchlists WHERE user_id = ?", (demo_user_id,))
+    if cursor.fetchone()[0] == 0:
+        default_wl_id = "wl-core-001"
+        cursor.execute("""
+        INSERT INTO watchlists (id, user_id, name, description, sort_order, created_at, updated_at)
+        VALUES (?, ?, ?, ?, 0, ?, ?)
+        """, (default_wl_id, demo_user_id, "Core Multi-Asset", "Indian blue-chips, major crypto, and benchmark FX", now, now))
+        seed_items = [
+            ("wli-1", default_wl_id, "STOCK", "RELIANCE", "NSE", "Reliance Industries Ltd.", 0, None, 0, None, now),
+            ("wli-2", default_wl_id, "STOCK", "TCS", "NSE", "Tata Consultancy Services Ltd.", 1, None, 0, None, now),
+            ("wli-3", default_wl_id, "CRYPTO", "BTCUSDT", "BINANCE", "Bitcoin", 2, None, 0, None, now),
+            ("wli-4", default_wl_id, "CRYPTO", "ETHUSDT", "BINANCE", "Ethereum", 3, None, 0, None, now),
+            ("wli-5", default_wl_id, "FOREX", "USDINR", "FX", "US Dollar / Indian Rupee", 4, None, 0, None, now),
+        ]
+        cursor.executemany("""
+        INSERT INTO watchlist_items (id, watchlist_id, asset_class, symbol, exchange, name, sort_order, target_price, alert_enabled, notes, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, seed_items)
 
     conn.commit()
 

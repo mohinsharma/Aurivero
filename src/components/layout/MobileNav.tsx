@@ -34,14 +34,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
 
   const bottomBarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Markets', path: '/markets', icon: Coins },
     { name: 'Simulator', path: '/simulator', icon: CandlestickChart },
-    { name: 'Markets', path: '/market-intelligence', icon: Coins },
     { name: 'Forums', path: '/forums', icon: MessageSquare },
     { name: 'Academy', path: '/academy', icon: GraduationCap },
   ];
 
   const fullDrawerItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Markets (Stocks, Crypto, FX)', path: '/markets', icon: Coins },
     { name: 'Paper Trading Simulator', path: '/simulator', icon: CandlestickChart },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
     { name: 'Market Intelligence (Crypto/FX)', path: '/market-intelligence', icon: Coins },

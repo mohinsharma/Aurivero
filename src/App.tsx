@@ -21,6 +21,8 @@ import { CommunityForumsPage } from './pages/CommunityForumsPage';
 import { AcademyPage } from './pages/AcademyPage';
 import { PersonalHubPage } from './pages/PersonalHubPage';
 import { AdminPage } from './pages/AdminPage';
+import { MarketsPage } from './pages/MarketsPage';
+import { InstrumentDetailPage } from './pages/InstrumentDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export const App: React.FC = () => {
@@ -44,6 +46,11 @@ export const App: React.FC = () => {
               <Route path="/market-replay" element={<MarketReplayPage />} />
               <Route path="/news-explainer" element={<NewsExplainerPage />} />
               <Route path="/challenges" element={<ChallengesPage />} />
+
+              {/* Unified Multi-Asset Markets Routes */}
+              <Route path="/markets" element={<MarketsPage />} />
+              <Route path="/markets/:tab" element={<MarketsPage />} />
+              <Route path="/markets/:assetClass/:symbol" element={<InstrumentDetailPage />} />
 
               {/* Blockchain, Crypto & Forex Ecosystem Routes */}
               <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
