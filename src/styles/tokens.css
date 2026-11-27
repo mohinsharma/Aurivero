@@ -33,8 +33,8 @@
 [data-theme="dark"] {
   --rgb-background: 13 21 18;          /* #0D1512 */
   --rgb-surface: 18 30 25;             /* #121E19 */
-  --rgb-surface-elevated: 24 39 32;    /* #182720 */
-  --rgb-surface-card: 27 43 35;        /* #1B2B23 */
+  --rgb-surface-elevated: 27 43 35;    /* #1B2B23 */
+  --rgb-surface-card: 24 37 30;        /* #18251E */
   --rgb-subtle-green: 25 56 44;        /* #19382C */
 
   --rgb-primary: 0 200 150;            /* #00C896 */

@@ -25,21 +25,21 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary flex flex-col antialiased selection:bg-gold/25 selection:text-text-primary">
-      {/* Top persistent Liquid Glass navigation */}
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-background text-text-primary flex flex-col antialiased selection:bg-primary/20 selection:text-text-primary">
+      {/* Top persistent navigation */}
       <Navbar onToggleMobileMenu={() => setIsMobileMenuOpen(true)} />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Persistent Collapsible Glass Sidebar for Desktop */}
+      <div className="flex-1 flex min-w-0 w-full">
+        {/* Persistent Collapsible Sidebar for Desktop */}
         <Sidebar />
 
         {/* Main Content Viewport with smooth route transitions */}
         <main
           ref={mainRef}
           onScroll={(e) => setShowScrollTop(e.currentTarget.scrollTop > 320)}
-          className="flex-1 overflow-y-auto scroll-smooth p-4 sm:p-6 lg:p-8 pb-24 lg:pb-10 max-w-7xl mx-auto w-full"
+          className="flex-1 min-w-0 w-full overflow-y-auto overflow-x-hidden scroll-smooth p-4 sm:p-6 lg:p-8 pb-24 lg:pb-10"
         >
-          <div key={location.pathname} className="animate-fadeIn">
+          <div key={location.pathname} className="max-w-7xl mx-auto w-full min-w-0 animate-fadeIn">
             <Outlet />
           </div>
         </main>

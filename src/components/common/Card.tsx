@@ -13,12 +13,12 @@ export const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    default: 'bg-surface border border-border rounded-2xl p-5',
-    elevated: 'bg-surface-elevated border border-border/90 shadow-glass rounded-2xl p-5',
-    glass: 'bg-glass border border-white/[0.06] shadow-glass rounded-2xl p-5',
+    default: 'bg-surface-card border border-border rounded-2xl p-5',
+    elevated: 'bg-surface-elevated border border-border shadow-sm rounded-2xl p-5',
+    glass: 'bg-glass shadow-glass rounded-2xl p-5',
     interactive:
-      'bg-surface border border-border hover:border-primary/45 hover:bg-surface-elevated/80 transition-all duration-200 cursor-pointer rounded-2xl p-5',
-    gold: 'bg-surface-elevated border border-gold/30 shadow-gold rounded-2xl p-5',
+      'bg-surface-card border border-border hover:border-primary/45 hover:bg-surface-elevated/80 transition-all duration-200 cursor-pointer rounded-2xl p-5',
+    gold: 'bg-surface-elevated border border-primary/30 rounded-2xl p-5',
   };
 
   return (

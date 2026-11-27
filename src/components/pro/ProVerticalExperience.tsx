@@ -212,9 +212,9 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
   };
 
   return (
-    <div className="space-y-10 pb-16">
-      {/* Smart Sticky Liquid Glass Section Navigation */}
-      <div className="sticky top-2 z-20 rounded-2xl liquid-glass-gold px-2.5 py-2 shadow-glass">
+    <div className="space-y-10 pb-16 min-w-0 w-full">
+      {/* Smart Sticky Theme-Aware Section Navigation */}
+      <div className="sticky top-2 z-20 rounded-2xl bg-surface/95 backdrop-blur-md border border-border px-2.5 py-2 shadow-sm">
         <nav
           aria-label="Pro Mode vertical sections"
           className="flex items-center gap-1.5 overflow-x-auto no-scrollbar"
@@ -227,10 +227,10 @@ export const ProVerticalExperience: React.FC<ProVerticalExperienceProps> = ({
                 key={sec.id}
                 type="button"
                 onClick={() => scrollToSection(sec.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold flex items-center gap-1.5 whitespace-nowrap transition-all shrink-0 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 whitespace-nowrap transition-all duration-150 shrink-0 ${
                   active
-                    ? 'bg-gold text-background shadow-gold'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated/70'
+                    ? 'bg-primary text-background font-semibold'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated'
                 }`}
               >
                 <Icon size={13} />

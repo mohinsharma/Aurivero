@@ -131,20 +131,20 @@ export const DashboardPage: React.FC = () => {
       <div className="space-y-8 max-w-5xl mx-auto pb-10">
         {/* A. Welcome Section */}
         <div className="rounded-3xl liquid-glass-gold p-6 sm:p-8 space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F3F1EB] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
             Welcome back. Let&apos;s build your investing knowledge one step at a time.
           </h1>
-          <p className="text-sm text-[#A5B0BB] max-w-2xl">
+          <p className="text-sm text-text-secondary max-w-2xl">
             Learn how investing works, practise with virtual money, and improve your decisions without risking real money.
           </p>
         </div>
 
         {/* Guided First-Run 3-Step Checklist */}
         {isFirstRun && (
-          <Card className="p-6 bg-[#101720] border-[#31B89A]/30 space-y-4">
+          <Card className="p-6 bg-surface border-primary/30 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-[#F3F1EB]">Getting Started Checklist (3 Quick Steps)</h2>
-              <span className="text-xs font-mono text-[#31B89A]">Virtual Learning Only</span>
+              <h2 className="text-base font-bold text-text-primary">Getting Started Checklist (3 Quick Steps)</h2>
+              <span className="text-xs font-mono text-primary">Virtual Learning Only</span>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               {[
@@ -152,20 +152,20 @@ export const DashboardPage: React.FC = () => {
                 { key: 'lesson', title: '2. Learn One Essential Concept', desc: 'Understand what stocks are and how investing risk works.', cta: 'Start Your First Lesson', route: '/academy', done: hasLessonDone },
                 { key: 'trade', title: '3. Make Your First Virtual Investment', desc: 'Uses virtual money only — no real money is involved.', cta: 'Try Paper Trading', route: '/simulator', done: hasSimActivity },
               ].map((step) => (
-                <div key={step.key} className={`p-4 rounded-2xl border space-y-3 flex flex-col justify-between ${step.done ? 'bg-[#31B89A]/10 border-[#31B89A]/40' : 'bg-[#090D12] border-white/10'}`}>
+                <div key={step.key} className={`p-4 rounded-2xl border space-y-3 flex flex-col justify-between ${step.done ? 'bg-subtle-green border-primary/40' : 'bg-surface-elevated border-border'}`}>
                   <div className="space-y-1.5">
-                    <div className="text-xs font-bold text-[#F3F1EB] flex items-center justify-between">
+                    <div className="text-xs font-bold text-text-primary flex items-center justify-between">
                       <span>{step.title}</span>
-                      {step.done && <CheckCircle2 size={15} className="text-[#31B89A]" />}
+                      {step.done && <CheckCircle2 size={15} className="text-primary" />}
                     </div>
-                    <p className="text-xs text-[#A5B0BB] leading-relaxed">{step.desc}</p>
+                    <p className="text-xs text-text-secondary leading-relaxed">{step.desc}</p>
                   </div>
                   {!step.done && !skippedSteps.includes(step.key) && (
                     <div className="flex items-center justify-between gap-2 pt-1">
                       <Button variant="primary" size="sm" onClick={() => navigate(step.route)} className="text-xs flex-1">
                         {step.cta}
                       </Button>
-                      <button type="button" onClick={() => skipStep(step.key)} className="text-[11px] text-[#A5B0BB] hover:text-white px-2">
+                      <button type="button" onClick={() => skipStep(step.key)} className="text-[11px] text-text-secondary hover:text-text-primary px-2">
                         Skip
                       </button>
                     </div>
@@ -177,13 +177,13 @@ export const DashboardPage: React.FC = () => {
         )}
 
         {/* B. Your Next Step */}
-        <Card className="p-6 bg-[#101720] border-[#31B89A]/35 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <Card className="p-6 bg-surface border-primary/35 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#31B89A] font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-primary font-semibold">
               Your Next Step
             </span>
-            <h2 className="text-lg font-bold text-[#F3F1EB]">{nextStep.title}</h2>
-            <p className="text-xs text-[#A5B0BB]">{nextStep.desc}</p>
+            <h2 className="text-lg font-bold text-text-primary">{nextStep.title}</h2>
+            <p className="text-xs text-text-secondary">{nextStep.desc}</p>
           </div>
           <Button variant="primary" size="md" onClick={() => navigate(nextStep.route)} icon={<ArrowRight size={16} />} iconPosition="right" className="shrink-0 font-bold">
             {nextStep.cta}
@@ -193,25 +193,25 @@ export const DashboardPage: React.FC = () => {
         {/* C. Portfolio Snapshot (3 Beginner Numbers) */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[#F3F1EB] uppercase tracking-wider">Virtual Portfolio Snapshot</h2>
+            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Virtual Portfolio Snapshot</h2>
             <button
               type="button"
               onClick={() => setShowExpandedPortfolio((v) => !v)}
-              className="text-xs font-semibold text-[#C9A96E] hover:underline"
+              className="text-xs font-semibold text-primary hover:underline"
             >
               {showExpandedPortfolio ? 'Hide Details' : 'Expand Portfolio Details'}
             </button>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
-            <Card className="p-5 bg-[#101720] border-white/10 space-y-1">
-              <div className="text-xs text-[#A5B0BB]">Total Virtual Money</div>
-              <div className="text-2xl font-extrabold font-mono text-[#F3F1EB]">
+            <Card className="p-5 bg-surface border-border space-y-1">
+              <div className="text-xs text-text-secondary">Total Virtual Money</div>
+              <div className="text-2xl font-extrabold font-mono text-text-primary">
                 ₹{totalPortfolioValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[11px] text-[#A5B0BB]">Your demo cash + stock value</div>
+              <div className="text-[11px] text-text-secondary">Your demo cash + stock value</div>
             </Card>
-            <Card className="p-5 bg-[#101720] border-white/10 space-y-1">
-              <div className="text-xs text-[#A5B0BB] flex items-center">
+            <Card className="p-5 bg-surface border-border space-y-1">
+              <div className="text-xs text-text-secondary flex items-center">
                 Today&apos;s Change
                 <BeginnerTooltip
                   term="Today's Change (P&L)"
@@ -219,36 +219,36 @@ export const DashboardPage: React.FC = () => {
                   example="If ₹1,000 grows to ₹1,020, Today's Change is +₹20."
                 />
               </div>
-              <div className={`text-2xl font-extrabold font-mono ${dayPnL >= 0 ? 'text-[#31B89A]' : 'text-[#F16D75]'}`}>
+              <div className={`text-2xl font-extrabold font-mono ${dayPnL >= 0 ? 'text-primary' : 'text-danger'}`}>
                 {dayPnL >= 0 ? '+' : ''}₹{dayPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[11px] text-[#A5B0BB]">Simulated daily movement</div>
+              <div className="text-[11px] text-text-secondary">Simulated daily movement</div>
             </Card>
-            <Card className="p-5 bg-[#101720] border-white/10 space-y-1">
-              <div className="text-xs text-[#A5B0BB]">Available Cash</div>
-              <div className="text-2xl font-extrabold font-mono text-[#31B89A]">
+            <Card className="p-5 bg-surface border-border space-y-1">
+              <div className="text-xs text-text-secondary">Available Cash</div>
+              <div className="text-2xl font-extrabold font-mono text-primary">
                 ₹{virtualCash.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[11px] text-[#A5B0BB]">Ready to practise with</div>
+              <div className="text-[11px] text-text-secondary">Ready to practise with</div>
             </Card>
           </div>
 
           {showExpandedPortfolio && (
-            <Card className="p-5 bg-[#101720] border-white/10 space-y-3">
-              <div className="text-xs font-bold text-[#F3F1EB]">Your Practice Holdings ({positions.length})</div>
+            <Card className="p-5 bg-surface border-border space-y-3">
+              <div className="text-xs font-bold text-text-primary">Your Practice Holdings ({positions.length})</div>
               {positions.length === 0 ? (
-                <p className="text-xs text-[#A5B0BB]">No virtual stocks held yet. Try Paper Trading when ready.</p>
+                <p className="text-xs text-text-secondary">No virtual stocks held yet. Try Paper Trading when ready.</p>
               ) : (
                 <div className="grid sm:grid-cols-2 gap-3">
                   {positions.map((p) => (
-                    <div key={p.id} className="p-3 rounded-xl bg-[#090D12] border border-white/10 flex items-center justify-between text-xs">
+                    <div key={p.id} className="p-3 rounded-xl bg-surface-elevated border border-border flex items-center justify-between text-xs">
                       <div>
-                        <div className="font-bold text-white">{p.symbol}</div>
-                        <div className="text-[#A5B0BB]">{p.quantity} shares • {p.sector}</div>
+                        <div className="font-bold text-text-primary">{p.symbol}</div>
+                        <div className="text-text-secondary">{p.quantity} shares • {p.sector}</div>
                       </div>
                       <div className="text-right font-mono">
-                        <div className="text-white">₹{p.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                        <div className={p.unrealizedPnL >= 0 ? 'text-[#31B89A]' : 'text-[#F16D75]'}>
+                        <div className="text-text-primary">₹{p.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                        <div className={p.unrealizedPnL >= 0 ? 'text-primary' : 'text-danger'}>
                           {p.unrealizedPnL >= 0 ? '+' : ''}{p.unrealizedPnLPercent.toFixed(1)}%
                         </div>
                       </div>
@@ -261,43 +261,43 @@ export const DashboardPage: React.FC = () => {
         </section>
 
         {/* Your Progress */}
-        <Card className="p-5 bg-[#101720] border-white/10 space-y-3">
-          <div className="text-sm font-bold text-[#F3F1EB] flex items-center justify-between">
+        <Card className="p-5 bg-surface border-border space-y-3">
+          <div className="text-sm font-bold text-text-primary flex items-center justify-between">
             <span>Your Progress</span>
-            <button type="button" onClick={() => navigate('/my-progress')} className="text-xs text-[#C9A96E] hover:underline">
+            <button type="button" onClick={() => navigate('/my-progress')} className="text-xs text-primary hover:underline">
               View Full Progress →
             </button>
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="p-3 rounded-xl bg-[#090D12] border border-white/10">
-              <div className="text-xl font-bold font-mono text-[#31B89A]">{gamStats.skills}</div>
-              <div className="text-[11px] text-[#A5B0BB]">Skills Completed</div>
+            <div className="p-3 rounded-xl bg-surface-elevated border border-border">
+              <div className="text-xl font-bold font-mono text-primary">{gamStats.skills}</div>
+              <div className="text-[11px] text-text-secondary">Skills Completed</div>
             </div>
-            <div className="p-3 rounded-xl bg-[#090D12] border-white/10">
-              <div className="text-xl font-bold font-mono text-[#F5B942]">{gamStats.streak}d</div>
-              <div className="text-[11px] text-[#A5B0BB]">Learning Streak</div>
+            <div className="p-3 rounded-xl bg-surface-elevated border-border">
+              <div className="text-xl font-bold font-mono text-warning">{gamStats.streak}d</div>
+              <div className="text-[11px] text-text-secondary">Learning Streak</div>
             </div>
-            <div className="p-3 rounded-xl bg-[#090D12] border border-white/10">
-              <div className="text-xl font-bold font-mono text-[#F3F1EB]">{gamStats.contests}</div>
-              <div className="text-[11px] text-[#A5B0BB]">Badges Earned</div>
+            <div className="p-3 rounded-xl bg-surface-elevated border border-border">
+              <div className="text-xl font-bold font-mono text-text-primary">{gamStats.contests}</div>
+              <div className="text-[11px] text-text-secondary">Badges Earned</div>
             </div>
           </div>
         </Card>
 
         {/* F. Market at a Glance (Max 3 Simplified Indicators) */}
         <section className="space-y-3">
-          <h2 className="text-sm font-bold text-[#F3F1EB] uppercase tracking-wider">Market at a Glance</h2>
+          <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Market at a Glance</h2>
           <div className="grid sm:grid-cols-3 gap-4">
             {INDIAN_INDICES.slice(0, 3).map((idx) => (
-              <Card key={idx.name} className="p-4 bg-[#101720] border-white/10 space-y-1">
+              <Card key={idx.name} className="p-4 bg-surface border-border space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#F3F1EB]">{idx.name}</span>
-                  <span className={`font-mono font-semibold ${idx.changePercent >= 0 ? 'text-[#31B89A]' : 'text-[#F16D75]'}`}>
+                  <span className="font-bold text-text-primary">{idx.name}</span>
+                  <span className={`font-mono font-semibold ${idx.changePercent >= 0 ? 'text-primary' : 'text-danger'}`}>
                     {idx.changePercent >= 0 ? '+' : ''}{idx.changePercent}%
                   </span>
                 </div>
-                <div className="text-lg font-mono font-bold text-[#F3F1EB]">{idx.value.toLocaleString('en-IN')}</div>
-                <div className="text-[11px] text-[#A5B0BB]">
+                <div className="text-lg font-mono font-bold text-text-primary">{idx.value.toLocaleString('en-IN')}</div>
+                <div className="text-[11px] text-text-secondary">
                   Tracks top Indian companies to show overall market mood.
                 </div>
               </Card>
@@ -307,7 +307,7 @@ export const DashboardPage: React.FC = () => {
 
         {/* Explore MINDMARK (5 Clean Cards) */}
         <section className="space-y-3">
-          <h2 className="text-sm font-bold text-[#F3F1EB] uppercase tracking-wider">Explore MINDMARK</h2>
+          <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Explore MINDMARK</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {[
               { title: 'Learn', desc: 'Build your investing knowledge step by step.', route: '/academy', icon: BookOpen },
@@ -320,11 +320,11 @@ export const DashboardPage: React.FC = () => {
                 key={m.title}
                 type="button"
                 onClick={() => navigate(m.route)}
-                className="p-4 rounded-2xl bg-[#101720] border border-white/10 hover:border-[#31B89A]/40 text-left space-y-2 transition"
+                className="p-4 rounded-2xl bg-surface border border-border hover:border-primary/40 text-left space-y-2 transition"
               >
-                <m.icon size={18} className="text-[#31B89A]" />
-                <div className="text-sm font-bold text-[#F3F1EB]">{m.title}</div>
-                <p className="text-xs text-[#A5B0BB] leading-relaxed">{m.desc}</p>
+                <m.icon size={18} className="text-primary" />
+                <div className="text-sm font-bold text-text-primary">{m.title}</div>
+                <p className="text-xs text-text-secondary leading-relaxed">{m.desc}</p>
               </button>
             ))}
           </div>

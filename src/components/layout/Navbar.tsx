@@ -61,12 +61,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 w-full border-b border-white/[0.07] bg-glass-elevated">
+      <header className="sticky top-0 z-30 w-full max-w-full overflow-x-hidden border-b border-border bg-surface">
         {/* Live Left-to-Right Bloomberg-Style Market Ticker */}
-        <LiveMarketTicker />
+        <div className="w-full overflow-hidden">
+          <LiveMarketTicker />
+        </div>
 
         {/* Main Navbar */}
-        <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        <div className="px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
           {/* Left: Mobile Menu Toggle & Brand Mobile */}
           <div className="flex items-center gap-3">
             <button

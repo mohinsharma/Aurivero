@@ -118,12 +118,11 @@ const BEGINNER_PRIMARY_GROUPS: NavGroup[] = [
     id: 'beginner_core',
     label: 'Start Here',
     items: [
-      { name: 'Home', path: '/dashboard', icon: LayoutDashboard },
-      { name: 'Learn', path: '/academy', icon: GraduationCap },
-      { name: 'Practice (Paper Trading)', path: '/simulator', icon: CandlestickChart },
+      { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+      { name: 'Learning Studio', path: '/learning', icon: GraduationCap },
+      { name: 'Paper Trading', path: '/simulator', icon: CandlestickChart },
       { name: 'My Portfolio', path: '/portfolio', icon: PieChart },
       { name: 'Explore Markets', path: '/markets', icon: Coins },
-      { name: 'AI Buddy', path: '/ai-buddy', icon: Bot },
     ],
   },
 ];
@@ -172,7 +171,7 @@ export const Sidebar: React.FC = () => {
   return (
     <aside
       aria-label="Primary sidebar navigation"
-      className={`hidden lg:flex flex-col border-r border-white/[0.06] bg-glass transition-all duration-300 ease-in-out relative z-20 ${
+      className={`hidden lg:flex flex-col shrink-0 border-r border-border bg-surface transition-all duration-200 ease-out relative z-20 ${
         sidebarCollapsed ? 'w-20' : 'w-64'
       }`}
     >
@@ -234,23 +233,46 @@ export const Sidebar: React.FC = () => {
                       end={item.path === '/markets'}
                       title={sidebarCollapsed ? item.name : undefined}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
+                        `relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 ease-out group ${
                           isActive
-                            ? 'bg-gold/10 text-gold border border-gold/30 shadow-gold'
-                            : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated/80 border border-transparent'
+                            ? 'bg-subtle-green text-primary font-semibold border border-primary/25'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated border border-transparent'
                         } ${sidebarCollapsed ? 'justify-center px-0' : ''}`
                       }
                     >
-                      <item.icon size={17} className="flex-shrink-0 transition-transform group-hover:scale-105" />
-                      {!sidebarCollapsed && (
-                        <span className="flex-1 flex items-center justify-between min-w-0">
-                          <span className="truncate">{item.name}</span>
-                          {item.badge && (
-                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30 font-semibold ml-1.5">
-                              {item.badge}
+                      {({ isActive }) => (
+                        <>
+                          {isActive && !sidebarCollapsed && (
+                            <span
+                              aria-hidden="true"
+                              className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-primary"
+                            />
+                          )}
+                          <item.icon
+                            size={17}
+                            className={`flex-shrink-0 transition-transform duration-200 ease-out ${
+                              isActive
+                                ? 'text-primary'
+                                : 'text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5'
+                            }`}
+                          />
+                          {!sidebarCollapsed && (
+                            <span className="flex-1 flex items-center justify-between min-w-0">
+                              <span className="truncate">{item.name}</span>
+                              {item.badge && (
+                                <span
+                                  className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full border font-semibold ml-1.5 ${
+                                    isActive
+                                      ? 'bg-primary/15 text-primary border-primary/30'
+                                      : 'bg-surface-elevated text-text-muted border-border'
+                                  }`}
+                                >
+                                  {item.badge}
+                                </span>
+                              )}
                             </span>
                           )}
-                        </span>
+                        </>
                       )}
                     </NavLink>
                   ))}
