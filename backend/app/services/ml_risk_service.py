@@ -160,10 +160,10 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
     baseline_mae = _mean([abs(p - a) for p, a in zip(base_test, y_test)])
     model_rmse = math.sqrt(_mean([(p - a) ** 2 for p, a in zip(test_preds, y_test)]))
     baseline_rmse = math.sqrt(_mean([(p - a) ** 2 for p, a in zip(base_test, y_test)]))
-    beats_baseline = model_mae < baseline_mae
+    beats_baseline = bool(model_mae < baseline_mae)
 
     # Volatility regime classification via historical percentile
-    pct_rank = (sum(1 for hv in y if hv <= r20_now) / len(y)) * 100.0
+    pct_rank = float((sum(1 for hv in y if hv <= r20_now) / len(y)) * 100.0)
     if pct_rank >= 75:
         regime = "HIGH"
     elif pct_rank >= 35:
@@ -182,8 +182,8 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
     # Unusual movement anomaly detection (latest 1D return Z-score vs 60d)
     ret_window = rets[-61:-1] if len(rets) > 61 else rets[:-1]
     ret_60_std = _std(ret_window)
-    ret_z = (rets[-1] - _mean(ret_window)) / max(1e-9, ret_60_std)
-    anomaly_detected = abs(ret_z) >= 2.2 or abs(vol_z_now) >= 2.5
+    ret_z = float((rets[-1] - _mean(ret_window)) / max(1e-9, ret_60_std))
+    anomaly_detected = bool(abs(ret_z) >= 2.2 or abs(float(vol_z_now)) >= 2.5)
 
     train_start = datetime.fromtimestamp(dates[0], tz=timezone.utc).strftime("%Y-%m-%d")
     test_start = datetime.fromtimestamp(dates[split_idx], tz=timezone.utc).strftime("%Y-%m-%d")
