@@ -1,40 +1,60 @@
-/* AURIVERO — Figma-Grade Design Token System
-   Obsidian + Champagne Gold + Muted Emerald */
-:root {
-  /* Surfaces */
-  --aurivero-bg-primary: #090D12;
-  --aurivero-bg-secondary: #101720;
-  --aurivero-bg-elevated: #151F29;
-  --aurivero-bg-surface: #192530;
+/* AURIVERO — Light & Dark Semantic Design Tokens (Groww-Inspired Financial Palette) */
+:root,
+[data-theme="light"] {
+  --rgb-background: 247 249 247;       /* #F7F9F7 */
+  --rgb-surface: 255 255 255;          /* #FFFFFF */
+  --rgb-surface-elevated: 240 244 241; /* #F0F4F1 */
+  --rgb-surface-card: 255 255 255;     /* #FFFFFF */
+  --rgb-subtle-green: 232 246 240;     /* #E8F6F0 */
 
-  /* Typography */
-  --aurivero-text-primary: #F3F1EB;
-  --aurivero-text-secondary: #A5B0BB;
-  --aurivero-text-muted: #718091;
+  --rgb-primary: 0 179 134;            /* #00B386 */
+  --rgb-primary-hover: 0 155 117;      /* #009B75 */
+  --rgb-gold: 168 128 58;              /* Restrained warm bronze/gold for light contrast */
+  --rgb-gold-hover: 145 108 45;
+  --rgb-secondary: 0 155 117;
+  --rgb-secondary-hover: 0 132 100;
+  --rgb-warning: 217 119 6;            /* #D97706 */
+  --rgb-danger: 220 38 38;             /* #DC2626 */
 
-  /* Brand & Accents */
-  --aurivero-gold: #C9A96E;
-  --aurivero-gold-hover: #D8BA82;
-  --aurivero-emerald: #31B89A;
-  --aurivero-emerald-hover: #29A287;
-  --aurivero-teal: #50D6BD;
+  --rgb-text-primary: 23 33 29;        /* #17211D */
+  --rgb-text-secondary: 104 117 110;   /* #68756E */
+  --rgb-text-muted: 133 148 140;       /* #85948C */
 
-  /* Semantic Financial Colors */
-  --aurivero-positive: #31B89A;
-  --aurivero-negative: #E0636B;
-  --aurivero-warning: #D9A441;
-  --aurivero-neutral: #718091;
+  --rgb-border: 227 234 229;           /* #E3EAE5 */
+  --rgb-border-subtle: 237 242 238;
 
-  /* Borders & Elevation */
-  --aurivero-border: #1F2D3B;
-  --aurivero-border-subtle: #16212C;
-  --aurivero-shadow-glass: 0 12px 36px rgba(0, 0, 0, 0.48);
-  --aurivero-shadow-gold: 0 0 24px -4px rgba(201, 169, 110, 0.25);
-  --aurivero-shadow-emerald: 0 0 22px -4px rgba(49, 184, 154, 0.28);
+  --aurivero-glass-bg: rgba(255, 255, 255, 0.82);
+  --aurivero-glass-elevated: rgba(255, 255, 255, 0.92);
+  --aurivero-glass-border: rgba(23, 33, 29, 0.08);
+  --aurivero-shadow-glass: 0 10px 30px rgba(23, 33, 29, 0.08);
+}
 
-  /* Radii */
-  --aurivero-radius-sm: 0.5rem;
-  --aurivero-radius-md: 0.75rem;
-  --aurivero-radius-lg: 1rem;
-  --aurivero-radius-xl: 1.25rem;
+.dark,
+[data-theme="dark"] {
+  --rgb-background: 13 21 18;          /* #0D1512 */
+  --rgb-surface: 18 30 25;             /* #121E19 */
+  --rgb-surface-elevated: 24 39 32;    /* #182720 */
+  --rgb-surface-card: 27 43 35;        /* #1B2B23 */
+  --rgb-subtle-green: 25 56 44;        /* #19382C */
+
+  --rgb-primary: 0 200 150;            /* #00C896 */
+  --rgb-primary-hover: 36 214 165;     /* #24D6A5 */
+  --rgb-gold: 201 169 110;             /* #C9A96E */
+  --rgb-gold-hover: 216 186 130;
+  --rgb-secondary: 36 214 165;
+  --rgb-secondary-hover: 0 200 150;
+  --rgb-warning: 245 185 66;
+  --rgb-danger: 235 87 87;
+
+  --rgb-text-primary: 240 245 241;     /* #F0F5F1 */
+  --rgb-text-secondary: 154 174 162;   /* #9AAEA2 */
+  --rgb-text-muted: 111 133 121;       /* #6F8579 */
+
+  --rgb-border: 41 59 49;              /* #293B31 */
+  --rgb-border-subtle: 30 45 37;
+
+  --aurivero-glass-bg: rgba(18, 30, 25, 0.80);
+  --aurivero-glass-elevated: rgba(24, 39, 32, 0.90);
+  --aurivero-glass-border: rgba(240, 245, 241, 0.08);
+  --aurivero-shadow-glass: 0 12px 36px rgba(0, 0, 0, 0.42);
 }

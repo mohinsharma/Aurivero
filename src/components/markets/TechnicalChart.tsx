@@ -11,6 +11,8 @@ import {
   UTCTimestamp,
   createChart,
 } from 'lightweight-charts';
+import { useTheme } from '../../context/ThemeContext';
+import { getLightweightChartTheme } from './chartTheme';
 import {
   Activity,
   BarChart2,
@@ -107,7 +109,23 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
   const rsiWrapRef = useRef<HTMLDivElement>(null);
   const macdWrapRef = useRef<HTMLDivElement>(null);
 
+  const { resolvedTheme } = useTheme();
   const mainChartRef = useRef<IChartApi | null>(null);
+
+  useEffect(() => {
+    if (!mainChartRef.current) return;
+    const ct = getLightweightChartTheme(resolvedTheme);
+    mainChartRef.current.applyOptions({
+      layout: ct.layout,
+      grid: ct.grid,
+      crosshair: {
+        vertLine: { color: ct.crosshairColor, labelBackgroundColor: ct.labelBg },
+        horzLine: { color: ct.crosshairColor, labelBackgroundColor: ct.labelBg },
+      },
+      rightPriceScale: { borderColor: ct.borderColor },
+      timeScale: { borderColor: ct.borderColor },
+    });
+  }, [resolvedTheme]);
   const mainSeriesRef = useRef<ISeriesApi<any> | null>(null);
   const volSeriesRef = useRef<ISeriesApi<any> | null>(null);
 
@@ -156,21 +174,18 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
     const el = mainChartWrapRef.current;
     if (!el) return;
 
+    const ct = getLightweightChartTheme(resolvedTheme);
     const chart = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: '#0B1017' },
-        textColor: '#93A2B4',
+        ...ct.layout,
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 11,
       },
-      grid: {
-        vertLines: { color: 'rgba(34, 49, 66, 0.45)' },
-        horzLines: { color: 'rgba(34, 49, 66, 0.45)' },
-      },
+      grid: ct.grid,
       crosshair: {
         mode: CrosshairMode.Normal,
-        vertLine: { color: '#5F7085', labelBackgroundColor: '#1A2531' },
-        horzLine: { color: '#5F7085', labelBackgroundColor: '#1A2531' },
+        vertLine: { color: ct.crosshairColor, labelBackgroundColor: ct.labelBg },
+        horzLine: { color: ct.crosshairColor, labelBackgroundColor: ct.labelBg },
       },
       rightPriceScale: {
         borderColor: '#223142',

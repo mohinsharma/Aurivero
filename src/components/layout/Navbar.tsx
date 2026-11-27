@@ -18,6 +18,7 @@ import { useSimulator } from '../../context/SimulatorContext';
 import { SearchModal } from '../common/SearchModal';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import { ThemeSwitcher } from '../common/ThemeSwitcher';
 import { LiveMarketTicker } from '../markets/LiveMarketTicker';
 import { api } from '../../services/api';
 
@@ -177,6 +178,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
                 Pro
               </button>
             </div>
+
+            {/* Light / Dark / System Theme Switcher */}
+            <ThemeSwitcher compact />
 
             {/* Learning Studio Quick Link */}
             <Link

@@ -13,6 +13,7 @@ import { useSimulator } from '../context/SimulatorContext';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Modal } from '../components/common/Modal';
+import { ThemeSwitcher } from '../components/common/ThemeSwitcher';
 
 export const SettingsPage: React.FC = () => {
   const { resetPortfolio, virtualCash } = useSimulator();
@@ -47,6 +48,17 @@ export const SettingsPage: React.FC = () => {
           <span>Settings saved successfully.</span>
         </div>
       )}
+
+      {/* Theme & Appearance */}
+      <Card variant="elevated" className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="font-bold text-sm text-text-primary">Appearance & Theme</h3>
+          <p className="text-xs text-text-secondary mt-0.5">
+            Switch instantly between Light, Dark, or your operating system preference.
+          </p>
+        </div>
+        <ThemeSwitcher />
+      </Card>
 
       {/* Simulator Capital Controls */}
       <Card variant="elevated" className="p-6 space-y-4">

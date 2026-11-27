@@ -24,6 +24,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
+import { getLightweightChartTheme } from './chartTheme';
 import {
   AssetClass,
   DataFreshnessStatus,
@@ -126,7 +128,19 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
 }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const subPaneRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
   const chartRef = useRef<IChartApi | null>(null);
+
+  useEffect(() => {
+    if (!chartRef.current) return;
+    const ct = getLightweightChartTheme(resolvedTheme);
+    chartRef.current.applyOptions({
+      layout: ct.layout,
+      grid: ct.grid,
+      rightPriceScale: { borderColor: ct.borderColor },
+      timeScale: { borderColor: ct.borderColor },
+    });
+  }, [resolvedTheme]);
   const mainSeriesRef = useRef<ISeriesApi<any> | null>(null);
   const volSeriesRef = useRef<ISeriesApi<any> | null>(null);
 
@@ -333,20 +347,17 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
     const el = wrapRef.current;
     if (!el || displayCandles.length === 0) return;
 
+    const ct = getLightweightChartTheme(resolvedTheme);
     const chart = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: '#0B1017' },
-        textColor: '#93A2B4',
+        ...ct.layout,
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 11,
       },
-      grid: {
-        vertLines: { color: 'rgba(34, 49, 66, 0.4)' },
-        horzLines: { color: 'rgba(34, 49, 66, 0.4)' },
-      },
+      grid: ct.grid,
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: {
-        borderColor: '#223142',
+        borderColor: ct.borderColor,
         mode: config.logScale ? PriceScaleMode.Logarithmic : PriceScaleMode.Normal,
         autoScale: true,
       },
