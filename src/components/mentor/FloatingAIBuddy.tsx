@@ -25,6 +25,7 @@ interface BubbleMessage {
   role: 'user' | 'assistant';
   content: string;
   status?: string;
+  errorCode?: string;
   suggestedFollowups?: string[];
   isError?: boolean;
   retryPrompt?: string;
@@ -82,22 +83,26 @@ export const FloatingAIBuddy: React.FC = () => {
     }
   }, [messages, isLoading, isOpen]);
 
-  const sendMessage = async (textOverride?: string) => {
+  const sendMessage = async (textOverride?: string, replaceErrorId?: string) => {
     const trimmed = (textOverride ?? input).trim();
     if (!trimmed || isLoading) return;
 
-    const uMsg: BubbleMessage = {
-      id: `u-${Date.now()}`,
-      role: 'user',
-      content: trimmed,
-    };
     const historyPayload = messages
       .filter((m) => !m.isError)
       .slice(-8)
       .map((m) => ({ role: m.role, content: m.content }));
 
-    setMessages((prev) => [...prev, uMsg]);
-    if (!textOverride) setInput('');
+    if (replaceErrorId) {
+      setMessages((prev) => prev.filter((m) => m.id !== replaceErrorId));
+    } else {
+      const uMsg: BubbleMessage = {
+        id: `u-${Date.now()}`,
+        role: 'user',
+        content: trimmed,
+      };
+      setMessages((prev) => [...prev, uMsg]);
+      if (!textOverride) setInput('');
+    }
     setIsLoading(true);
 
     const res = await api.aiBuddy.chat({
@@ -114,6 +119,7 @@ export const FloatingAIBuddy: React.FC = () => {
 
     if (res.success && res.data) {
       const d = res.data;
+      const isErr = d.status === 'error' || d.status === 'provider_unavailable';
       setMessages((prev) => [
         ...prev,
         {
@@ -121,9 +127,10 @@ export const FloatingAIBuddy: React.FC = () => {
           role: 'assistant',
           content: d.answer,
           status: d.status,
+          errorCode: d.error_code,
           suggestedFollowups: d.suggested_followups || [],
-          isError: d.status === 'error' || d.status === 'provider_unavailable',
-          retryPrompt: d.status === 'error' ? trimmed : undefined,
+          isError: isErr,
+          retryPrompt: isErr ? trimmed : undefined,
         },
       ]);
     } else {
@@ -132,7 +139,8 @@ export const FloatingAIBuddy: React.FC = () => {
         {
           id: `e-${Date.now()}`,
           role: 'assistant',
-          content: 'Unable to reach MINDMARK AI Buddy right now. Please retry.',
+          content: 'Unable to reach MINDMARK AI Buddy right now. Please check your connection and retry.',
+          errorCode: 'TEMPORARILY_UNAVAILABLE',
           isError: true,
           retryPrompt: trimmed,
         },
@@ -281,13 +289,19 @@ export const FloatingAIBuddy: React.FC = () => {
                       className="max-h-32 rounded border border-border/50 mb-1.5 object-contain"
                     />
                   )}
+                  {msg.isError && msg.errorCode && (
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-danger font-bold mb-1">
+                      {msg.errorCode.replace(/_/g, ' ')}
+                    </div>
+                  )}
                   <div className="whitespace-pre-wrap">{msg.content}</div>
 
                   {msg.isError && msg.retryPrompt && (
                     <button
                       type="button"
-                      onClick={() => sendMessage(msg.retryPrompt)}
-                      className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface border border-border text-[10px] font-mono text-primary"
+                      disabled={isLoading}
+                      onClick={() => sendMessage(msg.retryPrompt, msg.id)}
+                      className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface border border-border text-[10px] font-mono text-primary hover:border-primary/50 disabled:opacity-50"
                     >
                       <RotateCcw size={10} /> Retry
                     </button>
