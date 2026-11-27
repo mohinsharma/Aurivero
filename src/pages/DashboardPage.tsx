@@ -33,6 +33,7 @@ import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { BeginnerTooltip } from '../components/common/BeginnerTooltip';
+import { ProVerticalExperience } from '../components/pro/ProVerticalExperience';
 import { INDIAN_INDICES, POPULAR_INDIAN_STOCKS } from '../data/mockData';
 import api from '../services/api';
 
@@ -332,8 +333,8 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
-  return (
-    <div className="space-y-7 max-w-7xl mx-auto pb-8">
+  const proDashboardContent = (
+    <div className="space-y-7 max-w-7xl mx-auto pb-4">
       {/* ========================================================================= */}
       {/* TOP HEADER: Personalized Greeting, Market Status, Profile Level           */}
       {/* ========================================================================= */}
@@ -918,4 +919,6 @@ export const DashboardPage: React.FC = () => {
       </div>
     </div>
   );
+
+  return <ProVerticalExperience dashboardContent={proDashboardContent} />;
 };
