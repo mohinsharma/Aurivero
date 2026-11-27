@@ -1,9 +1,15 @@
+import base64
 from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from backend.app.models import AIBuddyChatRequest, StandardAPIResponse
 from backend.app.routers.auth_deps import get_current_user_optional
 from backend.app.services.ai_buddy_service import ai_buddy_service
+from backend.app.services.multimodal_ai_service import (
+    FinancialDomainGuardrail,
+    analyze_confirmed_multimodal_payload,
+    extract_financial_ocr,
+)
 from backend.app.services.mentor_engine import (
     build_daily_training_session,
     build_historical_scenario,
@@ -44,6 +50,20 @@ def chat_with_buddy(
 
     history_dicts = [{"role": h.role, "content": h.content} for h in req.history]
     ctx_dict = req.context.model_dump() if req.context else None
+
+    guard = FinancialDomainGuardrail.validate(req.message, history=history_dicts)
+    if not guard["allowed"]:
+        return StandardAPIResponse(
+            success=True,
+            data={
+                "status": "rejected_off_topic",
+                "answer": guard["message"],
+                "suggested_followups": [
+                    "Explain what NIFTY 50 is",
+                    "How do I calculate position size?",
+                ],
+            },
+        )
 
     result = ai_buddy_service.chat(
         message=req.message,
@@ -113,3 +133,84 @@ def get_daily_mentor_session(level: str = Query("ABSOLUTE_BEGINNER")):
 def get_mentor_weekly_report(behavioral_score: int = Query(76)):
     data = build_weekly_report(behavioral_score=behavioral_score)
     return StandardAPIResponse(success=True, data=data)
+
+
+class VoiceValidateRequest(BaseModel):
+    transcript: str
+    language: str = "en-IN"
+
+
+class MultimodalAnalyzeRequest(BaseModel):
+    question: str
+    confirmedFields: Dict[str, Any] = {}
+    sanitizedOcrText: str = ""
+    learningLevel: str = "BEGINNER"
+    allowPortfolioAccess: bool = False
+
+
+@router.post("/voice/validate", response_model=StandardAPIResponse)
+def validate_voice_transcript(
+    req: VoiceValidateRequest,
+    user: dict = Depends(get_current_user_optional),
+):
+    if not ai_buddy_service.check_rate_limit(user["id"]):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded.")
+    cleaned = FinancialDomainGuardrail.sanitize_untrusted_text(req.transcript)
+    guard = FinancialDomainGuardrail.validate(cleaned)
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "transcript": cleaned,
+            "language": req.language,
+            "allowed": guard["allowed"],
+            "guardrailMessage": None if guard["allowed"] else guard["message"],
+        },
+    )
+
+
+class MultimodalOcrRequest(BaseModel):
+    filename: str = "upload.png"
+    contentType: str = "image/png"
+    dataBase64: str
+    userHint: str = ""
+
+
+@router.post("/multimodal/ocr", response_model=StandardAPIResponse)
+async def upload_and_extract_ocr(
+    req: MultimodalOcrRequest,
+    user: dict = Depends(get_current_user_optional),
+):
+    if not ai_buddy_service.check_rate_limit(user["id"]):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded.")
+    try:
+        raw_b64 = req.dataBase64.split(",", 1)[-1]
+        content = base64.b64decode(raw_b64, validate=True)
+        data = await extract_financial_ocr(
+            content=content,
+            content_type=req.contentType,
+            filename=req.filename,
+            user_hint_text=req.userHint,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid base64 image/document payload.")
+    return StandardAPIResponse(success=True, data=data)
+
+
+@router.post("/multimodal/analyze", response_model=StandardAPIResponse)
+def analyze_multimodal_financial(
+    req: MultimodalAnalyzeRequest,
+    user: dict = Depends(get_current_user_optional),
+):
+    if not ai_buddy_service.check_rate_limit(user["id"]):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded.")
+    result = analyze_confirmed_multimodal_payload(
+        question=req.question,
+        confirmed_fields=req.confirmedFields,
+        sanitized_ocr_text=req.sanitizedOcrText,
+        user=user,
+        learning_level=req.learningLevel,
+        allow_portfolio_access=req.allowPortfolioAccess,
+    )
+    return StandardAPIResponse(success=True, data=result)

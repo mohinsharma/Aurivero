@@ -624,6 +624,40 @@ class ApiClient {
       this.request<any>(`/api/ai-buddy/mentor/daily-session?level=${encodeURIComponent(level)}`),
     getWeeklyReport: (behavioralScore = 76) =>
       this.request<any>(`/api/ai-buddy/mentor/weekly-report?behavioral_score=${behavioralScore}`),
+    validateVoiceTranscript: (transcript: string, language = 'en-IN') =>
+      this.request<any>('/api/ai-buddy/voice/validate', {
+        method: 'POST',
+        body: JSON.stringify({ transcript, language }),
+      }),
+    uploadOcr: async (file: File, userHint = '') => {
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const dataBase64 = btoa(binary);
+      return this.request<any>('/api/ai-buddy/multimodal/ocr', {
+        method: 'POST',
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          dataBase64,
+          userHint,
+        }),
+      });
+    },
+    analyzeMultimodal: (payload: {
+      question: string;
+      confirmedFields: Record<string, any>;
+      sanitizedOcrText: string;
+      learningLevel?: string;
+      allowPortfolioAccess?: boolean;
+    }) =>
+      this.request<any>('/api/ai-buddy/multimodal/analyze', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
   };
 
   // 20. Behavioral Intelligence Engine (BIE) Endpoints
