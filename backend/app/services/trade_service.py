@@ -179,6 +179,7 @@ class TradeService:
 
             proceeds = gross_value - charges
             new_cash = current_cash + proceeds
+            realized_pnl_delta = round((execution_price - existing_pos["average_buy_price"]) * quantity - charges, 2)
             now = datetime.utcnow().isoformat()
 
             if existing_pos["quantity"] == quantity:
@@ -190,14 +191,14 @@ class TradeService:
                 """, (rem_qty, execution_price, now, existing_pos["id"]))
 
             cursor.execute("""
-            UPDATE virtual_portfolios SET current_cash = ?, updated_at = ? WHERE id = ?
-            """, (new_cash, now, portfolio_id))
+            UPDATE virtual_portfolios SET current_cash = ?, realized_pnl = realized_pnl + ?, updated_at = ? WHERE id = ?
+            """, (new_cash, realized_pnl_delta, now, portfolio_id))
 
         # Log trade record
         order_id = f"ord-{uuid.uuid4().hex[:8]}"
         now_time = datetime.utcnow().isoformat()
 
-        learning_moment = f"Simulated {action} order executed for {quantity} shares of {symbol} at ₹{executionPrice:,.2f}." if 'executionPrice' in locals() else f"Simulated {action} order executed for {quantity} shares of {symbol} at ₹{execution_price:,.2f}."
+        learning_moment = f"Simulated {action} order executed for {quantity} shares of {symbol} at ₹{execution_price:,.2f}."
 
         cursor.execute("""
         INSERT INTO trades (id, user_id, portfolio_id, symbol, name, action, order_type, product_type, leverage_multiplier, quantity, execution_price, total_value, simulated_charges, stop_loss, target_price, reason_tag, learning_moment, executed_at)
@@ -206,6 +207,35 @@ class TradeService:
 
         conn.commit()
         conn.close()
+
+        # Record immutable Behavioral Intelligence Decision Event
+        try:
+            from backend.app.services.bie_service import bie_service
+            updated_portfolio = TradeService.get_portfolio(user_id)
+            bie_service.record_decision_event(
+                user_id,
+                {
+                    "client_event_id": order_data.get("client_event_id") or order_id,
+                    "symbol": symbol,
+                    "sector": stock["sector"],
+                    "action": action,
+                    "execution_price": execution_price,
+                    "quantity": quantity,
+                    "portfolio_value_before": total_portfolio_value,
+                    "portfolio_value_after": updated_portfolio["total_portfolio_value"],
+                    "cash_before": current_cash,
+                    "cash_after": updated_portfolio["current_cash"],
+                    "market_change_pct": stock.get("changePercent"),
+                    "realized_pnl_delta": realized_pnl_delta if action == "SELL" else 0.0,
+                    "stated_reason": order_data.get("reason_tag"),
+                    "viewed_info": order_data.get("viewed_info") or [],
+                    "decision_duration_sec": order_data.get("decision_duration_sec"),
+                    "pre_decision_contract": order_data.get("pre_decision_contract"),
+                },
+                portfolio_override=updated_portfolio,
+            )
+        except Exception:
+            pass
 
         return {
             "success": True,

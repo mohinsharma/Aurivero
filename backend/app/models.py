@@ -53,6 +53,37 @@ class AssessmentResultResponse(BaseModel):
 # -----------------------------------------------------------------------------
 # TRADING & PORTFOLIO
 # -----------------------------------------------------------------------------
+class PreDecisionContractInput(BaseModel):
+    why_making_decision: str = Field(..., min_length=2, max_length=300)
+    biggest_risk: str = Field(..., min_length=2, max_length=300)
+    what_proves_wrong: str = Field(..., min_length=2, max_length=300)
+    planned_exposure_pct: float = Field(..., ge=0.0, le=100.0)
+    confidence_level: int = Field(..., ge=1, le=5)
+    short_explanation: Optional[str] = Field(None, max_length=500)
+
+class DecisionEventCreateRequest(BaseModel):
+    client_event_id: Optional[str] = Field(None, max_length=120)
+    scenario_id: Optional[str] = None
+    symbol: str = Field(..., min_length=1, max_length=30)
+    sector: Optional[str] = None
+    action: Literal["BUY", "SELL", "HOLD", "REDUCE"]
+    execution_price: Optional[float] = Field(None, gt=0)
+    quantity: float = Field(..., gt=0)
+    portfolio_value_before: Optional[float] = Field(None, ge=0)
+    portfolio_value_after: Optional[float] = Field(None, ge=0)
+    cash_before: Optional[float] = Field(None, ge=0)
+    cash_after: Optional[float] = Field(None, ge=0)
+    stock_exposure_pct: Optional[float] = Field(None, ge=0, le=100)
+    sector_exposure_pct: Optional[float] = Field(None, ge=0, le=100)
+    market_change_pct: Optional[float] = None
+    recent_drawdown_pct: Optional[float] = Field(0.0, ge=0)
+    realized_pnl_delta: Optional[float] = 0.0
+    stated_reason: Optional[str] = Field(None, max_length=300)
+    confidence_level: Optional[int] = Field(None, ge=1, le=5)
+    viewed_info: List[str] = Field(default_factory=list)
+    decision_duration_sec: Optional[int] = Field(None, ge=0)
+    pre_decision_contract: Optional[PreDecisionContractInput] = None
+
 class TradeOrderRequest(BaseModel):
     symbol: str
     type: Literal["BUY", "SELL"]
@@ -64,6 +95,10 @@ class TradeOrderRequest(BaseModel):
     stop_loss: Optional[float] = None
     target_price: Optional[float] = None
     reason_tag: str = "Discretionary setup"
+    client_event_id: Optional[str] = None
+    viewed_info: List[str] = Field(default_factory=list)
+    decision_duration_sec: Optional[int] = None
+    pre_decision_contract: Optional[PreDecisionContractInput] = None
 
 class PortfolioPositionModel(BaseModel):
     id: str
@@ -208,6 +243,218 @@ class AIBuddyChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000)
     history: List[AIBuddyHistoryItem] = Field(default_factory=list, max_length=20)
     context: Optional[AIBuddyContext] = None
+
+# -----------------------------------------------------------------------------
+# PHASE 3 — MIRROR MODE MODELS
+# -----------------------------------------------------------------------------
+class MirrorStartRequest(BaseModel):
+    challenge_id: str
+    is_practice: bool = False
+    declared_strategy: Optional[str] = "Risk-controlled disciplined execution (max 25% single asset)"
+
+class MirrorDecisionRequest(BaseModel):
+    session_id: str
+    stage_index: int = Field(..., ge=0)
+    client_decision_id: Optional[str] = Field(None, max_length=120)
+    action: str = Field(..., min_length=1, max_length=60)
+    allocation: Optional[Dict[str, float]] = None
+    reasoning: str = Field(..., min_length=3, max_length=1000)
+    confidence_level: int = Field(..., ge=1, le=5)
+    invalidation_trigger: Optional[str] = Field(None, max_length=300)
+    reviewed_info: List[str] = Field(default_factory=list)
+
+class MirrorCompleteRequest(BaseModel):
+    session_id: str
+    reflection_text: Optional[str] = Field("", max_length=1000)
+    use_ai: bool = True
+
+# -----------------------------------------------------------------------------
+# PHASE 4 — MINDMARK ARENA MODELS
+# -----------------------------------------------------------------------------
+class ArenaStageDecision(BaseModel):
+    stage_index: int = Field(..., ge=0)
+    action: str = Field(..., min_length=1, max_length=60)
+    reasoning: str = Field(..., min_length=3, max_length=1200)
+    reviewed_info: List[str] = Field(default_factory=list)
+    confidence_level: int = Field(default=3, ge=1, le=5)
+
+class ArenaSubmitRequest(BaseModel):
+    started_at: Optional[str] = None
+    duration_sec: int = Field(default=60, ge=0, le=7200)
+    is_practice: bool = False
+    stage_decisions: List[ArenaStageDecision] = Field(default_factory=list)
+    allocation: Optional[Dict[str, float]] = None
+    selected_bias: Optional[str] = Field(None, max_length=120)
+    mitigation_plan: Optional[str] = Field(None, max_length=1200)
+    argument: Optional[str] = Field(None, max_length=2000)
+    evidence: Optional[str] = Field(None, max_length=1500)
+    risks: Optional[str] = Field(None, max_length=1500)
+    reasoning: Optional[str] = Field(None, max_length=1500)
+    reflection_text: Optional[str] = Field("", max_length=1200)
+    reviewed_info: List[str] = Field(default_factory=list)
+    use_ai: bool = True
+
+class ArenaContestCreateRequest(BaseModel):
+    contest_type: str = Field(..., pattern="^(CRASH_SURVIVOR|FOMO_TRAP|PORTFOLIO_ARCHITECT|DECISION_PRESSURE|ANALYST_DUEL|BIAS_BUSTER)$")
+    title: str = Field(..., min_length=4, max_length=140)
+    description: str = Field(..., min_length=10, max_length=800)
+    difficulty: str = Field(default="Intermediate", pattern="^(Beginner|Intermediate|Advanced)$")
+    starts_at: Optional[str] = None
+    ends_at: Optional[str] = None
+    duration_minutes: int = Field(default=15, ge=2, le=180)
+    time_window_sec: int = Field(default=180, ge=30, le=3600)
+    league_scope: str = Field(default="GLOBAL", pattern="^(GLOBAL|UNIVERSITY|FRIENDS)$")
+    university_name: Optional[str] = None
+    rubric_version: str = Field(default="v1.0-arena", max_length=40)
+    scenario: Dict[str, Any] = Field(default_factory=dict)
+
+class ArenaStartRequest(BaseModel):
+    is_practice: bool = False
+
+class ArenaProfileUpdateRequest(BaseModel):
+    display_name: Optional[str] = Field(None, min_length=2, max_length=80)
+    public_leaderboard_opt_in: Optional[bool] = None
+    share_university: Optional[bool] = None
+    university_name: Optional[str] = Field(None, min_length=2, max_length=120)
+
+class ArenaFriendChallengeCreateRequest(BaseModel):
+    contest_id: str
+    opponent_email: Optional[str] = None
+    share_reasoning: bool = True
+    expires_hours: int = Field(default=48, ge=1, le=168)
+
+class ArenaFriendChallengeSubmitRequest(BaseModel):
+    submission: ArenaSubmitRequest
+
+# -----------------------------------------------------------------------------
+# PHASE 5 — ADVANCED GAMIFICATION & PROGRESSION MODELS
+# -----------------------------------------------------------------------------
+class GamificationMissionCompleteRequest(BaseModel):
+    reflection_note: Optional[str] = Field(None, max_length=600)
+
+class GamificationSkillCompleteRequest(BaseModel):
+    exercise_answer: Optional[str] = Field(None, max_length=800)
+    use_ai: bool = True
+
+# -----------------------------------------------------------------------------
+# PHASE 6 — SOCIAL INTELLIGENCE MODELS
+# -----------------------------------------------------------------------------
+class SocialSquadCreateRequest(BaseModel):
+    name: str = Field(..., min_length=3, max_length=80)
+    description: Optional[str] = Field("", max_length=300)
+    avatar: Optional[str] = Field("Shield", max_length=40)
+    university_name: Optional[str] = Field(None, max_length=120)
+
+class SocialSquadInviteRequest(BaseModel):
+    invitee_email: str = Field(..., min_length=3, max_length=180)
+
+class SocialSquadJoinCodeRequest(BaseModel):
+    invite_code: str = Field(..., min_length=4, max_length=32)
+
+class SocialSquadRoleRequest(BaseModel):
+    member_user_id: str
+    role: str = Field(..., pattern="^(Market Analyst|Risk Officer|Portfolio Manager|Strategist|Researcher)$")
+
+class SocialSquadBattleCreateRequest(BaseModel):
+    title: str = Field(..., min_length=4, max_length=140)
+    scenario_id: str = Field(default="sb-macro-shock")
+
+class SocialSquadBattleContributeRequest(BaseModel):
+    analysis: str = Field(..., min_length=10, max_length=1200)
+
+class SocialSquadBattleSubmitRequest(BaseModel):
+    decision_action: str = Field(..., min_length=2, max_length=60)
+    team_reasoning: str = Field(..., min_length=10, max_length=1500)
+    risk_plan: str = Field(..., min_length=10, max_length=1000)
+    evidence_summary: str = Field(..., min_length=10, max_length=1000)
+    final_reflection: Optional[str] = Field("", max_length=800)
+
+class SocialDebateCreateRequest(BaseModel):
+    title: str = Field(..., min_length=5, max_length=160)
+    case_text: str = Field(..., min_length=15, max_length=1500)
+    format: str = Field(default="OPEN", pattern="^(1v1|OPEN|WEEKLY_FEATURED|UNIVERSITY)$")
+    university_name: Optional[str] = None
+
+class SocialDebateSubmitRequest(BaseModel):
+    interpretation: str = Field(..., min_length=10, max_length=1500)
+    evidence: str = Field(..., min_length=10, max_length=1200)
+    risks: str = Field(..., min_length=10, max_length=1200)
+    counterarguments: str = Field(..., min_length=10, max_length=1200)
+    invalidation_info: str = Field(..., min_length=5, max_length=800)
+    use_ai: bool = True
+
+class SocialReactionRequest(BaseModel):
+    reaction: str = Field(..., min_length=2, max_length=40)
+
+class SocialReportRequest(BaseModel):
+    reason: str = Field(..., min_length=4, max_length=400)
+
+class SocialCrowdSubmitRequest(BaseModel):
+    action: str = Field(..., min_length=2, max_length=60)
+    risk_category: str = Field(..., pattern="^(Conservative|Balanced|Aggressive|Wait & Research)$")
+    reasoning: str = Field(..., min_length=10, max_length=1200)
+    reflection_text: Optional[str] = Field("", max_length=800)
+    is_practice: bool = False
+
+class SocialPostCreateRequest(BaseModel):
+    post_type: str = Field(..., pattern="^(LESSON|BADGE|ARENA_RESULT|SQUAD_VICTORY|DEBATE|INSIGHT|MILESTONE)$")
+    title: str = Field(..., min_length=3, max_length=140)
+    content: str = Field(..., min_length=5, max_length=1500)
+    shared_ref_id: Optional[str] = None
+
+class SocialCommentRequest(BaseModel):
+    content: str = Field(..., min_length=2, max_length=600)
+
+class SocialPrivacyPatchRequest(BaseModel):
+    username: Optional[str] = Field(None, min_length=3, max_length=40)
+    show_university: Optional[bool] = None
+    show_squads: Optional[bool] = None
+    show_achievements: Optional[bool] = None
+    show_arena_rank: Optional[bool] = None
+    notify_squads: Optional[bool] = None
+    notify_challenges: Optional[bool] = None
+    notify_debates: Optional[bool] = None
+
+# -----------------------------------------------------------------------------
+# PHASE 7 — PERSONALIZED GEMINI AI COACH MODELS
+# -----------------------------------------------------------------------------
+class AICoachChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000)
+    conversation_id: Optional[str] = None
+    include_live_market: bool = True
+    use_ai: bool = True
+
+class AICoachDecisionReviewRequest(BaseModel):
+    symbol: str = Field(..., min_length=1, max_length=30)
+    action: str = Field(..., min_length=2, max_length=30)
+    stated_reasoning: str = Field(..., min_length=3, max_length=1500)
+    declared_strategy: Optional[str] = Field("Long-term risk-controlled allocation", max_length=400)
+    position_size_pct: float = Field(default=10.0, ge=0.0, le=100.0)
+    risk_limit_pct: float = Field(default=20.0, ge=1.0, le=100.0)
+    market_context_at_time: Optional[str] = Field("", max_length=1000)
+    contract_id: Optional[str] = None
+    scenario_context: Optional[str] = Field("", max_length=800)
+    use_ai: bool = True
+
+class ArenaDuelCreateRequest(BaseModel):
+    contest_id: str
+    argument: str = Field(..., min_length=10, max_length=2000)
+    evidence: str = Field(..., min_length=10, max_length=1500)
+    risks: str = Field(..., min_length=10, max_length=1500)
+    auto_match_benchmark: bool = True
+    use_ai: bool = True
+
+class ArenaDuelJoinRequest(BaseModel):
+    argument: str = Field(..., min_length=10, max_length=2000)
+    evidence: str = Field(..., min_length=10, max_length=1500)
+    risks: str = Field(..., min_length=10, max_length=1500)
+    use_ai: bool = True
+
+class ArenaUniversityRequest(BaseModel):
+    university_name: str = Field(..., min_length=2, max_length=120)
+
+class ArenaFriendRequest(BaseModel):
+    friend_email: str = Field(..., min_length=3, max_length=180)
 
 class StandardAPIResponse(BaseModel):
     success: bool

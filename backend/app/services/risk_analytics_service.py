@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from backend.app.services.providers import get_provider
@@ -65,16 +66,29 @@ async def compute_historical_risk_analytics(
     latest_close = candles[-1].close
     atr_pct = round((atr_14 / latest_close) * 100, 2) if latest_close > 0 else 0.0
 
-    # Max Drawdown
+    # Max Drawdown & Underwater Drawdown Series
     peak = candles[0].close
     max_dd = 0.0
+    cur_dd = 0.0
+    cur_dur = 0
+    max_dur = 0
+    drawdown_series: List[Dict[str, Any]] = []
     for c in candles:
-        if c.close > peak:
+        if c.close >= peak:
             peak = c.close
-        if peak > 0:
-            dd = (peak - c.close) / peak
-            if dd > max_dd:
-                max_dd = dd
+            cur_dur = 0
+        else:
+            cur_dur += 1
+            if cur_dur > max_dur:
+                max_dur = cur_dur
+        dd = ((peak - c.close) / peak) if peak > 0 else 0.0
+        cur_dd = dd
+        if dd > max_dd:
+            max_dd = dd
+        drawdown_series.append({
+            "date": datetime.fromtimestamp(int(c.time), tz=timezone.utc).strftime("%Y-%m-%d"),
+            "drawdownPct": -round(dd * 100.0, 2),
+        })
 
     # Historical Simulation VaR & CVaR (Expected Shortfall)
     sorted_rets = sorted(returns)
@@ -97,6 +111,8 @@ async def compute_historical_risk_analytics(
         "atr14": round(atr_14, 4),
         "atrPercent": atr_pct,
         "maxDrawdownPct": round(max_dd * 100, 2),
+        "currentDrawdownPct": round(cur_dd * 100, 2),
+        "maxDrawdownDurationDays": max_dur,
         "var": {
             "methodology": "Historical Simulation (Non-Parametric)",
             "confidenceLevel": confidence,
@@ -104,6 +120,8 @@ async def compute_historical_risk_analytics(
             "dailyVarPct": round(abs(min(0.0, var_return)) * 100, 2),
             "dailyCvarPct": round(abs(min(0.0, cvar_return)) * 100, 2),
         },
+        "dailyReturnsPct": [round(r * 100.0, 3) for r in returns[-252:]],
+        "drawdownSeries": drawdown_series[-252:],
         "disclaimer": "Historical risk metrics reflect past observed price distributions and do not guarantee future losses.",
         "status": series.status,
         "source": series.source,

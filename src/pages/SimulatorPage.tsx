@@ -34,6 +34,8 @@ import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import { StockQuote, PortfolioPosition, TradeOrder } from '../types';
 import { RiskRealityCheckModal, ProposedTradeData, PortfolioRiskMetrics } from '../components/simulator/RiskRealityCheckModal';
+import { PreDecisionContractCard, PreDecisionContractData } from '../components/simulator/PreDecisionContractCard';
+import { api } from '../services/api';
 
 export const SimulatorPage: React.FC = () => {
   const {
@@ -79,6 +81,8 @@ export const SimulatorPage: React.FC = () => {
   // Risk Reality Check Engine State
   const [isRiskModalOpen, setIsRiskModalOpen] = useState<boolean>(false);
   const [pendingTrade, setPendingTrade] = useState<ProposedTradeData | null>(null);
+  const [preDecisionContract, setPreDecisionContract] = useState<PreDecisionContractData | null>(null);
+  const [decisionStartTime] = useState<number>(Date.now());
 
   // Active view tab below trading panel: HOLDINGS vs ORDER HISTORY
   const [activeBottomTab, setActiveBottomTab] = useState<'HOLDINGS' | 'ORDERS'>('HOLDINGS');
@@ -203,6 +207,25 @@ export const SimulatorPage: React.FC = () => {
       targetPrice: targetPrice ? parseFloat(targetPrice) : undefined,
       reasonTag,
     });
+
+    if (result.success) {
+      const durationSec = Math.max(1, Math.round((Date.now() - decisionStartTime) / 1000));
+      api.behavior.recordEvent({
+        client_event_id: `sim-${Date.now()}-${selectedStock.symbol}`,
+        symbol: selectedStock.symbol,
+        sector: selectedStock.sector,
+        action: tradeType,
+        execution_price: effectivePrice,
+        quantity,
+        market_change_pct: selectedStock.changePercent,
+        stated_reason: preDecisionContract?.why_making_decision || reasonTag,
+        confidence_level: preDecisionContract?.confidence_level,
+        viewed_info: ['quote_panel', 'price_chart'],
+        decision_duration_sec: durationSec,
+        pre_decision_contract: preDecisionContract || undefined,
+      }).catch(() => {});
+      setPreDecisionContract(null);
+    }
 
     if (result.success) {
       setTradeNotification({ message: result.message, isError: false });
@@ -1101,6 +1124,13 @@ export const SimulatorPage: React.FC = () => {
                   I understand this is a 100% virtual paper trade using simulated capital.
                 </label>
               </div>
+
+              {/* Optional Pre-Decision Contract */}
+              <PreDecisionContractCard
+                proposedExposurePct={(estimatedValue / Math.max(totalPortfolioValue, 1)) * 100}
+                value={preDecisionContract}
+                onChange={setPreDecisionContract}
+              />
 
               {/* Run Risk Reality Check Button */}
               <button

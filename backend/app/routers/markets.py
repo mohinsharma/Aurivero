@@ -5,6 +5,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel, Field
 
 from backend.app.models import StandardAPIResponse
 from backend.app.services.providers import (
@@ -23,6 +24,7 @@ from backend.app.services.heatmap_service import get_stocks_heatmap
 from backend.app.services.screener_service import run_stock_screener
 from backend.app.services.risk_analytics_service import compute_historical_risk_analytics
 from backend.app.services.ml_risk_service import evaluate_ml_risk_intelligence
+from backend.app.services.portfolio_risk_service import compute_portfolio_risk
 from backend.app.services.providers.indian_vendors import bharatstock_adapter, tejhq_adapter
 from backend.app.services.providers.stocks_provider import get_indian_market_session_details
 from backend.app.services.stream_manager import stream_manager
@@ -355,6 +357,42 @@ async def get_ml_risk_insights(request: Request, asset_class: str, symbol: str):
     _enforce_rate_limit(request, "risk_ml")
     try:
         data = await evaluate_ml_risk_intelligence(asset_class=asset_class, symbol=symbol)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return StandardAPIResponse(success=True, data=data)
+
+
+class PortfolioRiskPositionIn(BaseModel):
+    symbol: str
+    name: Optional[str] = None
+    assetClass: str = Field(default="STOCK")
+    quantity: float = Field(gt=0)
+    entryPrice: float = Field(gt=0)
+    currentPrice: Optional[float] = None
+    stopLoss: Optional[float] = None
+    sector: Optional[str] = None
+    currency: Optional[str] = None
+
+
+class PortfolioRiskRequest(BaseModel):
+    positions: List[PortfolioRiskPositionIn] = Field(default_factory=list)
+    cashBalance: float = Field(default=0.0, ge=0.0)
+    baseCurrency: str = Field(default="INR")
+    confidence: float = Field(default=0.95, ge=0.80, le=0.99)
+    lookbackDays: int = Field(default=252, ge=30, le=400)
+
+
+@router.post("/risk/portfolio", response_model=StandardAPIResponse)
+async def analyze_portfolio_risk(request: Request, body: PortfolioRiskRequest):
+    _enforce_rate_limit(request, "risk_portfolio")
+    try:
+        data = await compute_portfolio_risk(
+            positions=[p.model_dump() for p in body.positions],
+            cash_balance=body.cashBalance,
+            base_currency=body.baseCurrency,
+            confidence=body.confidence,
+            lookback_days=body.lookbackDays,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return StandardAPIResponse(success=True, data=data)

@@ -23,7 +23,9 @@ import { StatCard } from '../components/common/StatCard';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
+import { BeginnerTooltip } from '../components/common/BeginnerTooltip';
 import { INDIAN_INDICES } from '../data/mockData';
+import api from '../services/api';
 
 export const DashboardPage: React.FC = () => {
   const {
@@ -37,9 +39,62 @@ export const DashboardPage: React.FC = () => {
     behavioralScore,
     assessment,
     orderHistory,
+    experienceMode,
   } = useSimulator();
 
   const navigate = useNavigate();
+  const [showExpandedPortfolio, setShowExpandedPortfolio] = useState(false);
+  const [aiQuickPrompt, setAiQuickPrompt] = useState('');
+  const [gamStats, setGamStats] = useState<{ skills: number; streak: number; contests: number }>({
+    skills: 0,
+    streak: 0,
+    contests: 0,
+  });
+  const [skippedSteps, setSkippedSteps] = useState<string[]>(() => {
+    try {
+      const s = localStorage.getItem('mindmark_skipped_onboarding_steps');
+      return s ? JSON.parse(s) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  React.useEffect(() => {
+    api.gamification.getProfile(false).then((res) => {
+      const d = res?.data ?? res;
+      if (d) {
+        setGamStats({
+          skills: d?.skill_tree?.completed_count || 0,
+          streak: d?.streak?.current_streak || 0,
+          contests: d?.badges?.unlocked_count || 0,
+        });
+      }
+    }).catch(() => {});
+  }, []);
+
+  const skipStep = (stepKey: string) => {
+    const next = [...skippedSteps, stepKey];
+    setSkippedSteps(next);
+    try {
+      localStorage.setItem('mindmark_skipped_onboarding_steps', JSON.stringify(next));
+    } catch {}
+  };
+
+  const hasAssessmentDone = Boolean(
+    (typeof window !== 'undefined' && localStorage.getItem('mindmark_onboarding_v2')) || assessment
+  );
+  const hasLessonDone = gamStats.skills > 0;
+  const hasSimActivity = orderHistory.length > 1 || positions.length > 0;
+  const isFirstRun = !hasLessonDone && orderHistory.length <= 1 && skippedSteps.length < 3;
+
+  // Determine single best next step based on actual progress
+  const nextStep = !hasAssessmentDone
+    ? { title: 'Complete your investor assessment', desc: 'Take 2 minutes to tailor your learning path.', cta: 'Take Assessment', route: '/onboarding' }
+    : !hasLessonDone
+    ? { title: 'Start with your first lesson', desc: 'Learn how stocks, indices, and investing risk work in plain English.', cta: 'Start Your First Lesson', route: '/academy' }
+    : !hasSimActivity
+    ? { title: 'Try your first virtual investment', desc: 'Practise buying a stock using ₹1,00,000 virtual money — zero real-money risk.', cta: 'Try Paper Trading', route: '/simulator' }
+    : { title: 'Review your last decision', desc: 'See what behavioral patterns your recent decisions show.', cta: 'View Behavioral Insights', route: '/behavioral-insights' };
 
   // Dynamic Time-Based Greeting
   const currentHour = new Date().getHours();
@@ -66,6 +121,309 @@ export const DashboardPage: React.FC = () => {
     }
     return 'bg-loss/10 border-loss/25 text-loss hover:bg-loss/15';
   };
+
+  // ===========================================================================
+  // BEGINNER MODE DASHBOARD (Low Cognitive Load, Plain English, AURIVERO UI)
+  // ===========================================================================
+  if (experienceMode === 'beginner') {
+    return (
+      <div className="space-y-6 max-w-6xl mx-auto pb-10">
+        {/* A. Calm Welcome Header */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5">
+            <Badge variant="primary" dot size="sm">
+              Beginner Friendly Mode
+            </Badge>
+            <span className="text-xs text-text-secondary hidden sm:inline">
+              Zero real money involved • Learn at your own pace
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight">
+            Welcome back.{' '}
+            <span className="text-primary">Let&apos;s build your investing knowledge step by step.</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-text-secondary max-w-2xl">
+            Learn how markets work, practise with virtual money, and improve your decisions without risking your savings.
+          </p>
+        </div>
+
+        {/* Guided First-Run 3-Step Checklist */}
+        {isFirstRun && (
+          <Card className="p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-bold text-text-primary">Getting Started Checklist (3 Quick Steps)</h2>
+              <span className="text-xs font-medium text-primary">Virtual Learning Only</span>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                { key: 'assess', title: '1. Discover Your Investor Profile', desc: 'Helps tailor learning to your experience. Not a financial qualification.', cta: 'Take the 2-minute assessment', route: '/onboarding', done: hasAssessmentDone },
+                { key: 'lesson', title: '2. Learn One Essential Concept', desc: 'Understand what stocks are and how investing risk works.', cta: 'Start Your First Lesson', route: '/academy', done: hasLessonDone },
+                { key: 'trade', title: '3. Make Your First Virtual Investment', desc: 'Uses virtual money only — no real money is involved.', cta: 'Try Paper Trading', route: '/simulator', done: hasSimActivity },
+              ].map((step) => (
+                <div
+                  key={step.key}
+                  className={`p-4 rounded-2xl border space-y-3 flex flex-col justify-between ${
+                    step.done ? 'bg-primary/10 border-primary/30' : 'bg-background border-border'
+                  }`}
+                >
+                  <div className="space-y-1.5">
+                    <div className="text-xs font-bold text-text-primary flex items-center justify-between">
+                      <span>{step.title}</span>
+                      {step.done && <CheckCircle2 size={15} className="text-primary" />}
+                    </div>
+                    <p className="text-xs text-text-secondary leading-relaxed">{step.desc}</p>
+                  </div>
+                  {!step.done && !skippedSteps.includes(step.key) && (
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <Button variant="primary" size="sm" onClick={() => navigate(step.route)} className="text-xs flex-1 rounded-xl">
+                        {step.cta}
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={() => skipStep(step.key)}
+                        className="text-[11px] text-text-secondary hover:text-text-primary px-2"
+                      >
+                        Skip
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* B. Your Next Step */}
+        <Card className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+              Your Next Step
+            </span>
+            <h2 className="text-lg font-bold text-text-primary">{nextStep.title}</h2>
+            <p className="text-xs text-text-secondary">{nextStep.desc}</p>
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => navigate(nextStep.route)}
+            icon={<ArrowRight size={16} />}
+            iconPosition="right"
+            className="shrink-0 font-semibold rounded-xl"
+          >
+            {nextStep.cta}
+          </Button>
+        </Card>
+
+        {/* C. Portfolio Snapshot (3 Beginner Numbers) */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-text-primary">Virtual Portfolio Snapshot</h2>
+            <button
+              type="button"
+              onClick={() => setShowExpandedPortfolio((v) => !v)}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              {showExpandedPortfolio ? 'Hide Details' : 'Expand Portfolio Details'}
+            </button>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Card className="p-5 space-y-1">
+              <div className="text-xs text-text-secondary">Total Virtual Money</div>
+              <div className="text-2xl font-bold text-text-primary tabular-nums">
+                ₹{totalPortfolioValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[11px] text-text-secondary">Your demo cash + stock value</div>
+            </Card>
+            <Card className="p-5 space-y-1">
+              <div className="text-xs text-text-secondary flex items-center">
+                Today&apos;s Change
+                <BeginnerTooltip
+                  term="Today's Change (P&L)"
+                  definition="Profit and Loss. It shows how much your virtual investments have gained or lost today."
+                  example="If ₹1,000 grows to ₹1,020, Today's Change is +₹20."
+                />
+              </div>
+              <div className={`text-2xl font-bold tabular-nums ${dayPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
+                {dayPnL >= 0 ? '+' : ''}₹{dayPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[11px] text-text-secondary">Simulated daily movement</div>
+            </Card>
+            <Card className="p-5 space-y-1">
+              <div className="text-xs text-text-secondary">Available Cash</div>
+              <div className="text-2xl font-bold text-text-primary tabular-nums">
+                ₹{virtualCash.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[11px] text-text-secondary">Ready to practise with</div>
+            </Card>
+          </div>
+
+          {showExpandedPortfolio && (
+            <Card className="p-5 space-y-3">
+              <div className="text-xs font-bold text-text-primary">Your Practice Holdings ({positions.length})</div>
+              {positions.length === 0 ? (
+                <p className="text-xs text-text-secondary">No virtual stocks held yet. Try Paper Trading when ready.</p>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {positions.map((p) => (
+                    <div key={p.id} className="p-3 rounded-xl bg-background border border-border flex items-center justify-between text-xs">
+                      <div>
+                        <div className="font-bold text-text-primary">{p.symbol}</div>
+                        <div className="text-text-secondary">{p.quantity} shares • {p.sector}</div>
+                      </div>
+                      <div className="text-right tabular-nums">
+                        <div className="text-text-primary font-semibold">
+                          ₹{p.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                        </div>
+                        <div className={p.unrealizedPnL >= 0 ? 'text-profit font-semibold' : 'text-loss font-semibold'}>
+                          {p.unrealizedPnL >= 0 ? '+' : ''}{p.unrealizedPnLPercent.toFixed(1)}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          )}
+        </section>
+
+        {/* D. AI Buddy Quick Help & E. Your Progress */}
+        <div className="grid lg:grid-cols-2 gap-5">
+          <Card className="p-5 space-y-3">
+            <div className="text-sm font-semibold text-text-primary flex items-center gap-2">
+              <Bot size={16} className="text-primary" /> AI Buddy Quick Help
+            </div>
+            <div className="flex gap-2">
+              <input
+                value={aiQuickPrompt}
+                onChange={(e) => setAiQuickPrompt(e.target.value)}
+                placeholder="Ask anything about investing in simple words..."
+                className="flex-1 rounded-xl bg-background border border-border px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+              />
+              <Button variant="primary" size="sm" onClick={() => navigate('/ai-buddy')} className="rounded-xl">
+                Ask
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {['What is a stock?', 'Why did my investment fall?', 'What is risk?', 'What does diversification mean?'].map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => navigate('/ai-buddy')}
+                  className="text-[11px] px-2.5 py-1 rounded-lg bg-background border border-border text-text-secondary hover:text-text-primary"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5 space-y-3">
+            <div className="text-sm font-semibold text-text-primary flex items-center justify-between">
+              <span>Your Progress</span>
+              <button type="button" onClick={() => navigate('/my-progress')} className="text-xs text-primary hover:underline font-semibold">
+                View Full Progress →
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="p-3 rounded-xl bg-background border border-border">
+                <div className="text-xl font-bold text-primary tabular-nums">{gamStats.skills}</div>
+                <div className="text-[11px] text-text-secondary">Skills Completed</div>
+              </div>
+              <div className="p-3 rounded-xl bg-background border border-border">
+                <div className="text-xl font-bold text-text-primary tabular-nums">{gamStats.streak}d</div>
+                <div className="text-[11px] text-text-secondary">Learning Streak</div>
+              </div>
+              <div className="p-3 rounded-xl bg-background border border-border">
+                <div className="text-xl font-bold text-text-primary tabular-nums">{gamStats.contests}</div>
+                <div className="text-[11px] text-text-secondary">Badges Earned</div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* F. Market Snapshot + NSE Heatmap */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-text-primary">Market at a Glance &amp; NSE Heatmap</h2>
+            <button
+              type="button"
+              onClick={() => navigate('/markets/heatmap')}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              Full Heatmap →
+            </button>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {INDIAN_INDICES.slice(0, 3).map((idx) => (
+              <Card key={idx.name} className="p-4 space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-text-primary">{idx.name}</span>
+                  <span className={`font-semibold tabular-nums ${idx.changePercent >= 0 ? 'text-profit' : 'text-loss'}`}>
+                    {idx.changePercent >= 0 ? '+' : ''}{idx.changePercent}%
+                  </span>
+                </div>
+                <div className="text-lg font-bold text-text-primary tabular-nums">{idx.value.toLocaleString('en-IN')}</div>
+                <div className="text-[11px] text-text-secondary">
+                  Tracks top Indian companies to show overall market mood.
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {stocks.slice(0, 8).map((stk) => {
+              const isUp = stk.changePercent >= 0;
+              return (
+                <button
+                  key={stk.symbol}
+                  type="button"
+                  onClick={() => navigate('/simulator')}
+                  className={`p-3 rounded-xl border text-left transition-transform hover:-translate-y-0.5 ${getHeatmapTileStyle(
+                    stk.changePercent
+                  )}`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-bold text-xs text-text-primary truncate">{stk.symbol}</span>
+                    <span className="text-xs font-bold tabular-nums">
+                      {isUp ? '+' : '-'}{Math.abs(stk.changePercent).toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-text-secondary truncate mt-0.5">
+                    ₹{stk.price.toFixed(0)} · {stk.sector.split(' ')[0]}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Explore Aurivero (5 Clean Cards) */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-text-primary">Explore Aurivero</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {[
+              { title: 'Learn', desc: 'Build your investing knowledge step by step.', route: '/academy', icon: BookOpen },
+              { title: 'Practice', desc: 'Try investing decisions using virtual money.', route: '/simulator', icon: CandlestickChart },
+              { title: 'AI Buddy', desc: 'Get finance concepts explained in simple language.', route: '/ai-buddy', icon: Bot },
+              { title: 'Markets', desc: 'Explore stocks and understand market movements.', route: '/markets', icon: LayoutGrid },
+              { title: 'Behavioral Insights', desc: 'Discover patterns in your simulated decisions.', route: '/behavioral-insights', icon: BrainCircuit },
+            ].map((m) => (
+              <button
+                key={m.title}
+                type="button"
+                onClick={() => navigate(m.route)}
+                className="p-4 rounded-2xl bg-surface border border-border hover:border-primary/40 text-left space-y-2 transition shadow-sm"
+              >
+                <m.icon size={18} className="text-primary" />
+                <div className="text-sm font-semibold text-text-primary">{m.title}</div>
+                <p className="text-xs text-text-secondary leading-relaxed">{m.desc}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5 w-full pb-8">
@@ -122,10 +480,10 @@ export const DashboardPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/onboarding')}
+            onClick={() => navigate('/behavioral-insights')}
             className="text-xs rounded-xl hidden sm:inline-flex"
           >
-            Skill Check-In
+            Investor Fingerprint
           </Button>
         </div>
       </div>

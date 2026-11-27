@@ -118,7 +118,7 @@ export const HotTopicsPage: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate('/forums')}
+              onClick={() => navigate('/news-community?tab=forums')}
               className="font-mono text-xs"
             >
               <MessageSquare size={14} className="mr-1.5 text-secondary" />
@@ -474,7 +474,7 @@ export const HotTopicsPage: React.FC = () => {
                 <div
                   onClick={() => {
                     setSelectedArticle(null);
-                    navigate('/forums');
+                    navigate('/news-community?tab=forums');
                   }}
                   className="p-3 rounded-lg bg-surface border border-border hover:border-primary transition-colors cursor-pointer group flex items-start gap-2.5"
                 >

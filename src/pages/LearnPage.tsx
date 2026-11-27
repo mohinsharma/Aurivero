@@ -21,6 +21,7 @@ import { Button } from '../components/common/Button';
 import { Modal } from '../components/common/Modal';
 import { COURSE_MODULES } from '../data/mockData';
 import { CourseModule, CourseLesson } from '../types';
+import { VisualLearningDiagrams } from '../components/learn/VisualLearningDiagrams';
 
 export const LearnPage: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<CourseModule>(COURSE_MODULES[0]);
@@ -75,6 +76,9 @@ export const LearnPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Visual Learning Engine */}
+      <VisualLearningDiagrams />
 
       {/* Main Track Selection & Lesson Viewer */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

@@ -315,6 +315,2174 @@ def init_db():
     """)
 
     # --------------------------------------------------------------------------
+    # 2b. BEHAVIORAL INTELLIGENCE ENGINE (BIE) TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS decision_events (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        client_event_id TEXT,
+        scenario_id TEXT,
+        symbol TEXT NOT NULL,
+        sector TEXT DEFAULT 'Unknown',
+        action TEXT NOT NULL CHECK (action IN ('BUY', 'SELL', 'HOLD', 'REDUCE')),
+        execution_price REAL NOT NULL,
+        quantity REAL NOT NULL,
+        total_value REAL NOT NULL,
+        realized_pnl_delta REAL DEFAULT 0.0,
+        portfolio_value_before REAL NOT NULL,
+        portfolio_value_after REAL NOT NULL,
+        cash_before REAL NOT NULL,
+        cash_after REAL NOT NULL,
+        stock_exposure_pct REAL DEFAULT 0.0,
+        sector_exposure_pct REAL DEFAULT 0.0,
+        market_change_pct REAL,
+        recent_drawdown_pct REAL DEFAULT 0.0,
+        stated_reason TEXT,
+        confidence_level INTEGER,
+        viewed_info_json TEXT DEFAULT '[]',
+        contract_id TEXT,
+        decision_duration_sec INTEGER,
+        subsequent_outcome_json TEXT,
+        version INTEGER DEFAULT 1,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, client_event_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS pre_decision_contracts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        event_id TEXT,
+        symbol TEXT NOT NULL,
+        action TEXT NOT NULL,
+        why_making_decision TEXT NOT NULL,
+        biggest_risk TEXT NOT NULL,
+        what_proves_wrong TEXT NOT NULL,
+        planned_exposure_pct REAL NOT NULL,
+        confidence_level INTEGER NOT NULL,
+        short_explanation TEXT,
+        version INTEGER DEFAULT 1,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS behavior_snapshots (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        features_json TEXT NOT NULL,
+        events_count INTEGER DEFAULT 0,
+        version INTEGER DEFAULT 1,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS behavior_patterns (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        pattern_key TEXT NOT NULL,
+        pattern_name TEXT NOT NULL,
+        detected INTEGER DEFAULT 0,
+        status TEXT NOT NULL,
+        severity TEXT NOT NULL,
+        confidence REAL DEFAULT 0.0,
+        evidence_count INTEGER DEFAULT 0,
+        observed_period TEXT,
+        evidence_event_ids_json TEXT DEFAULT '[]',
+        what_happened TEXT NOT NULL,
+        why_it_matters TEXT NOT NULL,
+        what_user_can_learn TEXT NOT NULL,
+        recommended_challenge TEXT NOT NULL,
+        limitations TEXT,
+        version INTEGER DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        UNIQUE (user_id, pattern_key),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS behavior_scores (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        dimension TEXT NOT NULL,
+        current_score REAL NOT NULL,
+        previous_score REAL NOT NULL,
+        trend TEXT DEFAULT 'STABLE',
+        evidence_count INTEGER DEFAULT 0,
+        confidence TEXT DEFAULT 'LOW',
+        explanation TEXT NOT NULL,
+        version INTEGER DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        UNIQUE (user_id, dimension),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS training_assignments (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        pattern_key TEXT NOT NULL,
+        challenge_title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        status TEXT DEFAULT 'ASSIGNED',
+        assigned_at TEXT NOT NULL,
+        completed_at TEXT,
+        UNIQUE (user_id, pattern_key),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_decision_events_user_time ON decision_events (user_id, created_at DESC);")
+
+    # --------------------------------------------------------------------------
+    # 2c. PHASE 3 — MIRROR MODE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_challenges (
+        id TEXT PRIMARY KEY,
+        challenge_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        target_pattern_key TEXT NOT NULL,
+        target_dimension TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        estimated_minutes INTEGER DEFAULT 5,
+        data_source_label TEXT NOT NULL,
+        scenario_version TEXT DEFAULT 'v1.0',
+        rubric_version TEXT DEFAULT 'v1.0-general',
+        intro_summary TEXT NOT NULL,
+        stages_json TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_sessions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        challenge_id TEXT NOT NULL,
+        is_personalized INTEGER DEFAULT 0,
+        is_practice INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'IN_PROGRESS',
+        current_stage INTEGER DEFAULT 0,
+        total_stages INTEGER NOT NULL,
+        declared_plan_json TEXT DEFAULT '{}',
+        portfolio_state_json TEXT DEFAULT '{}',
+        scenario_version TEXT DEFAULT 'v1.0',
+        xp_awarded INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (challenge_id) REFERENCES mirror_challenges (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_decisions (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        challenge_id TEXT NOT NULL,
+        stage_index INTEGER NOT NULL,
+        client_decision_id TEXT,
+        action TEXT NOT NULL,
+        allocation_json TEXT,
+        reasoning TEXT NOT NULL,
+        confidence_level INTEGER NOT NULL,
+        invalidation_trigger TEXT,
+        reviewed_info_json TEXT DEFAULT '[]',
+        created_at TEXT NOT NULL,
+        UNIQUE (session_id, stage_index),
+        UNIQUE (user_id, client_decision_id),
+        FOREIGN KEY (session_id) REFERENCES mirror_sessions (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2e. PHASE 5 — ADVANCED GAMIFICATION & PROGRESSION TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_xp_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        source_id TEXT,
+        reward_name TEXT NOT NULL,
+        xp_amount INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'COMPLETED',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_skill_completions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        skill_id TEXT NOT NULL,
+        branch TEXT NOT NULL,
+        xp_awarded INTEGER NOT NULL,
+        completed_at TEXT NOT NULL,
+        UNIQUE (user_id, skill_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_missions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        mission_key TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        mission_type TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        xp_reward INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        is_personalized INTEGER DEFAULT 0,
+        evidence_reason TEXT,
+        progress_current INTEGER DEFAULT 0,
+        progress_target INTEGER DEFAULT 1,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_badges (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        badge_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        category TEXT NOT NULL,
+        rarity TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        xp_reward INTEGER DEFAULT 0,
+        unlocked_at TEXT NOT NULL,
+        UNIQUE (user_id, badge_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_streak_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        activity_date TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, activity_date),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_user_streaks (
+        user_id TEXT PRIMARY KEY,
+        current_streak INTEGER DEFAULT 0,
+        longest_streak INTEGER DEFAULT 0,
+        last_activity_date TEXT,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_season_progress (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        season_id TEXT NOT NULL,
+        season_xp INTEGER DEFAULT 0,
+        completed_milestones_json TEXT DEFAULT '[]',
+        updated_at TEXT NOT NULL,
+        UNIQUE (user_id, season_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_gam_xp_user_time ON gamification_xp_transactions (user_id, created_at DESC);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_registrations (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        registered_at TEXT NOT NULL,
+        started_at TEXT,
+        status TEXT NOT NULL DEFAULT 'REGISTERED',
+        UNIQUE (contest_id, user_id),
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_practice_runs (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        total_score REAL NOT NULL,
+        reasoning_score REAL NOT NULL,
+        risk_score REAL NOT NULL,
+        evidence_score REAL NOT NULL,
+        consistency_score REAL NOT NULL,
+        reflection_score REAL NOT NULL,
+        rubric_version TEXT NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_friend_challenges (
+        id TEXT PRIMARY KEY,
+        challenge_code TEXT UNIQUE NOT NULL,
+        contest_id TEXT NOT NULL,
+        creator_id TEXT NOT NULL,
+        opponent_id TEXT,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        share_reasoning INTEGER DEFAULT 1,
+        creator_score REAL,
+        creator_submission_json TEXT,
+        opponent_score REAL,
+        opponent_submission_json TEXT,
+        winner_id TEXT,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_reward_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        contest_id TEXT,
+        reward_type TEXT NOT NULL,
+        xp_amount INTEGER DEFAULT 0,
+        arena_points_amount INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_audit_logs (
+        id TEXT PRIMARY KEY,
+        actor_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        details_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_contests ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN reflection_score REAL DEFAULT 75.0",
+        "ALTER TABLE arena_entries ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN strongest_decision TEXT DEFAULT ''",
+        "ALTER TABLE arena_entries ADD COLUMN improvement_area TEXT DEFAULT ''",
+        "ALTER TABLE arena_user_stats ADD COLUMN display_name TEXT",
+        "ALTER TABLE arena_user_stats ADD COLUMN public_leaderboard_opt_in INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN share_university INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN season_id TEXT DEFAULT '2026-S4'",
+        "ALTER TABLE arena_user_stats ADD COLUMN rank_history_json TEXT DEFAULT '[]'",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    # --------------------------------------------------------------------------
+    # 2f. PHASE 6 — SOCIAL INTELLIGENCE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squads (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        avatar TEXT DEFAULT 'Shield',
+        invite_code TEXT UNIQUE NOT NULL,
+        leader_id TEXT NOT NULL,
+        university_name TEXT,
+        max_members INTEGER DEFAULT 5,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (leader_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_members (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'Market Analyst',
+        joined_at TEXT NOT NULL,
+        UNIQUE (squad_id, user_id),
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_invitations (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        inviter_id TEXT NOT NULL,
+        invitee_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (invitee_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_battles (
+        id TEXT PRIMARY KEY,
+        challenger_squad_id TEXT NOT NULL,
+        opponent_squad_id TEXT,
+        title TEXT NOT NULL,
+        scenario_id TEXT NOT NULL,
+        scenario_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        challenger_contributions_json TEXT DEFAULT '[]',
+        challenger_final_json TEXT DEFAULT '{}',
+        challenger_score REAL DEFAULT 0.0,
+        opponent_contributions_json TEXT DEFAULT '[]',
+        opponent_final_json TEXT DEFAULT '{}',
+        opponent_score REAL DEFAULT 0.0,
+        winner_squad_id TEXT,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (challenger_squad_id) REFERENCES social_squads (id) ON DELETE CASCADE
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debates (
+        id TEXT PRIMARY KEY,
+        creator_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        case_text TEXT NOT NULL,
+        format TEXT NOT NULL DEFAULT 'OPEN',
+        university_name TEXT,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debate_submissions (
+        id TEXT PRIMARY KEY,
+        debate_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        interpretation TEXT NOT NULL,
+        evidence TEXT NOT NULL,
+        risks TEXT NOT NULL,
+        counterarguments TEXT NOT NULL,
+        invalidation_info TEXT NOT NULL,
+        rubric_score REAL NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        reactions_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        UNIQUE (debate_id, user_id),
+        FOREIGN KEY (debate_id) REFERENCES social_debates (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_crowd_submissions (
+        id TEXT PRIMARY KEY,
+        scenario_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        is_practice INTEGER NOT NULL DEFAULT 0,
+        action TEXT NOT NULL,
+        risk_category TEXT NOT NULL,
+        reasoning TEXT NOT NULL,
+        reflection_text TEXT DEFAULT '',
+        created_at TEXT NOT NULL,
+        UNIQUE (scenario_id, user_id, is_practice),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_posts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        shared_ref_id TEXT,
+        reactions_json TEXT DEFAULT '{}',
+        is_flagged INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_comments (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES social_posts (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2g. PHASE 7 — PERSONALIZED GEMINI AI COACH TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_conversations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        topic_tags_json TEXT DEFAULT '[]',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_messages (
+        id TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+        content TEXT NOT NULL,
+        structured_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (conversation_id) REFERENCES ai_coach_conversations (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_dismissed_recommendations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        rec_id TEXT NOT NULL,
+        dismissed_at TEXT NOT NULL,
+        UNIQUE (user_id, rec_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_token_usage (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        prompt_tokens INTEGER DEFAULT 0,
+        completion_tokens INTEGER DEFAULT 0,
+        source TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_reports (
+        id TEXT PRIMARY KEY,
+        reporter_id TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (reporter_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_blocks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        blocked_user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, blocked_user_id),
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (blocked_user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_privacy_settings (
+        user_id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        show_university INTEGER DEFAULT 1,
+        show_squads INTEGER DEFAULT 1,
+        show_achievements INTEGER DEFAULT 1,
+        show_arena_rank INTEGER DEFAULT 1,
+        notify_squads INTEGER DEFAULT 1,
+        notify_challenges INTEGER DEFAULT 1,
+        notify_debates INTEGER DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_notifications (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        notif_type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        is_read INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_friend_challenges ADD COLUMN difficulty TEXT DEFAULT 'Intermediate'",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN creator_reasoning TEXT",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN opponent_reasoning TEXT",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_registrations (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        registered_at TEXT NOT NULL,
+        started_at TEXT,
+        status TEXT NOT NULL DEFAULT 'REGISTERED',
+        UNIQUE (contest_id, user_id),
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_practice_runs (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        total_score REAL NOT NULL,
+        reasoning_score REAL NOT NULL,
+        risk_score REAL NOT NULL,
+        evidence_score REAL NOT NULL,
+        consistency_score REAL NOT NULL,
+        reflection_score REAL NOT NULL,
+        rubric_version TEXT NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_friend_challenges (
+        id TEXT PRIMARY KEY,
+        challenge_code TEXT UNIQUE NOT NULL,
+        contest_id TEXT NOT NULL,
+        creator_id TEXT NOT NULL,
+        opponent_id TEXT,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        share_reasoning INTEGER DEFAULT 1,
+        creator_score REAL,
+        creator_submission_json TEXT,
+        opponent_score REAL,
+        opponent_submission_json TEXT,
+        winner_id TEXT,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_reward_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        contest_id TEXT,
+        reward_type TEXT NOT NULL,
+        xp_amount INTEGER DEFAULT 0,
+        arena_points_amount INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_audit_logs (
+        id TEXT PRIMARY KEY,
+        actor_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        details_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_contests ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN reflection_score REAL DEFAULT 75.0",
+        "ALTER TABLE arena_entries ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN strongest_decision TEXT DEFAULT ''",
+        "ALTER TABLE arena_entries ADD COLUMN improvement_area TEXT DEFAULT ''",
+        "ALTER TABLE arena_user_stats ADD COLUMN display_name TEXT",
+        "ALTER TABLE arena_user_stats ADD COLUMN public_leaderboard_opt_in INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN share_university INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN season_id TEXT DEFAULT '2026-S4'",
+        "ALTER TABLE arena_user_stats ADD COLUMN rank_history_json TEXT DEFAULT '[]'",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    # --------------------------------------------------------------------------
+    # 2f. PHASE 6 — SOCIAL INTELLIGENCE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squads (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        avatar TEXT DEFAULT 'Shield',
+        invite_code TEXT UNIQUE NOT NULL,
+        leader_id TEXT NOT NULL,
+        university_name TEXT,
+        max_members INTEGER DEFAULT 5,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (leader_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_members (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'Market Analyst',
+        joined_at TEXT NOT NULL,
+        UNIQUE (squad_id, user_id),
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_invitations (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        inviter_id TEXT NOT NULL,
+        invitee_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (invitee_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_battles (
+        id TEXT PRIMARY KEY,
+        challenger_squad_id TEXT NOT NULL,
+        opponent_squad_id TEXT,
+        title TEXT NOT NULL,
+        scenario_id TEXT NOT NULL,
+        scenario_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        challenger_contributions_json TEXT DEFAULT '[]',
+        challenger_final_json TEXT DEFAULT '{}',
+        challenger_score REAL DEFAULT 0.0,
+        opponent_contributions_json TEXT DEFAULT '[]',
+        opponent_final_json TEXT DEFAULT '{}',
+        opponent_score REAL DEFAULT 0.0,
+        winner_squad_id TEXT,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (challenger_squad_id) REFERENCES social_squads (id) ON DELETE CASCADE
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debates (
+        id TEXT PRIMARY KEY,
+        creator_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        case_text TEXT NOT NULL,
+        format TEXT NOT NULL DEFAULT 'OPEN',
+        university_name TEXT,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debate_submissions (
+        id TEXT PRIMARY KEY,
+        debate_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        interpretation TEXT NOT NULL,
+        evidence TEXT NOT NULL,
+        risks TEXT NOT NULL,
+        counterarguments TEXT NOT NULL,
+        invalidation_info TEXT NOT NULL,
+        rubric_score REAL NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        reactions_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        UNIQUE (debate_id, user_id),
+        FOREIGN KEY (debate_id) REFERENCES social_debates (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_crowd_submissions (
+        id TEXT PRIMARY KEY,
+        scenario_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        is_practice INTEGER NOT NULL DEFAULT 0,
+        action TEXT NOT NULL,
+        risk_category TEXT NOT NULL,
+        reasoning TEXT NOT NULL,
+        reflection_text TEXT DEFAULT '',
+        created_at TEXT NOT NULL,
+        UNIQUE (scenario_id, user_id, is_practice),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_posts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        shared_ref_id TEXT,
+        reactions_json TEXT DEFAULT '{}',
+        is_flagged INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_comments (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES social_posts (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2g. PHASE 7 — PERSONALIZED GEMINI AI COACH TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_conversations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        topic_tags_json TEXT DEFAULT '[]',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_messages (
+        id TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+        content TEXT NOT NULL,
+        structured_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (conversation_id) REFERENCES ai_coach_conversations (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_dismissed_recommendations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        rec_id TEXT NOT NULL,
+        dismissed_at TEXT NOT NULL,
+        UNIQUE (user_id, rec_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_token_usage (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        prompt_tokens INTEGER DEFAULT 0,
+        completion_tokens INTEGER DEFAULT 0,
+        source TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_reports (
+        id TEXT PRIMARY KEY,
+        reporter_id TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (reporter_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_blocks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        blocked_user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, blocked_user_id),
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (blocked_user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_privacy_settings (
+        user_id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        show_university INTEGER DEFAULT 1,
+        show_squads INTEGER DEFAULT 1,
+        show_achievements INTEGER DEFAULT 1,
+        show_arena_rank INTEGER DEFAULT 1,
+        notify_squads INTEGER DEFAULT 1,
+        notify_challenges INTEGER DEFAULT 1,
+        notify_debates INTEGER DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_notifications (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        notif_type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        is_read INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_friend_challenges ADD COLUMN difficulty TEXT DEFAULT 'Intermediate'",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN creator_reasoning TEXT",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN opponent_reasoning TEXT",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_results (
+        id TEXT PRIMARY KEY,
+        session_id TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        challenge_id TEXT NOT NULL,
+        dqs_score REAL NOT NULL,
+        reasoning_score REAL NOT NULL,
+        risk_management_score REAL NOT NULL,
+        evidence_use_score REAL NOT NULL,
+        plan_consistency_score REAL NOT NULL,
+        reflection_score REAL NOT NULL,
+        rubric_version TEXT NOT NULL,
+        reflection_text TEXT,
+        feedback_summary TEXT NOT NULL,
+        ai_explanation TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        strengths_json TEXT DEFAULT '[]',
+        improvements_json TEXT DEFAULT '[]',
+        xp_awarded INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (session_id) REFERENCES mirror_sessions (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2e. PHASE 5 — ADVANCED GAMIFICATION & PROGRESSION TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_xp_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        source_id TEXT,
+        reward_name TEXT NOT NULL,
+        xp_amount INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'COMPLETED',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_skill_completions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        skill_id TEXT NOT NULL,
+        branch TEXT NOT NULL,
+        xp_awarded INTEGER NOT NULL,
+        completed_at TEXT NOT NULL,
+        UNIQUE (user_id, skill_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_missions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        mission_key TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        mission_type TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        xp_reward INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        is_personalized INTEGER DEFAULT 0,
+        evidence_reason TEXT,
+        progress_current INTEGER DEFAULT 0,
+        progress_target INTEGER DEFAULT 1,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_badges (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        badge_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        category TEXT NOT NULL,
+        rarity TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        xp_reward INTEGER DEFAULT 0,
+        unlocked_at TEXT NOT NULL,
+        UNIQUE (user_id, badge_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_streak_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        activity_date TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, activity_date),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_user_streaks (
+        user_id TEXT PRIMARY KEY,
+        current_streak INTEGER DEFAULT 0,
+        longest_streak INTEGER DEFAULT 0,
+        last_activity_date TEXT,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_season_progress (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        season_id TEXT NOT NULL,
+        season_xp INTEGER DEFAULT 0,
+        completed_milestones_json TEXT DEFAULT '[]',
+        updated_at TEXT NOT NULL,
+        UNIQUE (user_id, season_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_gam_xp_user_time ON gamification_xp_transactions (user_id, created_at DESC);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_registrations (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        registered_at TEXT NOT NULL,
+        started_at TEXT,
+        status TEXT NOT NULL DEFAULT 'REGISTERED',
+        UNIQUE (contest_id, user_id),
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_practice_runs (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        total_score REAL NOT NULL,
+        reasoning_score REAL NOT NULL,
+        risk_score REAL NOT NULL,
+        evidence_score REAL NOT NULL,
+        consistency_score REAL NOT NULL,
+        reflection_score REAL NOT NULL,
+        rubric_version TEXT NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_friend_challenges (
+        id TEXT PRIMARY KEY,
+        challenge_code TEXT UNIQUE NOT NULL,
+        contest_id TEXT NOT NULL,
+        creator_id TEXT NOT NULL,
+        opponent_id TEXT,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        share_reasoning INTEGER DEFAULT 1,
+        creator_score REAL,
+        creator_submission_json TEXT,
+        opponent_score REAL,
+        opponent_submission_json TEXT,
+        winner_id TEXT,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_reward_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        contest_id TEXT,
+        reward_type TEXT NOT NULL,
+        xp_amount INTEGER DEFAULT 0,
+        arena_points_amount INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_audit_logs (
+        id TEXT PRIMARY KEY,
+        actor_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        details_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_contests ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN reflection_score REAL DEFAULT 75.0",
+        "ALTER TABLE arena_entries ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN strongest_decision TEXT DEFAULT ''",
+        "ALTER TABLE arena_entries ADD COLUMN improvement_area TEXT DEFAULT ''",
+        "ALTER TABLE arena_user_stats ADD COLUMN display_name TEXT",
+        "ALTER TABLE arena_user_stats ADD COLUMN public_leaderboard_opt_in INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN share_university INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN season_id TEXT DEFAULT '2026-S4'",
+        "ALTER TABLE arena_user_stats ADD COLUMN rank_history_json TEXT DEFAULT '[]'",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    # --------------------------------------------------------------------------
+    # 2f. PHASE 6 — SOCIAL INTELLIGENCE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squads (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        avatar TEXT DEFAULT 'Shield',
+        invite_code TEXT UNIQUE NOT NULL,
+        leader_id TEXT NOT NULL,
+        university_name TEXT,
+        max_members INTEGER DEFAULT 5,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (leader_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_members (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'Market Analyst',
+        joined_at TEXT NOT NULL,
+        UNIQUE (squad_id, user_id),
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_invitations (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        inviter_id TEXT NOT NULL,
+        invitee_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (invitee_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_battles (
+        id TEXT PRIMARY KEY,
+        challenger_squad_id TEXT NOT NULL,
+        opponent_squad_id TEXT,
+        title TEXT NOT NULL,
+        scenario_id TEXT NOT NULL,
+        scenario_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        challenger_contributions_json TEXT DEFAULT '[]',
+        challenger_final_json TEXT DEFAULT '{}',
+        challenger_score REAL DEFAULT 0.0,
+        opponent_contributions_json TEXT DEFAULT '[]',
+        opponent_final_json TEXT DEFAULT '{}',
+        opponent_score REAL DEFAULT 0.0,
+        winner_squad_id TEXT,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (challenger_squad_id) REFERENCES social_squads (id) ON DELETE CASCADE
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debates (
+        id TEXT PRIMARY KEY,
+        creator_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        case_text TEXT NOT NULL,
+        format TEXT NOT NULL DEFAULT 'OPEN',
+        university_name TEXT,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debate_submissions (
+        id TEXT PRIMARY KEY,
+        debate_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        interpretation TEXT NOT NULL,
+        evidence TEXT NOT NULL,
+        risks TEXT NOT NULL,
+        counterarguments TEXT NOT NULL,
+        invalidation_info TEXT NOT NULL,
+        rubric_score REAL NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        reactions_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        UNIQUE (debate_id, user_id),
+        FOREIGN KEY (debate_id) REFERENCES social_debates (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_crowd_submissions (
+        id TEXT PRIMARY KEY,
+        scenario_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        is_practice INTEGER NOT NULL DEFAULT 0,
+        action TEXT NOT NULL,
+        risk_category TEXT NOT NULL,
+        reasoning TEXT NOT NULL,
+        reflection_text TEXT DEFAULT '',
+        created_at TEXT NOT NULL,
+        UNIQUE (scenario_id, user_id, is_practice),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_posts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        shared_ref_id TEXT,
+        reactions_json TEXT DEFAULT '{}',
+        is_flagged INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_comments (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES social_posts (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2g. PHASE 7 — PERSONALIZED GEMINI AI COACH TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_conversations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        topic_tags_json TEXT DEFAULT '[]',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_messages (
+        id TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+        content TEXT NOT NULL,
+        structured_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (conversation_id) REFERENCES ai_coach_conversations (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_dismissed_recommendations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        rec_id TEXT NOT NULL,
+        dismissed_at TEXT NOT NULL,
+        UNIQUE (user_id, rec_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_token_usage (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        prompt_tokens INTEGER DEFAULT 0,
+        completion_tokens INTEGER DEFAULT 0,
+        source TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_reports (
+        id TEXT PRIMARY KEY,
+        reporter_id TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (reporter_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_blocks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        blocked_user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, blocked_user_id),
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (blocked_user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_privacy_settings (
+        user_id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        show_university INTEGER DEFAULT 1,
+        show_squads INTEGER DEFAULT 1,
+        show_achievements INTEGER DEFAULT 1,
+        show_arena_rank INTEGER DEFAULT 1,
+        notify_squads INTEGER DEFAULT 1,
+        notify_challenges INTEGER DEFAULT 1,
+        notify_debates INTEGER DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_notifications (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        notif_type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        is_read INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_friend_challenges ADD COLUMN difficulty TEXT DEFAULT 'Intermediate'",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN creator_reasoning TEXT",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN opponent_reasoning TEXT",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_registrations (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        registered_at TEXT NOT NULL,
+        started_at TEXT,
+        status TEXT NOT NULL DEFAULT 'REGISTERED',
+        UNIQUE (contest_id, user_id),
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_practice_runs (
+        id TEXT PRIMARY KEY,
+        contest_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        total_score REAL NOT NULL,
+        reasoning_score REAL NOT NULL,
+        risk_score REAL NOT NULL,
+        evidence_score REAL NOT NULL,
+        consistency_score REAL NOT NULL,
+        reflection_score REAL NOT NULL,
+        rubric_version TEXT NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_friend_challenges (
+        id TEXT PRIMARY KEY,
+        challenge_code TEXT UNIQUE NOT NULL,
+        contest_id TEXT NOT NULL,
+        creator_id TEXT NOT NULL,
+        opponent_id TEXT,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        share_reasoning INTEGER DEFAULT 1,
+        creator_score REAL,
+        creator_submission_json TEXT,
+        opponent_score REAL,
+        opponent_submission_json TEXT,
+        winner_id TEXT,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (contest_id) REFERENCES arena_contests (id) ON DELETE CASCADE,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_reward_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        contest_id TEXT,
+        reward_type TEXT NOT NULL,
+        xp_amount INTEGER DEFAULT 0,
+        arena_points_amount INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS arena_audit_logs (
+        id TEXT PRIMARY KEY,
+        actor_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        details_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_contests ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN reflection_score REAL DEFAULT 75.0",
+        "ALTER TABLE arena_entries ADD COLUMN scenario_version TEXT DEFAULT 'v1.0'",
+        "ALTER TABLE arena_entries ADD COLUMN strongest_decision TEXT DEFAULT ''",
+        "ALTER TABLE arena_entries ADD COLUMN improvement_area TEXT DEFAULT ''",
+        "ALTER TABLE arena_user_stats ADD COLUMN display_name TEXT",
+        "ALTER TABLE arena_user_stats ADD COLUMN public_leaderboard_opt_in INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN share_university INTEGER DEFAULT 1",
+        "ALTER TABLE arena_user_stats ADD COLUMN season_id TEXT DEFAULT '2026-S4'",
+        "ALTER TABLE arena_user_stats ADD COLUMN rank_history_json TEXT DEFAULT '[]'",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    # --------------------------------------------------------------------------
+    # 2f. PHASE 6 — SOCIAL INTELLIGENCE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squads (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        avatar TEXT DEFAULT 'Shield',
+        invite_code TEXT UNIQUE NOT NULL,
+        leader_id TEXT NOT NULL,
+        university_name TEXT,
+        max_members INTEGER DEFAULT 5,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (leader_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_members (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'Market Analyst',
+        joined_at TEXT NOT NULL,
+        UNIQUE (squad_id, user_id),
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_invitations (
+        id TEXT PRIMARY KEY,
+        squad_id TEXT NOT NULL,
+        inviter_id TEXT NOT NULL,
+        invitee_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (squad_id) REFERENCES social_squads (id) ON DELETE CASCADE,
+        FOREIGN KEY (invitee_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_squad_battles (
+        id TEXT PRIMARY KEY,
+        challenger_squad_id TEXT NOT NULL,
+        opponent_squad_id TEXT,
+        title TEXT NOT NULL,
+        scenario_id TEXT NOT NULL,
+        scenario_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        challenger_contributions_json TEXT DEFAULT '[]',
+        challenger_final_json TEXT DEFAULT '{}',
+        challenger_score REAL DEFAULT 0.0,
+        opponent_contributions_json TEXT DEFAULT '[]',
+        opponent_final_json TEXT DEFAULT '{}',
+        opponent_score REAL DEFAULT 0.0,
+        winner_squad_id TEXT,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (challenger_squad_id) REFERENCES social_squads (id) ON DELETE CASCADE
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debates (
+        id TEXT PRIMARY KEY,
+        creator_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        case_text TEXT NOT NULL,
+        format TEXT NOT NULL DEFAULT 'OPEN',
+        university_name TEXT,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_debate_submissions (
+        id TEXT PRIMARY KEY,
+        debate_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        interpretation TEXT NOT NULL,
+        evidence TEXT NOT NULL,
+        risks TEXT NOT NULL,
+        counterarguments TEXT NOT NULL,
+        invalidation_info TEXT NOT NULL,
+        rubric_score REAL NOT NULL,
+        ai_feedback TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        reactions_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        UNIQUE (debate_id, user_id),
+        FOREIGN KEY (debate_id) REFERENCES social_debates (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_crowd_submissions (
+        id TEXT PRIMARY KEY,
+        scenario_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        is_practice INTEGER NOT NULL DEFAULT 0,
+        action TEXT NOT NULL,
+        risk_category TEXT NOT NULL,
+        reasoning TEXT NOT NULL,
+        reflection_text TEXT DEFAULT '',
+        created_at TEXT NOT NULL,
+        UNIQUE (scenario_id, user_id, is_practice),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_posts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        shared_ref_id TEXT,
+        reactions_json TEXT DEFAULT '{}',
+        is_flagged INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_comments (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES social_posts (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2g. PHASE 7 — PERSONALIZED GEMINI AI COACH TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_conversations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        topic_tags_json TEXT DEFAULT '[]',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_messages (
+        id TEXT PRIMARY KEY,
+        conversation_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+        content TEXT NOT NULL,
+        structured_json TEXT DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (conversation_id) REFERENCES ai_coach_conversations (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_dismissed_recommendations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        rec_id TEXT NOT NULL,
+        dismissed_at TEXT NOT NULL,
+        UNIQUE (user_id, rec_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_coach_token_usage (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        prompt_tokens INTEGER DEFAULT 0,
+        completion_tokens INTEGER DEFAULT 0,
+        source TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_reports (
+        id TEXT PRIMARY KEY,
+        reporter_id TEXT NOT NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (reporter_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_blocks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        blocked_user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, blocked_user_id),
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (blocked_user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_privacy_settings (
+        user_id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        show_university INTEGER DEFAULT 1,
+        show_squads INTEGER DEFAULT 1,
+        show_achievements INTEGER DEFAULT 1,
+        show_arena_rank INTEGER DEFAULT 1,
+        notify_squads INTEGER DEFAULT 1,
+        notify_challenges INTEGER DEFAULT 1,
+        notify_debates INTEGER DEFAULT 1,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS social_notifications (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        notif_type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        is_read INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    for stmt in [
+        "ALTER TABLE arena_friend_challenges ADD COLUMN difficulty TEXT DEFAULT 'Intermediate'",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN creator_reasoning TEXT",
+        "ALTER TABLE arena_friend_challenges ADD COLUMN opponent_reasoning TEXT",
+    ]:
+        try:
+            cursor.execute(stmt)
+        except sqlite3.OperationalError:
+            pass
+
+    # --------------------------------------------------------------------------
+    # 2c. PHASE 3 — MIRROR MODE TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_challenges (
+        id TEXT PRIMARY KEY,
+        challenge_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        target_pattern_key TEXT NOT NULL,
+        target_dimension TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        estimated_minutes INTEGER DEFAULT 5,
+        data_source_label TEXT NOT NULL,
+        scenario_version TEXT DEFAULT 'v1.0',
+        rubric_version TEXT DEFAULT 'v1.0-general',
+        intro_summary TEXT NOT NULL,
+        stages_json TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_sessions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        challenge_id TEXT NOT NULL,
+        is_personalized INTEGER DEFAULT 0,
+        is_practice INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'IN_PROGRESS',
+        current_stage INTEGER DEFAULT 0,
+        total_stages INTEGER NOT NULL,
+        declared_plan_json TEXT DEFAULT '{}',
+        portfolio_state_json TEXT DEFAULT '{}',
+        scenario_version TEXT DEFAULT 'v1.0',
+        xp_awarded INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (challenge_id) REFERENCES mirror_challenges (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_decisions (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        challenge_id TEXT NOT NULL,
+        stage_index INTEGER NOT NULL,
+        client_decision_id TEXT,
+        action TEXT NOT NULL,
+        allocation_json TEXT,
+        reasoning TEXT NOT NULL,
+        confidence_level INTEGER NOT NULL,
+        invalidation_trigger TEXT,
+        reviewed_info_json TEXT DEFAULT '[]',
+        created_at TEXT NOT NULL,
+        UNIQUE (session_id, stage_index),
+        UNIQUE (user_id, client_decision_id),
+        FOREIGN KEY (session_id) REFERENCES mirror_sessions (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2e. PHASE 5 — ADVANCED GAMIFICATION & PROGRESSION TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_xp_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        source_id TEXT,
+        reward_name TEXT NOT NULL,
+        xp_amount INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'COMPLETED',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_skill_completions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        skill_id TEXT NOT NULL,
+        branch TEXT NOT NULL,
+        xp_awarded INTEGER NOT NULL,
+        completed_at TEXT NOT NULL,
+        UNIQUE (user_id, skill_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_missions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        mission_key TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        mission_type TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        xp_reward INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        is_personalized INTEGER DEFAULT 0,
+        evidence_reason TEXT,
+        progress_current INTEGER DEFAULT 0,
+        progress_target INTEGER DEFAULT 1,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_badges (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        badge_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        category TEXT NOT NULL,
+        rarity TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        xp_reward INTEGER DEFAULT 0,
+        unlocked_at TEXT NOT NULL,
+        UNIQUE (user_id, badge_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_streak_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        activity_date TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, activity_date),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_user_streaks (
+        user_id TEXT PRIMARY KEY,
+        current_streak INTEGER DEFAULT 0,
+        longest_streak INTEGER DEFAULT 0,
+        last_activity_date TEXT,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_season_progress (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        season_id TEXT NOT NULL,
+        season_xp INTEGER DEFAULT 0,
+        completed_milestones_json TEXT DEFAULT '[]',
+        updated_at TEXT NOT NULL,
+        UNIQUE (user_id, season_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_gam_xp_user_time ON gamification_xp_transactions (user_id, created_at DESC);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS mirror_results (
+        id TEXT PRIMARY KEY,
+        session_id TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        challenge_id TEXT NOT NULL,
+        dqs_score REAL NOT NULL,
+        reasoning_score REAL NOT NULL,
+        risk_management_score REAL NOT NULL,
+        evidence_use_score REAL NOT NULL,
+        plan_consistency_score REAL NOT NULL,
+        reflection_score REAL NOT NULL,
+        rubric_version TEXT NOT NULL,
+        reflection_text TEXT,
+        feedback_summary TEXT NOT NULL,
+        ai_explanation TEXT,
+        ai_source TEXT DEFAULT 'deterministic_backend',
+        strengths_json TEXT DEFAULT '[]',
+        improvements_json TEXT DEFAULT '[]',
+        xp_awarded INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (session_id) REFERENCES mirror_sessions (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # --------------------------------------------------------------------------
+    # 2e. PHASE 5 — ADVANCED GAMIFICATION & PROGRESSION TABLES
+    # --------------------------------------------------------------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_xp_transactions (
+        id TEXT PRIMARY KEY,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        user_id TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        source_id TEXT,
+        reward_name TEXT NOT NULL,
+        xp_amount INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'COMPLETED',
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_skill_completions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        skill_id TEXT NOT NULL,
+        branch TEXT NOT NULL,
+        xp_awarded INTEGER NOT NULL,
+        completed_at TEXT NOT NULL,
+        UNIQUE (user_id, skill_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_missions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        mission_key TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        mission_type TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        xp_reward INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ACTIVE',
+        is_personalized INTEGER DEFAULT 0,
+        evidence_reason TEXT,
+        progress_current INTEGER DEFAULT 0,
+        progress_target INTEGER DEFAULT 1,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        completed_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_badges (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        badge_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        category TEXT NOT NULL,
+        rarity TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        xp_reward INTEGER DEFAULT 0,
+        unlocked_at TEXT NOT NULL,
+        UNIQUE (user_id, badge_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_streak_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        activity_date TEXT NOT NULL,
+        activity_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (user_id, activity_date),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_user_streaks (
+        user_id TEXT PRIMARY KEY,
+        current_streak INTEGER DEFAULT 0,
+        longest_streak INTEGER DEFAULT 0,
+        last_activity_date TEXT,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gamification_season_progress (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        season_id TEXT NOT NULL,
+        season_xp INTEGER DEFAULT 0,
+        completed_milestones_json TEXT DEFAULT '[]',
+        updated_at TEXT NOT NULL,
+        UNIQUE (user_id, season_id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_gam_xp_user_time ON gamification_xp_transactions (user_id, created_at DESC);")
+
+    # --------------------------------------------------------------------------
     # 3. LEARN & TEACH ACADEMY
     # --------------------------------------------------------------------------
     cursor.execute("""

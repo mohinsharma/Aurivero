@@ -16,6 +16,9 @@ interface SimulatorContextType {
   theme: 'light' | 'dark';
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
+  experienceMode: 'beginner' | 'pro';
+  setExperienceMode: (mode: 'beginner' | 'pro') => void;
+  toggleExperienceMode: () => void;
   executeTrade: (params: {
     symbol: string;
     type: 'BUY' | 'SELL';
@@ -216,6 +219,36 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+
+  const [experienceMode, setExperienceModeState] = useState<'beginner' | 'pro'>(() => {
+    try {
+      const saved = localStorage.getItem('mindmark_experience_mode');
+      if (saved === 'beginner' || saved === 'pro') return saved;
+      const onb = localStorage.getItem('mindmark_onboarding_v2');
+      if (onb) {
+        const parsed = JSON.parse(onb);
+        if (parsed?.assignedPath === 'ADVANCED' || parsed?.experienceLevel?.toLowerCase?.().includes('pro')) {
+          return 'pro';
+        }
+      }
+    } catch {
+      // default to beginner
+    }
+    return 'beginner';
+  });
+
+  const setExperienceMode = (mode: 'beginner' | 'pro') => {
+    setExperienceModeState(mode);
+    try {
+      localStorage.setItem('mindmark_experience_mode', mode);
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  const toggleExperienceMode = () => {
+    setExperienceMode(experienceMode === 'beginner' ? 'pro' : 'beginner');
+  };
 
   useEffect(() => {
     try {
@@ -461,6 +494,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         theme,
         setTheme,
         toggleTheme,
+        experienceMode,
+        setExperienceMode,
+        toggleExperienceMode,
         executeTrade,
         squareOffPosition,
         resetPortfolio,

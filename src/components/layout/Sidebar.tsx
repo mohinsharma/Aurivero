@@ -66,6 +66,7 @@ const EXPANDABLE_GROUPS: ExpandableGroup[] = [
     label: 'News & Topics',
     icon: Newspaper,
     items: [
+      { name: 'News & Community', path: '/news-community' },
       { name: 'Financial News', path: '/markets/news' },
       { name: 'Hot Topics', path: '/hot-topics' },
       { name: 'News Explainer', path: '/news-explainer' },
@@ -76,7 +77,10 @@ const EXPANDABLE_GROUPS: ExpandableGroup[] = [
     label: 'Learning & Coach',
     icon: Sparkles,
     items: [
+      { name: 'AI Coach', path: '/ai-coach' },
       { name: 'AI Buddy', path: '/ai-buddy' },
+      { name: 'My Progress', path: '/my-progress' },
+      { name: 'Arena', path: '/arena' },
       { name: 'Learn & Teach Academy', path: '/academy' },
       { name: 'Behavioral Insights', path: '/behavioral-insights' },
       { name: 'Challenges & XP', path: '/challenges' },
@@ -99,6 +103,7 @@ export const Sidebar: React.FC = () => {
     totalPortfolioValue,
     startingCapital,
     behavioralScore,
+    experienceMode,
     resetPortfolio,
   } = useSimulator();
   const location = useLocation();
@@ -113,6 +118,18 @@ export const Sidebar: React.FC = () => {
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const visibleGroups =
+    experienceMode === 'beginner'
+      ? [
+          EXPANDABLE_GROUPS.find((g) => g.id === 'learning')!,
+          EXPANDABLE_GROUPS.find((g) => g.id === 'news')!,
+          {
+            ...EXPANDABLE_GROUPS.find((g) => g.id === 'markets')!,
+            label: 'Explore Advanced Tools',
+          },
+        ]
+      : EXPANDABLE_GROUPS;
 
   const returnPct =
     startingCapital > 0 ? ((totalPortfolioValue - startingCapital) / startingCapital) * 100 : 0;
@@ -157,10 +174,9 @@ export const Sidebar: React.FC = () => {
           </Link>
         </div>
 
-        {/* Sleek Black Virtual Capital Card (like earlier GoStock reference) */}
+        {/* Sleek Black Virtual Capital Card */}
         {!sidebarCollapsed && (
           <div className="mx-4 mt-1 mb-2 p-4 rounded-2xl bg-[#14171D] dark:bg-[#090D16] border border-transparent dark:border-slate-800 text-white relative overflow-hidden shadow-sm">
-            {/* Subtle decorative contour lines */}
             <svg
               className="absolute -right-4 -bottom-4 w-28 h-28 text-white/[0.06] pointer-events-none"
               viewBox="0 0 100 100"
@@ -231,7 +247,7 @@ export const Sidebar: React.FC = () => {
           ))}
 
           {/* Expandable Clean Groups */}
-          {EXPANDABLE_GROUPS.map((group) => {
+          {visibleGroups.map((group) => {
             const hasActiveChild = group.items.some((sub) => location.pathname === sub.path);
             const isOpen = !sidebarCollapsed && (openGroups[group.id] || hasActiveChild);
 

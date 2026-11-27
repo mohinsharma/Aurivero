@@ -114,7 +114,7 @@ export const PersonalHubPage: React.FC = () => {
               <Flame size={15} className="text-primary" />
               Saved Reading List ({hubData?.saved_articles?.length || 0})
             </h3>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/hot-topics')} className="text-xs font-mono text-primary p-0">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/news-community?tab=hot-topics')} className="text-xs font-mono text-primary p-0">
               Explore News →
             </Button>
           </div>
@@ -126,7 +126,7 @@ export const PersonalHubPage: React.FC = () => {
               {hubData?.saved_articles?.map((art: any) => (
                 <div
                   key={art.id}
-                  onClick={() => navigate('/hot-topics')}
+                  onClick={() => navigate('/news-community?tab=hot-topics')}
                   className="p-3 rounded-xl bg-surface-elevated/70 border border-border/70 hover:border-primary/40 cursor-pointer transition-colors"
                 >
                   <div className="flex items-center justify-between text-[10px] font-mono text-text-muted mb-1">
@@ -147,7 +147,7 @@ export const PersonalHubPage: React.FC = () => {
               <MessageSquare size={15} className="text-secondary" />
               Saved Discussions ({hubData?.saved_threads?.length || 0})
             </h3>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/forums')} className="text-xs font-mono text-secondary p-0">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/news-community?tab=forums')} className="text-xs font-mono text-secondary p-0">
               Community Forums →
             </Button>
           </div>
@@ -159,7 +159,7 @@ export const PersonalHubPage: React.FC = () => {
               {hubData?.saved_threads?.map((th: any) => (
                 <div
                   key={th.id}
-                  onClick={() => navigate('/forums')}
+                  onClick={() => navigate('/news-community?tab=forums')}
                   className="p-3 rounded-xl bg-surface-elevated/70 border border-border/70 hover:border-secondary/40 cursor-pointer transition-colors"
                 >
                   <div className="flex items-center justify-between text-[10px] font-mono text-text-muted mb-1">

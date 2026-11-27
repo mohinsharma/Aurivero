@@ -9,12 +9,19 @@ import {
   AlertCircle,
   RotateCcw,
   Lock,
-  TrendingUp
+  TrendingUp,
+  Copy,
+  Check,
+  ImagePlus
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useSimulator } from '../context/SimulatorContext';
 import { Button } from '../components/common/Button';
 import { Modal } from '../components/common/Modal';
+import { MentorTrainingLab } from '../components/mentor/MentorTrainingLab';
+import { VoiceRecorder } from '../components/mentor/VoiceRecorder';
+import { SpeechPlayback } from '../components/mentor/SpeechPlayback';
+import { FinancialOCRModal } from '../components/mentor/FinancialOCRModal';
 
 interface ChatMessage {
   id: string;
@@ -25,6 +32,8 @@ interface ChatMessage {
   suggestedFollowups?: string[];
   isError?: boolean;
   retryPrompt?: string;
+  previewUrl?: string;
+  sourcePrompt?: string;
 }
 
 const STARTER_PROMPTS = [
@@ -38,13 +47,20 @@ const STARTER_PROMPTS = [
 ];
 
 export const AIBuddyPage: React.FC = () => {
-  const { assessment } = useSimulator();
+  const { assessment, behavioralScore } = useSimulator();
+  const [buddyTab, setBuddyTab] = useState<'CHAT' | 'SCENARIOS' | 'DAILY' | 'REPORT'>('CHAT');
+  const [mentorLevel, setMentorLevel] = useState<{ code: string; label: string }>({
+    code: 'ABSOLUTE_BEGINNER',
+    label: 'Absolute Beginner',
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [allowPortfolioAccess, setAllowPortfolioAccess] = useState(true);
   const [buddyStatus, setBuddyStatus] = useState<{ is_live: boolean; model_name: string } | null>(null);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +70,14 @@ export const AIBuddyPage: React.FC = () => {
         setBuddyStatus(res.data);
       }
     });
-  }, []);
+    api.aiBuddy
+      .getMentorProfile(assessment?.experienceLevel, behavioralScore?.overallHealth ?? 76)
+      .then((res) => {
+        if (res.success && res.data?.level) {
+          setMentorLevel(res.data.level);
+        }
+      });
+  }, [assessment?.experienceLevel, behavioralScore?.overallHealth]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -139,7 +162,7 @@ export const AIBuddyPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto h-[calc(100vh-8.5rem)] flex flex-col gap-4 pb-2">
+    <div className="max-w-5xl mx-auto h-[calc(100vh-8.5rem)] min-h-[540px] flex flex-col gap-4 pb-2 overflow-hidden">
       {/* Header */}
       <div className="rounded-2xl bg-surface border border-border/80 px-5 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
@@ -157,9 +180,32 @@ export const AIBuddyPage: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-text-muted">
-              Finance Learning & Market Education Assistant • Indian Markets, Risk & Paper Trading
+              AI Trading Mentor & Risk Intelligence Buddy • Level: <strong className="text-primary">{mentorLevel.label}</strong>
             </p>
           </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {(
+            [
+              { id: 'CHAT', label: 'Mentor Chat' },
+              { id: 'SCENARIOS', label: 'Scenario Lab' },
+              { id: 'DAILY', label: 'Daily Training' },
+              { id: 'REPORT', label: 'Weekly Report' },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setBuddyTab(tab.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                buddyTab === tab.id
+                  ? 'bg-primary text-background font-bold'
+                  : 'bg-surface-elevated border border-border text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -201,8 +247,17 @@ export const AIBuddyPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Chat Viewport */}
-      <div className="flex-1 overflow-y-auto rounded-2xl bg-surface/75 border border-border/80 p-4 sm:p-6 space-y-5">
+      {buddyTab !== 'CHAT' ? (
+        <MentorTrainingLab
+          mode={buddyTab}
+          learningLevelCode={mentorLevel.code}
+          learningLevelLabel={mentorLevel.label}
+          behavioralScore={behavioralScore?.overallHealth ?? 76}
+        />
+      ) : (
+        <>
+          {/* Chat Viewport */}
+      <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl bg-surface/75 border border-border/80 p-4 sm:p-6 space-y-5">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto py-6 space-y-6">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
@@ -267,7 +322,48 @@ export const AIBuddyPage: React.FC = () => {
                     </div>
                   )}
 
+                  {msg.previewUrl && (
+                    <img
+                      src={msg.previewUrl}
+                      alt="Uploaded financial attachment"
+                      className="max-h-40 rounded-lg border border-border/50 mb-2 object-contain"
+                    />
+                  )}
                   <div className="whitespace-pre-wrap">{msg.content}</div>
+
+                  {msg.role === 'assistant' && !msg.isError && (
+                    <div className="mt-2.5 pt-2 border-t border-border/40 flex flex-wrap items-center justify-between gap-2">
+                      <SpeechPlayback text={msg.content} />
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard?.writeText(msg.content);
+                            setCopiedId(msg.id);
+                            window.setTimeout(() => setCopiedId(null), 1500);
+                          }}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface border border-border text-text-secondary hover:text-primary"
+                          aria-label="Copy response"
+                        >
+                          {copiedId === msg.id ? <Check size={11} className="text-primary" /> : <Copy size={11} />}
+                          {copiedId === msg.id ? 'Copied' : 'Copy'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const lastUser = [...messages]
+                              .reverse()
+                              .find((m) => m.role === 'user');
+                            if (lastUser) sendMessage(lastUser.content);
+                          }}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface border border-border text-text-secondary hover:text-primary"
+                          aria-label="Regenerate response"
+                        >
+                          <RotateCcw size={11} /> Regenerate
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {msg.isError && msg.retryPrompt && (
                     <button
@@ -310,28 +406,70 @@ export const AIBuddyPage: React.FC = () => {
       </div>
 
       {/* Composer */}
-      <div className="rounded-2xl bg-surface border border-border/80 p-3 flex items-end gap-3">
-        <textarea
-          rows={1}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask about NIFTY 50, SIPs, RSI, P/E ratio, risk management, or your paper portfolio..."
-          aria-label="Message Aurivero AI Buddy"
-          className="flex-1 bg-surface-elevated/60 border border-border/60 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 resize-none max-h-32"
-        />
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => sendMessage()}
-          disabled={!input.trim() || isLoading}
-          aria-label="Send message"
-          className="font-mono text-xs flex-shrink-0"
-        >
-          <Send size={15} className="sm:mr-1.5" />
-          <span className="hidden sm:inline">Send</span>
-        </Button>
+      <div className="rounded-2xl bg-surface border border-border/80 p-3 space-y-2.5 shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <VoiceRecorder
+            onTranscriptConfirmed={(text) => setInput((prev) => (prev ? `${prev} ${text}` : text))}
+          />
+          <button
+            type="button"
+            onClick={() => setIsOcrModalOpen(true)}
+            aria-label="Upload financial image or document for OCR"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-elevated border border-border hover:border-primary/60 text-xs font-medium text-text-primary transition-colors min-h-[38px]"
+          >
+            <ImagePlus size={14} className="text-primary" />
+            <span>Upload Chart / OCR</span>
+          </button>
+        </div>
+
+        <div className="flex items-end gap-3">
+          <textarea
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about NIFTY 50, SIPs, RSI, P/E ratio, risk management, or upload a chart..."
+            aria-label="Message Aurivero AI Buddy"
+            className="flex-1 bg-background border border-border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 resize-none max-h-32"
+          />
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => sendMessage()}
+            disabled={!input.trim() || isLoading}
+            aria-label="Send message"
+            className="text-xs flex-shrink-0 min-h-[40px]"
+          >
+            <Send size={15} className="sm:mr-1.5" />
+            <span className="hidden sm:inline">Send</span>
+          </Button>
+        </div>
       </div>
+
+      <FinancialOCRModal
+        isOpen={isOcrModalOpen}
+        onClose={() => setIsOcrModalOpen(false)}
+        learningLevel={mentorLevel.code}
+        allowPortfolioAccess={allowPortfolioAccess}
+        onAnalysisComplete={({ userPrompt, aiResponse, previewUrl }) => {
+          const uMsg: ChatMessage = {
+            id: `u-${Date.now()}`,
+            role: 'user',
+            content: userPrompt,
+            previewUrl,
+          };
+          const aMsg: ChatMessage = {
+            id: `a-${Date.now() + 1}`,
+            role: 'assistant',
+            content: aiResponse.answer || 'Analysis complete.',
+            status: aiResponse.status,
+            suggestedFollowups: aiResponse.suggested_followups || [],
+          };
+          setMessages((prev) => [...prev, uMsg, aMsg]);
+        }}
+      />
+        </>
+      )}
 
       {/* Clear Conversation Confirmation Modal */}
       <Modal

@@ -637,7 +637,7 @@ export const InstrumentDetailPage: React.FC = () => {
             )}
           </div>
           <div className="pt-2 flex flex-wrap gap-2">
-            <Link to="/markets/news">
+            <Link to="/news-community?tab=news">
               <Button size="sm" variant="outline" icon={<Newspaper size={13} />}>
                 All Financial News
               </Button>
@@ -654,7 +654,7 @@ export const InstrumentDetailPage: React.FC = () => {
             <Newspaper size={16} className="text-primary" />
             Related Financial News ({quote?.displaySymbol || symbol})
           </h2>
-          <Link to="/markets/news" className="text-xs text-primary hover:underline">
+          <Link to="/news-community?tab=news" className="text-xs text-primary hover:underline">
             View all news →
           </Link>
         </div>

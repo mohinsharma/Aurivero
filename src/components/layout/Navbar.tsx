@@ -20,7 +20,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
-  const { theme, toggleTheme } = useSimulator();
+  const { theme, toggleTheme, experienceMode, setExperienceMode } = useSimulator();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -110,6 +110,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
+
+            {/* Global Beginner / Pro Mode Switch */}
+            <div
+              role="group"
+              aria-label="Experience mode"
+              className="flex items-center bg-background border border-border rounded-xl p-0.5 text-xs"
+            >
+              <button
+                type="button"
+                onClick={() => setExperienceMode('beginner')}
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
+                  experienceMode === 'beginner'
+                    ? 'bg-primary text-white font-semibold'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                Beginner
+              </button>
+              <button
+                type="button"
+                onClick={() => setExperienceMode('pro')}
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
+                  experienceMode === 'pro'
+                    ? 'bg-primary text-white font-semibold'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                Pro
+              </button>
+            </div>
 
             {/* Quick AI Buddy Link */}
             <Link
