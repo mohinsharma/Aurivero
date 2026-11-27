@@ -172,7 +172,7 @@ export const Sidebar: React.FC = () => {
   return (
     <aside
       aria-label="Primary sidebar navigation"
-      className={`hidden lg:flex flex-col border-r border-border/80 bg-surface/75 backdrop-blur-xl transition-all duration-300 ease-in-out relative z-20 ${
+      className={`hidden lg:flex flex-col border-r border-white/[0.06] bg-glass transition-all duration-300 ease-in-out relative z-20 ${
         sidebarCollapsed ? 'w-20' : 'w-64'
       }`}
     >

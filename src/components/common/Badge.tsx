@@ -2,7 +2,7 @@ import React from 'react';
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'warning' | 'danger' | 'neutral';
+  variant?: 'primary' | 'gold' | 'secondary' | 'warning' | 'danger' | 'neutral';
   size?: 'sm' | 'md';
   className?: string;
   dot?: boolean;
@@ -17,6 +17,7 @@ export const Badge: React.FC<BadgeProps> = ({
 }) => {
   const variantStyles = {
     primary: 'bg-primary/10 text-primary border-primary/20',
+    gold: 'bg-gold/12 text-gold border-gold/30',
     secondary: 'bg-secondary/10 text-secondary border-secondary/20',
     warning: 'bg-warning/10 text-warning border-warning/20',
     danger: 'bg-danger/10 text-danger border-danger/20',
@@ -25,6 +26,7 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const dotColors = {
     primary: 'bg-primary',
+    gold: 'bg-gold',
     secondary: 'bg-secondary',
     warning: 'bg-warning',
     danger: 'bg-danger',

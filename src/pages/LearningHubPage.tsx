@@ -73,7 +73,7 @@ export const LearningHubPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Shared Learning Header & Sub-Navigation */}
-      <div className="p-5 rounded-2xl bg-surface border border-border flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="p-5 sm:p-6 rounded-2xl liquid-glass-gold flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <Badge variant="primary" size="sm">LEARNING SECTION</Badge>

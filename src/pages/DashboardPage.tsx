@@ -129,7 +129,7 @@ export const DashboardPage: React.FC = () => {
     return (
       <div className="space-y-8 max-w-5xl mx-auto pb-10">
         {/* A. Welcome Section */}
-        <div className="rounded-3xl bg-gradient-to-br from-[#101720] via-[#151F29] to-[#090D12] border border-white/10 p-6 sm:p-8 space-y-2">
+        <div className="rounded-3xl liquid-glass-gold p-6 sm:p-8 space-y-2">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F3F1EB] tracking-tight">
             Welcome back. Let&apos;s build your investing knowledge one step at a time.
           </h1>
@@ -377,22 +377,22 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <Button
-            variant="primary"
+            variant="gold"
             size="sm"
-            onClick={() => navigate('/ai-buddy')}
-            className="text-xs font-mono shadow-glow"
+            onClick={() => navigate('/learning')}
+            className="text-xs font-mono"
           >
-            <Bot size={14} className="mr-1.5" />
-            Ask AI Buddy
+            <Sparkles size={14} className="mr-1.5" />
+            Learning Studio
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/behavioral-insights')}
+            onClick={() => navigate('/markets/risk')}
             className="text-xs font-mono hidden sm:inline-flex"
           >
-            Investor Fingerprint
+            Risk & ML Lab
           </Button>
         </div>
       </div>

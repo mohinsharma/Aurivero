@@ -60,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 w-full border-b border-border/80 bg-surface/90 backdrop-blur-md">
+      <header className="sticky top-0 z-30 w-full border-b border-white/[0.07] bg-glass-elevated">
         {/* Live Left-to-Right Bloomberg-Style Market Ticker */}
         <LiveMarketTicker />
 

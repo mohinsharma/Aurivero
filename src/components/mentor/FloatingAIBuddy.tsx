@@ -146,12 +146,12 @@ export const FloatingAIBuddy: React.FC = () => {
         type="button"
         onClick={() => setIsOpen(true)}
         aria-label="Open MINDMARK AI Buddy"
-        className="fixed bottom-20 lg:bottom-6 right-5 z-50 group flex items-center gap-2.5 px-4 py-3 rounded-full bg-surface-elevated border border-primary/50 text-text-primary shadow-[0_0_24px_rgba(69,214,181,0.28)] hover:shadow-[0_0_32px_rgba(69,214,181,0.45)] hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+        className="fixed bottom-20 lg:bottom-6 right-5 z-50 group flex items-center gap-2.5 px-4 py-2.5 rounded-full liquid-glass-gold text-text-primary hover:border-gold/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold transition-all active:scale-[0.97]"
       >
-        <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-          <Bot size={18} />
+        <span className="w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
+          <Bot size={17} />
         </span>
-        <span className="hidden sm:inline text-xs font-mono font-bold tracking-tight">
+        <span className="hidden sm:inline text-xs font-mono font-semibold tracking-wide text-text-primary">
           MINDMARK AI
         </span>
         {messages.length > 0 && (
@@ -166,7 +166,7 @@ export const FloatingAIBuddy: React.FC = () => {
       <div
         role="dialog"
         aria-label="MINDMARK AI Buddy"
-        className="fixed inset-x-2 bottom-2 top-14 sm:inset-auto sm:bottom-5 sm:right-5 z-50 sm:w-[420px] sm:max-w-[calc(100vw-2rem)] sm:h-[620px] sm:max-h-[calc(100vh-3rem)] rounded-2xl bg-surface border border-primary/40 shadow-2xl flex flex-col overflow-hidden"
+        className="fixed inset-x-2 bottom-2 top-14 sm:inset-auto sm:bottom-5 sm:right-5 z-50 sm:w-[420px] sm:max-w-[calc(100vw-2rem)] sm:h-[620px] sm:max-h-[calc(100vh-3rem)] rounded-2xl bg-glass-elevated border border-white/[0.1] shadow-glass flex flex-col overflow-hidden animate-fadeIn"
       >
         {/* Header */}
         <div className="px-4 py-3 bg-surface-elevated border-b border-border flex items-center justify-between gap-2 shrink-0">
