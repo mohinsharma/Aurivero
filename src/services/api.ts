@@ -431,6 +431,27 @@ class ApiClient {
       ),
     getMlRisk: (assetClass: string, symbol: string) =>
       this.request<any>(`/api/markets/risk/ml/${assetClass}/${encodeURIComponent(symbol)}`),
+    analyzePortfolioRisk: (payload: {
+      positions: Array<{
+        symbol: string;
+        name?: string;
+        assetClass: string;
+        quantity: number;
+        entryPrice: number;
+        currentPrice?: number;
+        stopLoss?: number | null;
+        sector?: string;
+        currency?: string;
+      }>;
+      cashBalance: number;
+      baseCurrency: 'INR' | 'USD';
+      confidence?: number;
+      lookbackDays?: number;
+    }) =>
+      this.request<any>('/api/markets/risk/portfolio', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
     getScreener: (params?: Record<string, string | number | undefined>) => {
       const sp = new URLSearchParams();
       if (params) {

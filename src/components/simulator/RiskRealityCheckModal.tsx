@@ -20,6 +20,7 @@ import {
 import { Modal } from '../common/Modal';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
+import { loadRiskBudgets } from '../../utils/riskBudgets';
 
 export interface ProposedTradeData {
   symbol: string;
@@ -87,6 +88,32 @@ export const RiskRealityCheckModal: React.FC<RiskRealityCheckModalProps> = ({
   const isLossChasing = portfolio.isAfterLosingTrade && positionRatio > 20;
   const isLeveraged = trade.productType === 'MIS_LEVERAGED' && trade.leverageMultiplier > 1;
   const isOptions = trade.productType === 'OPTIONS';
+
+  // User-configured Risk Lab Budgets (non-blocking advisory)
+  const riskBudgets = useMemo(() => loadRiskBudgets(), [isOpen]);
+  const tradeStopRiskPct =
+    trade.stopLoss && trade.stopLoss > 0
+      ? (Math.abs(trade.price - trade.stopLoss) * trade.quantity * 100) / totalPortfolio
+      : null;
+  const budgetBreaches = useMemo(() => {
+    const list: string[] = [];
+    if (trade.type === 'BUY' && positionRatio > riskBudgets.maxSinglePositionPct) {
+      list.push(
+        `Order size (${positionRatio.toFixed(1)}%) exceeds your Risk Lab Single-Position Budget (${riskBudgets.maxSinglePositionPct}%).`
+      );
+    }
+    if (trade.type === 'BUY' && sectorConcentrationPercent > riskBudgets.maxSectorExposurePct) {
+      list.push(
+        `${trade.sector} sector exposure (${sectorConcentrationPercent.toFixed(1)}%) exceeds your Risk Lab Sector Budget (${riskBudgets.maxSectorExposurePct}%).`
+      );
+    }
+    if (tradeStopRiskPct !== null && tradeStopRiskPct > riskBudgets.maxPositionRiskPct) {
+      list.push(
+        `Stop-loss risk (${tradeStopRiskPct.toFixed(2)}% of equity) exceeds your Risk Lab Position Risk Budget (${riskBudgets.maxPositionRiskPct}%).`
+      );
+    }
+    return list;
+  }, [trade.type, trade.sector, positionRatio, sectorConcentrationPercent, tradeStopRiskPct, riskBudgets]);
 
   // Overall Risk Severity Rating
   const riskScore = useMemo(() => {
@@ -270,6 +297,18 @@ export const RiskRealityCheckModal: React.FC<RiskRealityCheckModalProps> = ({
               <span>
                 <strong className="text-text-primary">Concentration Alert:</strong> One stock ({trade.symbol}) will represent <strong className="text-warning">{stockConcentrationPercent.toFixed(1)}%</strong> of your entire portfolio. If it falls sharply, your overall net worth will take a severe hit with no other assets to cushion the fall.
               </span>
+            </div>
+          )}
+
+          {/* Risk Lab Budget Advisories */}
+          {budgetBreaches.length > 0 && (
+            <div className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-xs text-text-secondary space-y-1">
+              <div className="font-semibold text-danger flex items-center gap-1.5">
+                <ShieldAlert size={14} /> Risk Lab Budget Advisory (Non-Blocking)
+              </div>
+              {budgetBreaches.map((b, i) => (
+                <div key={i} className="text-[11px] leading-relaxed">• {b}</div>
+              ))}
             </div>
           )}
         </div>

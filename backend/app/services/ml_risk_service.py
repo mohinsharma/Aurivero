@@ -130,6 +130,18 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
     X_test, y_test = X[split_idx:], y[split_idx:]
     base_test = base_preds[split_idx:]
 
+    feature_labels = [
+        "5D Volatility",
+        "20D Volatility",
+        "60D Volatility",
+        "ATR(14) %",
+        "1D Abs Return",
+        "5D Return",
+        "20D Drawdown",
+        "Vol Ratio (5D/20D)",
+        "Volume Z-Score",
+    ]
+
     if HAS_SKLEARN and HAS_NUMPY:
         model = RandomForestRegressor(n_estimators=80, max_depth=5, min_samples_leaf=5, random_state=42)
         model.fit(np.array(X_train), np.array(y_train))
@@ -137,6 +149,7 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
         model_full = RandomForestRegressor(n_estimators=80, max_depth=5, min_samples_leaf=5, random_state=42)
         model_full.fit(np.array(X), np.array(y))
         est_vol = float(model_full.predict(np.array(latest_x))[0])
+        raw_imp = [float(v) for v in model_full.feature_importances_]
         model_name = "RandomForestRegressor (scikit-learn)"
     elif HAS_NUMPY:
         lam = 1.0
@@ -149,12 +162,37 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
         Xb_full = np.hstack([np.ones((len(Xf), 1)), Xf])
         w_full = np.linalg.solve(Xb_full.T @ Xb_full + lam * np.eye(Xb_full.shape[1]), Xb_full.T @ np.array(y))
         est_vol = float((np.hstack([np.ones((1, 1)), np.array(latest_x)]) @ w_full)[0])
+        col_stds = [float(np.std(Xf[:, idx])) for idx in range(Xf.shape[1])]
+        abs_contrib = [abs(float(w_full[idx + 1])) * max(1e-6, col_stds[idx]) for idx in range(len(feature_labels))]
+        tot_contrib = sum(abs_contrib) or 1.0
+        raw_imp = [c / tot_contrib for c in abs_contrib]
         model_name = "Ridge Regression (NumPy)"
     else:
         # Pure-Python EWMA Volatility Baseline (no external ML packages required)
         test_preds = [0.65 * row[1] + 0.35 * row[2] for row in X_test]
         est_vol = 0.65 * r20_now + 0.35 * r60_now
+        raw_imp = [0.0, 0.65, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         model_name = "EWMA Volatility Blend (Pure Python)"
+
+    feature_importance = sorted(
+        [
+            {"feature": lbl, "importancePct": round(imp * 100.0, 1)}
+            for lbl, imp in zip(feature_labels, raw_imp)
+        ],
+        key=lambda item: item["importancePct"],
+        reverse=True,
+    )
+
+    test_dates = dates[split_idx:]
+    out_of_sample_series = [
+        {
+            "date": datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%d"),
+            "actualVolPct": round(float(act) * 100.0, 2),
+            "mlVolPct": round(float(pred) * 100.0, 2),
+            "baselineVolPct": round(float(base) * 100.0, 2),
+        }
+        for ts, act, pred, base in zip(test_dates, y_test, test_preds, base_test)
+    ]
 
     model_mae = _mean([abs(p - a) for p, a in zip(test_preds, y_test)])
     baseline_mae = _mean([abs(p - a) for p, a in zip(base_test, y_test)])
@@ -226,6 +264,8 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
             "modelRmsePct": round(model_rmse * 100, 2),
             "baselineRmsePct": round(baseline_rmse * 100, 2),
         },
+        "featureImportance": feature_importance,
+        "outOfSampleSeries": out_of_sample_series,
         "limitations": [
             "Volatility estimates are statistical approximations of future dispersion, not price direction predictions.",
             "Sudden earnings, RBI policy, or macro shocks can exceed historical volatility bands.",

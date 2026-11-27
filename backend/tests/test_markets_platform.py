@@ -410,6 +410,8 @@ def test_historical_risk_analytics_and_ml_walk_forward():
     assert rdata["atr14"] > 0
     assert rdata["maxDrawdownPct"] >= 0
     assert rdata["var"]["dailyCvarPct"] >= rdata["var"]["dailyVarPct"]
+    assert len(rdata["dailyReturnsPct"]) > 20
+    assert len(rdata["drawdownSeries"]) > 20
 
     ml = client.get("/api/markets/risk/ml/CRYPTO/BTCUSDT")
     assert ml.status_code == 200
@@ -420,6 +422,65 @@ def test_historical_risk_analytics_and_ml_walk_forward():
     assert mdata["evaluation"]["testSamples"] > 0
     assert mdata["evaluation"]["modelMaePct"] >= 0
     assert mdata["evaluation"]["baselineMaePct"] >= 0
+    assert len(mdata["featureImportance"]) == 9
+    assert len(mdata["outOfSampleSeries"]) == mdata["evaluation"]["testSamples"]
+
+
+def test_correlated_portfolio_risk_engine():
+    res = client.post(
+        "/api/markets/risk/portfolio",
+        json={
+            "positions": [
+                {
+                    "symbol": "RELIANCE",
+                    "assetClass": "STOCK",
+                    "quantity": 10,
+                    "entryPrice": 2850,
+                    "stopLoss": 2750,
+                    "sector": "Energy",
+                    "currency": "INR",
+                },
+                {
+                    "symbol": "TCS",
+                    "assetClass": "STOCK",
+                    "quantity": 8,
+                    "entryPrice": 4000,
+                    "stopLoss": 3880,
+                    "sector": "IT",
+                    "currency": "INR",
+                },
+                {
+                    "symbol": "BTCUSDT",
+                    "assetClass": "CRYPTO",
+                    "quantity": 0.01,
+                    "entryPrice": 85000,
+                    "stopLoss": 80000,
+                    "sector": "N/A",
+                    "currency": "USD",
+                },
+            ],
+            "cashBalance": 25000,
+            "baseCurrency": "INR",
+            "confidence": 0.95,
+            "lookbackDays": 180,
+        },
+    )
+    assert res.status_code == 200
+    pdata = res.json()["data"]
+    assert pdata["baseCurrency"] == "INR"
+    assert pdata["totalEquity"] > 25000
+    assert pdata["alignedDays"] >= 20
+    assert pdata["portfolioDailyCvarAmount"] >= pdata["portfolioDailyVarAmount"]
+    assert pdata["portfolioDailyVarAmount"] <= pdata["undiversifiedVarAmount"] + 1e-6
+    assert len(pdata["correlationMatrix"]["labels"]) == 3
+    matrix = pdata["correlationMatrix"]["matrix"]
+    for i in range(3):
+        assert abs(matrix[i][i] - 1.0) < 1e-6
+        for j in range(3):
+            assert abs(matrix[i][j] - matrix[j][i]) < 1e-6
+    total_mrc = sum(p["riskContributionPct"] for p in pdata["positions"])
+    assert abs(total_mrc - 100.0) < 1.5
+    assert len(pdata["drawdownSeries"]) > 10
 
 
 def test_live_market_ticker_endpoint():
