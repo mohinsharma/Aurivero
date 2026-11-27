@@ -62,3 +62,12 @@ def get_current_user_required(authorization: Optional[str] = Header(None)) -> Di
             detail="Authentication token missing or invalid."
         )
     return user
+
+def get_current_user_strict(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Strictly requires a valid Bearer JWT token; rejects missing or invalid auth with 401."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token missing or invalid."
+        )
+    return get_current_user_optional(authorization)

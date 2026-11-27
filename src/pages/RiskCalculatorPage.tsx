@@ -34,6 +34,7 @@ import {
 } from '../utils/riskBudgets';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
+import { BeginnerTooltip } from '../components/common/BeginnerTooltip';
 import { InstrumentSearchInput } from '../components/markets/InstrumentSearchInput';
 import { FreshnessBadge } from '../components/markets/FreshnessBadge';
 import {
@@ -58,8 +59,10 @@ interface ExtendedPortfolioPosition extends Omit<PortfolioRiskPosition, 'stopLos
 export const RiskCalculatorPage: React.FC = () => {
   const navigate = useNavigate();
   const simulator = useSimulator();
-
+  const { experienceMode, setExperienceMode } = simulator;
   const [activeTab, setActiveTab] = useState<RiskTab>('POSITION');
+  const [showQuantDetails, setShowQuantDetails] = useState(false);
+  const [showAdvancedInputs, setShowAdvancedInputs] = useState(false);
 
   // Selected Instrument for Position, Analytics & ML
   const [assetClass, setAssetClass] = useState<AssetClass>('STOCK');
@@ -381,6 +384,23 @@ export const RiskCalculatorPage: React.FC = () => {
     return () => window.clearTimeout(timer);
   }, [activePositions, activeCash, portfolioBaseCurrency, confidence, lookback, livePricesByKey]);
 
+  useEffect(() => {
+    if (experienceMode === 'beginner' || activeTab === 'ANALYTICS') {
+      setLoadingAnalytics(true);
+      api.markets.getRiskAnalytics(assetClass, symbol, confidence, lookback).then((res) => {
+        if (res.success) setAnalytics(res.data);
+        setLoadingAnalytics(false);
+      });
+    }
+    if (experienceMode === 'beginner' || activeTab === 'ML') {
+      setLoadingMl(true);
+      api.markets.getMlRisk(assetClass, symbol).then((res) => {
+        if (res.success) setMlData(res.data);
+        setLoadingMl(false);
+      });
+    }
+  }, [experienceMode, activeTab, assetClass, symbol, confidence, lookback]);
+
   const posResult = useMemo(
     () =>
       calculatePositionSize({
@@ -553,6 +573,201 @@ export const RiskCalculatorPage: React.FC = () => {
     });
     return Array.from(set);
   }, [activePositions]);
+
+  // Beginner-friendly risk regime mapping driven by actual backend calculations
+  const beginnerRiskState = useMemo(() => {
+    const regime = (mlData?.regime?.label || analytics?.regime || '').toUpperCase();
+    if (regime.includes('HIGH') || regime.includes('STRESS') || regime.includes('TURBULENT')) {
+      return {
+        badge: '🔴 Turbulent',
+        color: 'text-[#F16D75] border-[#F16D75]/30 bg-[#F16D75]/10',
+        summary: 'Prices have been moving sharply. You could see larger gains or losses than usual.',
+      };
+    }
+    if (regime.includes('MODERATE') || regime.includes('ELEVATED') || regime.includes('MEDIUM')) {
+      return {
+        badge: '🟡 Choppy',
+        color: 'text-[#F5B942] border-[#F5B942]/30 bg-[#F5B942]/10',
+        summary: 'Prices are moving up and down more than usual. Your investment value may change quickly.',
+      };
+    }
+    return {
+      badge: '🟢 Calm',
+      color: 'text-[#45D6B5] border-[#45D6B5]/30 bg-[#45D6B5]/10',
+      summary: 'Prices have been moving less than usual recently.',
+    };
+  }, [mlData, analytics]);
+
+  if (experienceMode === 'beginner') {
+    const currSym = accountCurrency === 'INR' ? '₹' : '$';
+    return (
+      <div className="max-w-4xl mx-auto space-y-6 pb-12">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <button onClick={() => navigate('/markets')} className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary">
+              <ArrowLeft size={14} /> Back to Markets
+            </button>
+            <h1 className="text-2xl font-extrabold text-text-primary mt-1">Simple Risk &amp; Position Sizing</h1>
+            <p className="text-xs text-text-secondary">
+              Plan how much virtual money to put into one stock without taking oversized risks.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setExperienceMode('pro')} className="text-xs font-mono">
+            Switch to Pro Risk Lab
+          </Button>
+        </div>
+
+        {/* Beginner Risk Summary First */}
+        <Card className={`p-5 border space-y-3 ${beginnerRiskState.color}`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold">{beginnerRiskState.badge}</span>
+              <span className="text-xs font-mono text-text-primary">• {symbol} ({instrumentName})</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowQuantDetails((v) => !v)}
+              className="text-xs font-semibold text-[#78A9FF] hover:underline"
+            >
+              {showQuantDetails ? 'Hide Quant Details' : 'View Quant Details'}
+            </button>
+          </div>
+          <p className="text-xs text-[#F3F6F8]">{beginnerRiskState.summary}</p>
+
+          {showQuantDetails && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-white/10 text-xs font-mono">
+              <div className="p-2.5 rounded-xl bg-[#0B1017]">
+                <div className="text-[#93A2B4] text-[10px]">Daily VaR (95%)</div>
+                <div className="text-white font-bold">{analytics?.var_pct != null ? `${analytics.var_pct}%` : '—'}</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#0B1017]">
+                <div className="text-[#93A2B4] text-[10px]">CVaR / Expected Shortfall</div>
+                <div className="text-white font-bold">{analytics?.cvar_pct != null ? `${analytics.cvar_pct}%` : '—'}</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#0B1017]">
+                <div className="text-[#93A2B4] text-[10px]">Volatility Regime</div>
+                <div className="text-white font-bold">{mlData?.regime?.label || 'Normal'}</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#0B1017]">
+                <div className="text-[#93A2B4] text-[10px]">OOS MAE</div>
+                <div className="text-white font-bold">{mlData?.validation?.oos_mae != null ? `${mlData.validation.oos_mae}%` : '—'}</div>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* Simplified Position Sizing Inputs */}
+        <Card className="p-6 space-y-5">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-text-secondary block">1. Stock or Asset</label>
+            <InstrumentSearchInput
+              onSelect={handleInstrumentSelect}
+              placeholder="Search stock (e.g., RELIANCE, TCS, INFY)..."
+              ariaLabel="Select stock for position sizing"
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text-secondary block">2. Total Virtual Account Size ({currSym})</label>
+              <input
+                type="number"
+                value={accountBalance}
+                onChange={(e) => setAccountBalance(Number(e.target.value))}
+                className="w-full rounded-xl bg-[#0B1017] border border-white/10 px-3 py-2 text-sm text-white font-mono"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text-secondary block">3. Entry Price ({currSym})</label>
+              <input
+                type="number"
+                value={entryPrice}
+                onChange={(e) => setEntryPrice(Number(e.target.value))}
+                className="w-full rounded-xl bg-[#0B1017] border border-white/10 px-3 py-2 text-sm text-white font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-text-secondary flex items-center">
+                4. How much are you willing to lose if the decision is wrong?
+                <BeginnerTooltip
+                  term="Stop Loss & Planned Risk"
+                  definition="A price level you set to help limit a loss if the market moves against you. It cannot guarantee the final loss amount."
+                  example="Risking 1% of ₹1,00,000 means planning to limit your loss to ₹1,000."
+                />
+              </span>
+              <span className="font-mono font-bold text-[#45D6B5]">{riskPercent}% ({currSym}{Math.round((accountBalance * riskPercent) / 100).toLocaleString('en-IN')})</span>
+            </div>
+            <input
+              type="range"
+              min={0.5}
+              max={5}
+              step={0.5}
+              value={riskPercent}
+              onChange={(e) => setRiskPercent(Number(e.target.value))}
+              className="w-full accent-[#45D6B5]"
+            />
+            <p className="text-[11px] text-[#93A2B4]">
+              Limit your potential loss on this practice trade to {riskPercent}% of your virtual account. If the trade moves against you, this is the amount you are planning to risk — not a guarantee that the loss will never be higher.
+            </p>
+          </div>
+
+          {/* Suggested Result */}
+          <div className="p-4 rounded-2xl bg-[#0B1017] border border-[#45D6B5]/30 grid sm:grid-cols-2 gap-4">
+            <div>
+              <div className="text-[11px] text-[#93A2B4]">Suggested Practice Quantity</div>
+              <div className="text-2xl font-extrabold font-mono text-[#45D6B5]">
+                {posResult.valid ? `${posResult.recommendedQuantity} shares` : 'Check inputs'}
+              </div>
+            </div>
+            <div>
+              <div className="text-[11px] text-[#93A2B4]">Planned Max Risk Amount</div>
+              <div className="text-2xl font-extrabold font-mono text-white">
+                {currSym}{Math.round((accountBalance * riskPercent) / 100).toLocaleString('en-IN')}
+              </div>
+            </div>
+          </div>
+
+          {/* Advanced Cost & Margin Settings Accordion */}
+          <div className="pt-2 border-t border-white/10">
+            <button
+              type="button"
+              onClick={() => setShowAdvancedInputs((v) => !v)}
+              className="text-xs font-semibold text-[#78A9FF] hover:underline"
+            >
+              {showAdvancedInputs ? 'Hide Advanced Cost & Margin Settings' : 'Advanced Cost & Margin Settings'}
+            </button>
+            {showAdvancedInputs && (
+              <div className="grid sm:grid-cols-3 gap-3 mt-3 text-xs">
+                <div>
+                  <label className="text-[#93A2B4] block mb-1">Stop Loss ({currSym})</label>
+                  <input type="number" value={stopLoss} onChange={(e) => setStopLoss(Number(e.target.value))} className="w-full rounded-lg bg-[#0B1017] border border-white/10 px-2.5 py-1.5 text-white font-mono" />
+                </div>
+                <div>
+                  <label className="text-[#93A2B4] block mb-1">Lot Size</label>
+                  <input type="number" value={lotSize} onChange={(e) => setLotSize(Number(e.target.value))} className="w-full rounded-lg bg-[#0B1017] border border-white/10 px-2.5 py-1.5 text-white font-mono" />
+                </div>
+                <div>
+                  <label className="text-[#93A2B4] block mb-1">Leverage (x)</label>
+                  <input type="number" value={leverage} onChange={(e) => setLeverage(Number(e.target.value))} className="w-full rounded-lg bg-[#0B1017] border border-white/10 px-2.5 py-1.5 text-white font-mono" />
+                </div>
+                <div>
+                  <label className="text-[#93A2B4] block mb-1">Brokerage %</label>
+                  <input type="number" step="0.01" value={brokeragePercent} onChange={(e) => setBrokeragePercent(Number(e.target.value))} className="w-full rounded-lg bg-[#0B1017] border border-white/10 px-2.5 py-1.5 text-white font-mono" />
+                </div>
+                <div>
+                  <label className="text-[#93A2B4] block mb-1">Slippage %</label>
+                  <input type="number" step="0.01" value={slippagePercent} onChange={(e) => setSlippagePercent(Number(e.target.value))} className="w-full rounded-lg bg-[#0B1017] border border-white/10 px-2.5 py-1.5 text-white font-mono" />
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-12">

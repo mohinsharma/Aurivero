@@ -30,6 +30,7 @@ import {
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { Card } from '../components/common/Card';
+import { BeginnerTooltip } from '../components/common/BeginnerTooltip';
 import { INDIAN_INDICES, POPULAR_INDIAN_STOCKS } from '../data/mockData';
 
 export const LandingPage: React.FC = () => {
@@ -37,6 +38,16 @@ export const LandingPage: React.FC = () => {
 
   // State for interactive hero chart timeframe
   const [heroTimeframe, setHeroTimeframe] = useState<'1D' | '1W' | '1M'>('1D');
+  const HERO_CURVES: Record<'1D' | '1W' | '1M', { path: string; endY: number; changeLabel: string }> = {
+    '1D': { path: 'M0,75 C70,60 120,70 180,45 C240,25 320,38 400,15', endY: 15, changeLabel: '+₹2,480.00 (+2.48%)' },
+    '1W': { path: 'M0,68 C65,78 130,52 200,56 C270,35 335,28 400,20', endY: 20, changeLabel: '+₹4,920.00 (+4.92%)' },
+    '1M': { path: 'M0,82 C80,68 150,48 220,38 C290,44 345,18 400,8', endY: 8, changeLabel: '+₹11,350.00 (+11.35%)' },
+  };
+  const activeHeroCurve = HERO_CURVES[heroTimeframe];
+
+  // State for "Try It in 10 Seconds" interactive mini demonstration
+  const [demoCompany, setDemoCompany] = useState<'TCS' | 'RELIANCE'>('TCS');
+  const [demoAmount, setDemoAmount] = useState<500 | 1000 | 5000>(1000);
 
   // State for Section 2: Problem interactive tabs
   const [activeProblem, setActiveProblem] = useState<number>(0);
@@ -135,15 +146,14 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-primary leading-[1.12]">
-              Your first market mistake <br />
-              shouldn't{' '}
+              Learn to Invest. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#5eecd0] to-primary">
-                cost you money.
+                Practise Without Risk.
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl font-normal">
-              Practice with real market movements. Build your investing knowledge. Discover your trading habits. All without risking a single rupee.
+              Understand the stock market, practise with virtual money, and discover how your decisions affect your portfolio — without risking your savings.
             </p>
 
             {/* CTAs */}
@@ -151,34 +161,40 @@ export const LandingPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                onClick={() => navigate('/simulator')}
-                icon={<CandlestickChart size={18} />}
+                onClick={() => navigate('/onboarding')}
+                icon={<ArrowRight size={18} />}
+                iconPosition="right"
                 className="font-bold text-sm"
               >
-                Start Your Simulation
+                I&apos;m New — Guide Me
               </Button>
-              <a href="#how-it-works">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="font-mono text-xs w-full sm:w-auto"
-                  icon={<Play size={14} />}
-                >
-                  Explore How It Works
-                </Button>
-              </a>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate('/simulator')}
+                className="font-mono text-xs w-full sm:w-auto"
+                icon={<CandlestickChart size={15} />}
+              >
+                Explore the Simulator
+              </Button>
             </div>
 
-            {/* Micro trust indicators */}
-            <div className="pt-4 flex flex-wrap items-center gap-6 text-xs font-mono text-text-muted">
+            <div>
+              <Link to="/ai-buddy" className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary hover:underline">
+                Have a question? Ask AI Buddy <ArrowRight size={12} />
+              </Link>
+            </div>
+
+            {/* Three Simple Benefits */}
+            <div className="pt-2 flex flex-wrap items-center gap-6 text-xs font-mono text-text-muted">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-primary" /> ₹1,00,000 Demo Capital
+                <CheckCircle2 size={14} className="text-primary" /> Learn how investing works
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-primary" /> No Demat Needed
+                <CheckCircle2 size={14} className="text-primary" /> Practise using virtual money
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-primary" /> Indian Market Context
+                <CheckCircle2 size={14} className="text-primary" /> Understand your decisions and habits
               </span>
             </div>
           </div>
@@ -216,9 +232,16 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 <div className="text-right font-mono">
-                  <span className="text-[11px] text-text-muted block">Simulated Intraday P&L</span>
+                  <span className="text-[11px] text-text-muted flex items-center justify-end">
+                    Simulated {heroTimeframe} Change (P&amp;L)
+                    <BeginnerTooltip
+                      term="P&L (Profit & Loss)"
+                      definition="Shows how much money your virtual investment has gained or lost."
+                      example="If ₹1,00,000 grows to ₹1,02,480, your P&L is +₹2,480."
+                    />
+                  </span>
                   <span className="text-xs font-semibold text-primary flex items-center justify-end gap-1">
-                    <TrendingUp size={13} /> +₹2,480.00 (+2.48%)
+                    <TrendingUp size={13} /> {activeHeroCurve.changeLabel}
                   </span>
                 </div>
               </div>
@@ -273,17 +296,17 @@ export const LandingPage: React.FC = () => {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M0,75 C70,60 120,70 180,45 C240,25 320,38 400,15"
+                      d={activeHeroCurve.path}
                       fill="none"
                       stroke="#45D6B5"
                       strokeWidth="2.5"
                     />
                     <path
-                      d="M0,75 C70,60 120,70 180,45 C240,25 320,38 400,15 L400,90 L0,90 Z"
+                      d={`${activeHeroCurve.path} L400,90 L0,90 Z`}
                       fill="url(#heroGradient)"
                     />
-                    <circle cx="400" cy="15" r="4" fill="#45D6B5" className="animate-ping opacity-75" />
-                    <circle cx="400" cy="15" r="3.5" fill="#45D6B5" />
+                    <circle cx="400" cy={activeHeroCurve.endY} r="4" fill="#45D6B5" className="animate-ping opacity-75" />
+                    <circle cx="400" cy={activeHeroCurve.endY} r="3.5" fill="#45D6B5" />
                   </svg>
                 </div>
               </div>
@@ -334,6 +357,93 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* "TRY IT IN 10 SECONDS" INTERACTIVE LEARNING                               */}
+      {/* ========================================================================= */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pb-16">
+        <div className="rounded-3xl bg-surface border border-primary/25 p-6 sm:p-8 space-y-6">
+          <div>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-primary font-semibold">
+              Try It in 10 Seconds • Illustrative Simulation
+            </span>
+            <h2 className="text-2xl font-extrabold text-text-primary mt-1">
+              What happens when you invest ₹{demoAmount.toLocaleString('en-IN')}?
+            </h2>
+            <p className="text-xs text-text-secondary mt-1">
+              A stock is a small ownership share in a company. Pick a company and a virtual amount below to see how prices move.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="text-xs font-mono text-text-muted">1. Choose an illustrative company</div>
+              <div className="flex gap-2">
+                {(['TCS', 'RELIANCE'] as const).map((comp) => (
+                  <button
+                    key={comp}
+                    type="button"
+                    onClick={() => setDemoCompany(comp)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition ${
+                      demoCompany === comp
+                        ? 'bg-primary text-background border-primary'
+                        : 'bg-background text-text-secondary border-border hover:text-text-primary'
+                    }`}
+                  >
+                    {comp === 'TCS' ? 'TCS (IT Services)' : 'Reliance (Energy & Retail)'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-xs font-mono text-text-muted">2. Choose a virtual amount</div>
+              <div className="flex gap-2">
+                {([500, 1000, 5000] as const).map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => setDemoAmount(amt)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-mono font-bold border transition ${
+                      demoAmount === amt
+                        ? 'bg-primary text-background border-primary'
+                        : 'bg-background text-text-secondary border-border hover:text-text-primary'
+                    }`}
+                  >
+                    ₹{amt.toLocaleString('en-IN')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-2xl bg-primary/10 border border-primary/30 space-y-1">
+              <div className="text-xs font-mono text-primary font-semibold">If {demoCompany} rises +5%</div>
+              <div className="text-2xl font-extrabold font-mono text-text-primary">
+                ₹{Math.round(demoAmount * 1.05).toLocaleString('en-IN')}
+              </div>
+              <div className="text-xs text-text-secondary">
+                Gain of +₹{Math.round(demoAmount * 0.05).toLocaleString('en-IN')} on your virtual investment
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-danger/10 border border-danger/30 space-y-1">
+              <div className="text-xs font-mono text-danger font-semibold">If {demoCompany} falls -5%</div>
+              <div className="text-2xl font-extrabold font-mono text-text-primary">
+                ₹{Math.round(demoAmount * 0.95).toLocaleString('en-IN')}
+              </div>
+              <div className="text-xs text-text-secondary">
+                Loss of -₹{Math.round(demoAmount * 0.05).toLocaleString('en-IN')} on your virtual investment
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-text-muted">
+            Investments can rise or fall. You can make money, but you can also lose money. This is a deterministic educational illustration, not a price forecast.
+          </p>
         </div>
       </section>
 
@@ -1086,14 +1196,40 @@ export const LandingPage: React.FC = () => {
             >
               Begin Your Financial Learning Journey
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => navigate('/onboarding')}
-              className="font-mono text-xs"
-            >
-              Take 2-Min Knowledge Quiz
-            </Button>
+          </div>
+
+          {/* Integrated Front-Page Investor Skill Assessment Entry */}
+          <div className="mt-8 p-6 rounded-2xl bg-surface/90 border border-primary/25 text-left max-w-2xl mx-auto space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
+                Understand Your Investing Behavior
+              </span>
+              {typeof window !== 'undefined' && localStorage.getItem('mindmark_onboarding_v2') && (
+                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                  ✓ Assessment Completed
+                </span>
+              )}
+            </div>
+            <h3 className="text-lg font-bold text-text-primary">Discover Your Investor Profile</h3>
+            <p className="text-xs text-text-secondary leading-relaxed">
+              Take a quick 2-minute diagnostic to uncover your risk tolerance, behavioral tendencies, and personalized MINDMARK learning path.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              {typeof window !== 'undefined' && localStorage.getItem('mindmark_onboarding_v2') ? (
+                <>
+                  <Button variant="primary" size="sm" onClick={() => navigate('/behavioral-insights')} className="text-xs font-mono">
+                    View Your Investor Profile
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => navigate('/onboarding')} className="text-xs font-mono">
+                    Retake Assessment
+                  </Button>
+                </>
+              ) : (
+                <Button variant="primary" size="sm" onClick={() => navigate('/onboarding')} className="text-xs font-mono">
+                  Start Your Investor Assessment
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="pt-6 flex flex-wrap justify-center gap-6 text-xs font-mono text-text-muted">

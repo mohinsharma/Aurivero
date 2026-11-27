@@ -29,6 +29,13 @@ from backend.app.routers.watchlists import router as watchlists_router
 from backend.app.routers.charts import router as charts_router
 from backend.app.routers.financial_news import router as financial_news_router
 from backend.app.routers.ai_buddy import router as ai_buddy_router
+from backend.app.routers.behavior import router as behavior_router
+from backend.app.routers.fingerprint import router as fingerprint_router
+from backend.app.routers.mirror import router as mirror_router
+from backend.app.routers.arena import router as arena_router
+from backend.app.routers.gamification import router as gamification_router
+from backend.app.routers.social import router as social_router
+from backend.app.routers.ai_coach import router as ai_coach_router
 
 app = FastAPI(
     title="MINDMARK API — AI Financial Market Learning Simulator",
@@ -86,6 +93,13 @@ app.include_router(watchlists_router)
 app.include_router(charts_router)
 app.include_router(financial_news_router)
 app.include_router(ai_buddy_router)
+app.include_router(behavior_router)
+app.include_router(fingerprint_router)
+app.include_router(mirror_router)
+app.include_router(arena_router)
+app.include_router(gamification_router)
+app.include_router(social_router)
+app.include_router(ai_coach_router)
 
 @app.get("/")
 def root():

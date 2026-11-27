@@ -24,6 +24,11 @@ import { AdminPage } from './pages/AdminPage';
 import { MarketsPage } from './pages/MarketsPage';
 import { InstrumentDetailPage } from './pages/InstrumentDetailPage';
 import { AIBuddyPage } from './pages/AIBuddyPage';
+import { MirrorModePage } from './pages/MirrorModePage';
+import { ArenaPage } from './pages/ArenaPage';
+import { MyProgressPage } from './pages/MyProgressPage';
+import { AICoachPage } from './pages/AICoachPage';
+import { NewsCommunityPage } from './pages/NewsCommunityPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 const HeatmapPage = lazy(() => import('./pages/HeatmapPage').then((m) => ({ default: m.HeatmapPage })));
@@ -48,6 +53,12 @@ export const App: React.FC = () => {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/ai-buddy" element={<AIBuddyPage />} />
+              <Route path="/mirror-mode" element={<Navigate to="/arena?tab=mirror" replace />} />
+              <Route path="/arena" element={<ArenaPage />} />
+              <Route path="/my-progress" element={<MyProgressPage />} />
+              <Route path="/news-community" element={<NewsCommunityPage />} />
+              <Route path="/community" element={<Navigate to="/news-community?tab=community" replace />} />
+              <Route path="/ai-coach" element={<AICoachPage />} />
               <Route path="/learn" element={<LearnPage />} />
               <Route path="/simulator" element={<SimulatorPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
@@ -61,15 +72,15 @@ export const App: React.FC = () => {
               <Route path="/markets/heatmap" element={<HeatmapPage />} />
               <Route path="/markets/terminal" element={<ChartTerminalPage />} />
               <Route path="/markets/screener" element={<ScreenerPage />} />
-              <Route path="/markets/news" element={<FinancialNewsPage />} />
+              <Route path="/markets/news" element={<Navigate to="/news-community?tab=news" replace />} />
               <Route path="/markets/risk" element={<RiskCalculatorPage />} />
               <Route path="/markets/:tab" element={<MarketsPage />} />
               <Route path="/markets/:assetClass/:symbol" element={<InstrumentDetailPage />} />
 
               {/* Blockchain, Crypto & Forex Ecosystem Routes */}
               <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
-              <Route path="/hot-topics" element={<HotTopicsPage />} />
-              <Route path="/forums" element={<CommunityForumsPage />} />
+              <Route path="/hot-topics" element={<Navigate to="/news-community?tab=hot-topics" replace />} />
+              <Route path="/forums" element={<Navigate to="/news-community?tab=forums" replace />} />
               <Route path="/academy" element={<AcademyPage />} />
               <Route path="/hub" element={<PersonalHubPage />} />
               <Route path="/admin" element={<AdminPage />} />

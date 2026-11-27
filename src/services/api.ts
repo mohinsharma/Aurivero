@@ -625,6 +625,261 @@ class ApiClient {
     getWeeklyReport: (behavioralScore = 76) =>
       this.request<any>(`/api/ai-buddy/mentor/weekly-report?behavioral_score=${behavioralScore}`),
   };
+
+  // 20. Behavioral Intelligence Engine (BIE) Endpoints
+  public behavior = {
+    recordEvent: (payload: {
+      client_event_id?: string;
+      scenario_id?: string;
+      symbol: string;
+      sector?: string;
+      action: 'BUY' | 'SELL' | 'HOLD' | 'REDUCE';
+      execution_price?: number;
+      quantity: number;
+      market_change_pct?: number;
+      recent_drawdown_pct?: number;
+      stated_reason?: string;
+      confidence_level?: number;
+      viewed_info?: string[];
+      decision_duration_sec?: number;
+      pre_decision_contract?: {
+        why_making_decision: string;
+        biggest_risk: string;
+        what_proves_wrong: string;
+        planned_exposure_pct: number;
+        confidence_level: number;
+        short_explanation?: string;
+      };
+    }) =>
+      this.request<any>('/api/behavior/events', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    getProfile: () => this.request<any>('/api/behavior/profile'),
+    getScores: () => this.request<any>('/api/behavior/scores'),
+    getPatterns: () => this.request<any>('/api/behavior/patterns'),
+    getDiagnostics: () => this.request<any>('/api/behavior/diagnostics'),
+    getTimeline: (limit = 25, offset = 0) =>
+      this.request<any>(`/api/behavior/timeline?limit=${limit}&offset=${offset}`),
+    recalculate: () =>
+      this.request<any>('/api/behavior/recalculate', { method: 'POST' }),
+    getRecommendations: (useAi = true) =>
+      this.request<any>(`/api/behavior/recommendations?use_ai=${useAi}`),
+  };
+
+  // 21. Phase 2: Investor Decision Fingerprint Endpoints
+  public fingerprint = {
+    getProfile: () => this.request<any>('/api/fingerprint'),
+    getHistory: (period: '7d' | '30d' | '90d' | 'all' = 'all') =>
+      this.request<any>(`/api/fingerprint/history?period=${period}`),
+    getArchetype: () => this.request<any>('/api/fingerprint/archetype'),
+    getDeclaredObserved: () => this.request<any>('/api/fingerprint/declared-observed'),
+    getRecommendations: (useAi = true) =>
+      this.request<any>(`/api/fingerprint/recommendations?use_ai=${useAi}`),
+  };
+
+  // 22. Phase 3: Mirror Mode Behavioral Training Endpoints
+  public mirror = {
+    getChallenges: () => this.request<any>('/api/mirror/challenges'),
+    getChallengeDetail: (challengeId: string) =>
+      this.request<any>(`/api/mirror/challenges/${challengeId}`),
+    startChallenge: (payload: { challenge_id: string; is_practice?: boolean; declared_strategy?: string }) =>
+      this.request<any>('/api/mirror/challenges/start', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    submitDecision: (
+      challengeId: string,
+      payload: {
+        session_id: string;
+        stage_index: number;
+        client_decision_id?: string;
+        action: string;
+        allocation?: Record<string, number>;
+        reasoning: string;
+        confidence_level: number;
+        invalidation_trigger?: string;
+        reviewed_info?: string[];
+      }
+    ) =>
+      this.request<any>(`/api/mirror/challenges/${challengeId}/decision`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    completeChallenge: (
+      challengeId: string,
+      payload: { session_id: string; reflection_text?: string; use_ai?: boolean }
+    ) =>
+      this.request<any>(`/api/mirror/challenges/${challengeId}/complete`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    skipChallenge: (challengeId: string) =>
+      this.request<any>(`/api/mirror/challenges/${challengeId}/skip`, { method: 'POST' }),
+    getHistory: () => this.request<any>('/api/mirror/history'),
+    getRecommendations: () => this.request<any>('/api/mirror/recommendations'),
+  };
+
+  // 22. Phase 4 — MINDMARK Arena
+  public arena = {
+    getDashboard: () => this.request<any>('/api/arena/dashboard'),
+    getContestDetail: (contestId: string) => this.request<any>(`/api/arena/contests/${contestId}`),
+    registerContest: (contestId: string) =>
+      this.request<any>(`/api/arena/contests/${contestId}/register`, { method: 'POST' }),
+    startContest: (contestId: string, is_practice = false) =>
+      this.request<any>(`/api/arena/contests/${contestId}/start`, {
+        method: 'POST',
+        body: JSON.stringify({ is_practice }),
+      }),
+    submitContest: (contestId: string, payload: any) =>
+      this.request<any>(`/api/arena/contests/${contestId}/submit`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    getContestResults: (contestId: string) =>
+      this.request<any>(`/api/arena/contests/${contestId}/results`),
+    createDuel: (payload: {
+      contest_id: string;
+      argument: string;
+      evidence: string;
+      risks: string;
+      auto_match_benchmark?: boolean;
+      use_ai?: boolean;
+    }) =>
+      this.request<any>('/api/arena/duels/create', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    getLeaderboard: (
+      scope: 'global' | 'weekly' | 'monthly' | 'university' | 'friends' | 'contest',
+      university?: string,
+      page = 1,
+      limit = 20
+    ) => {
+      const qs = university ? `&university=${encodeURIComponent(university)}` : '';
+      return this.request<any>(`/api/arena/leaderboards/${scope}?page=${page}&limit=${limit}${qs}`);
+    },
+    getUniversityLeague: () => this.request<any>('/api/arena/university-league'),
+    getProfile: () => this.request<any>('/api/arena/profile'),
+    updateProfile: (payload: {
+      display_name?: string;
+      public_leaderboard_opt_in?: boolean;
+      share_university?: boolean;
+      university_name?: string;
+    }) =>
+      this.request<any>('/api/arena/profile', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      }),
+    listFriendChallenges: () => this.request<any>('/api/arena/friend-challenges'),
+    createFriendChallenge: (payload: { contest_id: string; opponent_email?: string; share_reasoning?: boolean }) =>
+      this.request<any>('/api/arena/friend-challenges', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    acceptFriendChallenge: (challengeId: string) =>
+      this.request<any>(`/api/arena/friend-challenges/${challengeId}/accept`, { method: 'POST' }),
+    setUniversity: (university_name: string) =>
+      this.request<any>('/api/arena/university', {
+        method: 'POST',
+        body: JSON.stringify({ university_name }),
+      }),
+    addFriend: (friend_email: string) =>
+      this.request<any>('/api/arena/friends', {
+        method: 'POST',
+        body: JSON.stringify({ friend_email }),
+      }),
+  };
+
+  // 23. Phase 5 — Gamification & Progression ("My Progress")
+  public gamification = {
+    getProfile: (useAi = true) => this.request<any>(`/api/gamification/profile?use_ai=${useAi}`),
+    getXpHistory: (page = 1, limit = 25) =>
+      this.request<any>(`/api/gamification/xp-history?page=${page}&limit=${limit}`),
+    getLevels: () => this.request<any>('/api/gamification/levels'),
+    getMissions: () => this.request<any>('/api/gamification/missions'),
+    completeMission: (missionId: string, reflection_note?: string) =>
+      this.request<any>(`/api/gamification/missions/${missionId}/complete`, {
+        method: 'POST',
+        body: JSON.stringify({ reflection_note }),
+      }),
+    skipMission: (missionId: string) =>
+      this.request<any>(`/api/gamification/missions/${missionId}/skip`, { method: 'POST' }),
+    dismissMission: (missionId: string) =>
+      this.request<any>(`/api/gamification/missions/${missionId}/dismiss`, { method: 'POST' }),
+    getSkillTree: () => this.request<any>('/api/gamification/skill-tree'),
+    completeSkill: (skillId: string, exercise_answer?: string) =>
+      this.request<any>(`/api/gamification/skills/${skillId}/complete`, {
+        method: 'POST',
+        body: JSON.stringify({ exercise_answer }),
+      }),
+    getBadges: () => this.request<any>('/api/gamification/badges'),
+    getStreak: () => this.request<any>('/api/gamification/streak'),
+    getSeasons: () => this.request<any>('/api/gamification/seasons'),
+  };
+
+  // 24. Phase 6 — MINDMARK Social Intelligence ("Community")
+  public social = {
+    getDashboard: () => this.request<any>('/api/social/dashboard'),
+    searchUsers: (q: string) => this.request<any>(`/api/social/users/search?q=${encodeURIComponent(q)}`),
+    listSquads: () => this.request<any>('/api/social/squads'),
+    createSquad: (payload: { name: string; description?: string; university_name?: string }) =>
+      this.request<any>('/api/social/squads', { method: 'POST', body: JSON.stringify(payload) }),
+    getSquadDetail: (squadId: string) => this.request<any>(`/api/social/squads/${squadId}`),
+    joinSquadByCode: (invite_code: string) =>
+      this.request<any>('/api/social/squads/join-code', { method: 'POST', body: JSON.stringify({ invite_code }) }),
+    acceptInvitation: (invId: string) =>
+      this.request<any>(`/api/social/invitations/${invId}/accept`, { method: 'POST' }),
+    createBattle: (squadId: string, payload: { title: string; scenario_id?: string }) =>
+      this.request<any>(`/api/social/squads/${squadId}/battles`, { method: 'POST', body: JSON.stringify(payload) }),
+    listDebates: () => this.request<any>('/api/social/debates'),
+    submitDebate: (debateId: string, payload: any) =>
+      this.request<any>(`/api/social/debates/${debateId}/submissions`, { method: 'POST', body: JSON.stringify(payload) }),
+    reactDebate: (debateId: string, submissionId: string, reaction: string) =>
+      this.request<any>(`/api/social/debates/${debateId}/reactions?submission_id=${encodeURIComponent(submissionId)}`, {
+        method: 'POST',
+        body: JSON.stringify({ reaction }),
+      }),
+    listCrowdScenarios: () => this.request<any>('/api/social/crowd-mirror/scenarios'),
+    submitCrowdMirror: (scenarioId: string, payload: any) =>
+      this.request<any>(`/api/social/crowd-mirror/${scenarioId}/submit`, { method: 'POST', body: JSON.stringify(payload) }),
+    getCrowdResults: (scenarioId: string) =>
+      this.request<any>(`/api/social/crowd-mirror/${scenarioId}/results`),
+    getFeed: () => this.request<any>('/api/social/feed'),
+    createPost: (payload: { post_type: string; title: string; content: string }) =>
+      this.request<any>('/api/social/posts', { method: 'POST', body: JSON.stringify(payload) }),
+    reactPost: (postId: string, reaction: string) =>
+      this.request<any>(`/api/social/posts/${postId}/reactions`, { method: 'POST', body: JSON.stringify({ reaction }) }),
+    deletePost: (postId: string) =>
+      this.request<any>(`/api/social/posts/${postId}`, { method: 'DELETE' }),
+    patchPrivacy: (payload: any) =>
+      this.request<any>('/api/social/profile/privacy', { method: 'PATCH', body: JSON.stringify(payload) }),
+  };
+
+  // 25. Phase 7 — Personalized Gemini AI Coach
+  public aiCoach = {
+    chat: (payload: { message: string; conversation_id?: string | null; use_ai?: boolean }) =>
+      this.request<any>('/api/ai-coach/chat', { method: 'POST', body: JSON.stringify(payload) }),
+    getContext: () => this.request<any>('/api/ai-coach/context'),
+    getRecommendations: () => this.request<any>('/api/ai-coach/recommendations'),
+    dismissRecommendation: (recId: string) =>
+      this.request<any>(`/api/ai-coach/recommendations/${recId}/dismiss`, { method: 'POST' }),
+    reviewDecision: (payload: {
+      symbol: string;
+      action: string;
+      stated_reasoning: string;
+      declared_strategy?: string;
+      position_size_pct?: number;
+      risk_limit_pct?: number;
+      market_context_at_time?: string;
+      use_ai?: boolean;
+    }) =>
+      this.request<any>('/api/ai-coach/review-decision', { method: 'POST', body: JSON.stringify(payload) }),
+    listConversations: () => this.request<any>('/api/ai-coach/conversations'),
+    getConversation: (id: string) => this.request<any>(`/api/ai-coach/conversations/${id}`),
+    deleteConversation: (id: string) =>
+      this.request<any>(`/api/ai-coach/conversations/${id}`, { method: 'DELETE' }),
+  };
 }
 
 export const api = new ApiClient();

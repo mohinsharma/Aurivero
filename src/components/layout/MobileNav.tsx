@@ -21,7 +21,9 @@ import {
   GraduationCap,
   Bookmark,
   ShieldAlert,
-  Bot
+  Bot,
+  Target,
+  Swords
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 
@@ -37,24 +39,25 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Markets', path: '/markets', icon: Coins },
     { name: 'Simulator', path: '/simulator', icon: CandlestickChart },
-    { name: 'Forums', path: '/forums', icon: MessageSquare },
+    { name: 'News & Hub', path: '/news-community', icon: MessageSquare },
     { name: 'Academy', path: '/academy', icon: GraduationCap },
   ];
 
   const fullDrawerItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'AI Coach', path: '/ai-coach', icon: Bot },
+    { name: 'My Progress', path: '/my-progress', icon: Trophy },
+    { name: 'MINDMARK Arena', path: '/arena', icon: Swords },
+    { name: 'News & Community', path: '/news-community', icon: Newspaper },
     { name: 'MINDMARK AI Buddy', path: '/ai-buddy', icon: Bot },
     { name: 'Markets (Stocks, Crypto, FX)', path: '/markets', icon: Coins },
     { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: PieChart },
     { name: 'Market Screener', path: '/markets/screener', icon: Compass },
-    { name: 'Financial News (IST)', path: '/markets/news', icon: Newspaper },
     { name: 'Pro Charting Terminal', path: '/markets/terminal', icon: CandlestickChart },
     { name: 'Risk & ML Calculator', path: '/markets/risk', icon: ShieldCheck },
     { name: 'Paper Trading Simulator', path: '/simulator', icon: CandlestickChart },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
     { name: 'Market Intelligence (Crypto/FX)', path: '/market-intelligence', icon: Coins },
-    { name: 'Hot Topics & News', path: '/hot-topics', icon: Flame },
-    { name: 'Community Forums', path: '/forums', icon: MessageSquare },
     { name: 'Learn & Teach Academy', path: '/academy', icon: GraduationCap },
     { name: 'Personal Hub & Bookmarks', path: '/hub', icon: Bookmark },
     { name: 'Behavioral Insights', path: '/behavioral-insights', icon: BrainCircuit },
@@ -62,7 +65,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
     { name: 'Market News Explainer', path: '/news-explainer', icon: Newspaper },
     { name: 'Challenges & XP', path: '/challenges', icon: Trophy },
     { name: 'Admin & Moderation', path: '/admin', icon: ShieldAlert },
-    { name: 'Knowledge Assessment', path: '/onboarding', icon: Compass },
     { name: 'Profile & Settings', path: '/settings', icon: Settings },
   ];
 

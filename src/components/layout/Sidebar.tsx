@@ -22,7 +22,9 @@ import {
   Bookmark,
   ShieldAlert,
   type LucideIcon,
-  Bot
+  Bot,
+  Target,
+  Swords
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 
@@ -67,12 +69,18 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    id: 'ai_intelligence',
+    label: 'AI Intelligence',
+    items: [
+      { name: 'AI Coach', path: '/ai-coach', icon: Sparkles, badge: 'COACH' },
+      { name: 'AI Buddy', path: '/ai-buddy', icon: Bot, badge: 'FINANCE AI' },
+    ],
+  },
+  {
     id: 'news_community',
     label: 'News & Community',
     items: [
-      { name: 'Financial News', path: '/markets/news', icon: Newspaper, badge: 'RSS' },
-      { name: 'Hot Topics & Insights', path: '/hot-topics', icon: Flame },
-      { name: 'Community Forums', path: '/forums', icon: MessageSquare },
+      { name: 'News & Community', path: '/news-community', icon: Newspaper, badge: 'HUB' },
       { name: 'News Explainer', path: '/news-explainer', icon: Newspaper },
     ],
   },
@@ -80,10 +88,10 @@ const NAV_GROUPS: NavGroup[] = [
     id: 'learning',
     label: 'Learning',
     items: [
-      { name: 'AI Buddy', path: '/ai-buddy', icon: Bot, badge: 'FINANCE AI' },
+      { name: 'My Progress', path: '/my-progress', icon: Trophy, badge: 'XP' },
+      { name: 'Arena', path: '/arena', icon: Swords, badge: 'COMPETE' },
       { name: 'Learn & Teach Academy', path: '/academy', icon: GraduationCap },
       { name: 'Behavioral Insights', path: '/behavioral-insights', icon: BrainCircuit },
-      { name: 'Skill Assessment', path: '/onboarding', icon: Compass },
       { name: 'Challenges & XP', path: '/challenges', icon: Trophy },
     ],
   },
@@ -105,17 +113,57 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const BEGINNER_PRIMARY_GROUPS: NavGroup[] = [
+  {
+    id: 'beginner_core',
+    label: 'Start Here',
+    items: [
+      { name: 'Home', path: '/dashboard', icon: LayoutDashboard },
+      { name: 'Learn', path: '/academy', icon: GraduationCap },
+      { name: 'Practice (Paper Trading)', path: '/simulator', icon: CandlestickChart },
+      { name: 'My Portfolio', path: '/portfolio', icon: PieChart },
+      { name: 'Explore Markets', path: '/markets', icon: Coins },
+      { name: 'AI Buddy', path: '/ai-buddy', icon: Bot },
+    ],
+  },
+];
+
+const BEGINNER_ADVANCED_TOOLS: NavGroup = {
+  id: 'advanced_tools',
+  label: 'Explore Advanced Tools',
+  items: [
+    { name: 'Pro Charting', path: '/markets/terminal', icon: CandlestickChart },
+    { name: 'Market Replay', path: '/market-replay', icon: History },
+    { name: 'Market Screener', path: '/markets/screener', icon: Compass },
+    { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: Sparkles },
+    { name: 'Risk & ML Lab', path: '/markets/risk', icon: ShieldCheck },
+    { name: 'Behavioral Insights', path: '/behavioral-insights', icon: BrainCircuit },
+    { name: 'Arena & Mirror', path: '/arena', icon: Trophy },
+    { name: 'News & Community', path: '/news-community', icon: Newspaper },
+    { name: 'AI Coach', path: '/ai-coach', icon: Sparkles },
+    { name: 'My Progress', path: '/my-progress', icon: Trophy },
+  ],
+};
+
 export const Sidebar: React.FC = () => {
-  const { sidebarCollapsed, toggleSidebar, behavioralScore } = useSimulator();
+  const { sidebarCollapsed, toggleSidebar, behavioralScore, experienceMode } = useSimulator();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     overview: true,
+    ai_intelligence: true,
     markets: true,
     analysis: true,
     news_community: true,
     learning: false,
     workspace: true,
     settings_admin: false,
+    beginner_core: true,
+    advanced_tools: false,
   });
+
+  const activeGroups =
+    experienceMode === 'beginner'
+      ? [...BEGINNER_PRIMARY_GROUPS, BEGINNER_ADVANCED_TOOLS]
+      : NAV_GROUPS;
 
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -137,7 +185,7 @@ export const Sidebar: React.FC = () => {
         {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
-      {!sidebarCollapsed && (
+      {!sidebarCollapsed && experienceMode === 'pro' && (
         <div className="mx-4 mt-4 p-3 rounded-xl bg-surface-elevated/70 border border-primary/20">
           <div className="flex items-center justify-between text-xs">
             <span className="text-text-muted flex items-center gap-1.5 font-mono">
@@ -158,7 +206,7 @@ export const Sidebar: React.FC = () => {
       )}
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-3" aria-label="Workspace sections">
-        {NAV_GROUPS.map((group) => {
+        {activeGroups.map((group) => {
           const isOpen = sidebarCollapsed || openGroups[group.id];
           return (
             <div key={group.id}>

@@ -13,6 +13,9 @@ interface SimulatorContextType {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
+  experienceMode: 'beginner' | 'pro';
+  setExperienceMode: (mode: 'beginner' | 'pro') => void;
+  toggleExperienceMode: () => void;
   executeTrade: (params: {
     symbol: string;
     type: 'BUY' | 'SELL';
@@ -194,6 +197,35 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [experienceMode, setExperienceModeState] = useState<'beginner' | 'pro'>(() => {
+    try {
+      const saved = localStorage.getItem('mindmark_experience_mode');
+      if (saved === 'beginner' || saved === 'pro') return saved;
+      const onb = localStorage.getItem('mindmark_onboarding_v2');
+      if (onb) {
+        const parsed = JSON.parse(onb);
+        if (parsed?.assignedPath === 'ADVANCED' || parsed?.experienceLevel?.toLowerCase?.().includes('pro')) {
+          return 'pro';
+        }
+      }
+    } catch {
+      // default to beginner
+    }
+    return 'beginner';
+  });
+
+  const setExperienceMode = (mode: 'beginner' | 'pro') => {
+    setExperienceModeState(mode);
+    try {
+      localStorage.setItem('mindmark_experience_mode', mode);
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  const toggleExperienceMode = () => {
+    setExperienceMode(experienceMode === 'beginner' ? 'pro' : 'beginner');
+  };
 
   useEffect(() => {
     try {
@@ -436,6 +468,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         sidebarCollapsed,
         setSidebarCollapsed,
         toggleSidebar,
+        experienceMode,
+        setExperienceMode,
+        toggleExperienceMode,
         executeTrade,
         squareOffPosition,
         resetPortfolio,

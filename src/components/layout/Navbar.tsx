@@ -26,7 +26,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
-  const { virtualCash, totalPortfolioValue, resetPortfolio } = useSimulator();
+  const { virtualCash, totalPortfolioValue, resetPortfolio, experienceMode, setExperienceMode } = useSimulator();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
@@ -146,6 +146,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
                 aria-label="Reset virtual capital"
               >
                 <RotateCcw size={13} />
+              </button>
+            </div>
+
+            {/* Global Beginner / Pro Mode Switch */}
+            <div
+              role="group"
+              aria-label="Experience mode"
+              className="flex items-center bg-surface border border-border rounded-xl p-0.5 text-[11px] font-mono"
+            >
+              <button
+                type="button"
+                onClick={() => setExperienceMode('beginner')}
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
+                  experienceMode === 'beginner'
+                    ? 'bg-primary text-background font-bold'
+                    : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                Beginner
+              </button>
+              <button
+                type="button"
+                onClick={() => setExperienceMode('pro')}
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
+                  experienceMode === 'pro'
+                    ? 'bg-secondary text-background font-bold'
+                    : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                Pro
               </button>
             </div>
 
