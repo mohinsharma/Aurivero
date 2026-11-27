@@ -15,6 +15,7 @@ import { api } from '../services/api';
 import { useSimulator } from '../context/SimulatorContext';
 import { Button } from '../components/common/Button';
 import { Modal } from '../components/common/Modal';
+import { MentorTrainingLab } from '../components/mentor/MentorTrainingLab';
 
 interface ChatMessage {
   id: string;
@@ -38,7 +39,12 @@ const STARTER_PROMPTS = [
 ];
 
 export const AIBuddyPage: React.FC = () => {
-  const { assessment } = useSimulator();
+  const { assessment, behavioralScore } = useSimulator();
+  const [buddyTab, setBuddyTab] = useState<'CHAT' | 'SCENARIOS' | 'DAILY' | 'REPORT'>('CHAT');
+  const [mentorLevel, setMentorLevel] = useState<{ code: string; label: string }>({
+    code: 'ABSOLUTE_BEGINNER',
+    label: 'Absolute Beginner',
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +60,14 @@ export const AIBuddyPage: React.FC = () => {
         setBuddyStatus(res.data);
       }
     });
-  }, []);
+    api.aiBuddy
+      .getMentorProfile(assessment?.experienceLevel, behavioralScore?.overallHealth ?? 76)
+      .then((res) => {
+        if (res.success && res.data?.level) {
+          setMentorLevel(res.data.level);
+        }
+      });
+  }, [assessment?.experienceLevel, behavioralScore?.overallHealth]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -157,9 +170,32 @@ export const AIBuddyPage: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-text-muted">
-              Finance Learning & Market Education Assistant • Indian Markets, Risk & Paper Trading
+              AI Trading Mentor & Risk Intelligence Buddy • Level: <strong className="text-primary">{mentorLevel.label}</strong>
             </p>
           </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {(
+            [
+              { id: 'CHAT', label: 'Mentor Chat' },
+              { id: 'SCENARIOS', label: 'Scenario Lab' },
+              { id: 'DAILY', label: 'Daily Training' },
+              { id: 'REPORT', label: 'Weekly Report' },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setBuddyTab(tab.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                buddyTab === tab.id
+                  ? 'bg-primary text-background font-bold'
+                  : 'bg-surface-elevated border border-border text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -201,7 +237,16 @@ export const AIBuddyPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Chat Viewport */}
+      {buddyTab !== 'CHAT' ? (
+        <MentorTrainingLab
+          mode={buddyTab}
+          learningLevelCode={mentorLevel.code}
+          learningLevelLabel={mentorLevel.label}
+          behavioralScore={behavioralScore?.overallHealth ?? 76}
+        />
+      ) : (
+        <>
+          {/* Chat Viewport */}
       <div className="flex-1 overflow-y-auto rounded-2xl bg-surface/75 border border-border/80 p-4 sm:p-6 space-y-5">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto py-6 space-y-6">
@@ -332,6 +377,8 @@ export const AIBuddyPage: React.FC = () => {
           <span className="hidden sm:inline">Send</span>
         </Button>
       </div>
+        </>
+      )}
 
       {/* Clear Conversation Confirmation Modal */}
       <Modal

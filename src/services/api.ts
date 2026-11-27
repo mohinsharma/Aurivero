@@ -593,6 +593,37 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(payload),
       }),
+    getMentorProfile: (experienceLevel?: string, behavioralScore = 76) =>
+      this.request<any>(
+        `/api/ai-buddy/mentor/profile?behavioral_score=${behavioralScore}${
+          experienceLevel ? `&experience_level=${encodeURIComponent(experienceLevel)}` : ''
+        }`
+      ),
+    getHistoricalScenario: (symbol = 'RELIANCE', assetClass = 'STOCK') =>
+      this.request<any>(
+        `/api/ai-buddy/mentor/historical-scenario?symbol=${encodeURIComponent(symbol)}&asset_class=${assetClass}`
+      ),
+    getRandomScenario: (level = 'ABSOLUTE_BEGINNER') =>
+      this.request<any>(`/api/ai-buddy/mentor/random-scenario?level=${encodeURIComponent(level)}`),
+    evaluateMentorStep: (payload: {
+      archetype: string;
+      selectedChoiceId: string;
+      userReasoning: string;
+      attemptNumber: number;
+    }) =>
+      this.request<any>('/api/ai-buddy/mentor/evaluate-step', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    run4TierRiskCheck: (payload: Record<string, any>) =>
+      this.request<any>('/api/ai-buddy/mentor/risk-check', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    getDailySession: (level = 'ABSOLUTE_BEGINNER') =>
+      this.request<any>(`/api/ai-buddy/mentor/daily-session?level=${encodeURIComponent(level)}`),
+    getWeeklyReport: (behavioralScore = 76) =>
+      this.request<any>(`/api/ai-buddy/mentor/weekly-report?behavioral_score=${behavioralScore}`),
   };
 }
 

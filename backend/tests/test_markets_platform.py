@@ -495,3 +495,61 @@ def test_live_market_ticker_endpoint():
     for idx_q in data["indices"]:
         assert idx_q["status"] != "LIVE"
         assert idx_q["price"] is not None and idx_q["price"] > 0
+
+
+def test_mentor_engine_scenarios_and_4tier_risk():
+    prof = client.get("/api/ai-buddy/mentor/profile?experience_level=BEGINNER&behavioral_score=76")
+    assert prof.status_code == 200
+    assert prof.json()["data"]["level"]["code"] == "ABSOLUTE_BEGINNER"
+
+    hist = client.get("/api/ai-buddy/mentor/historical-scenario?symbol=RELIANCE&asset_class=STOCK")
+    assert hist.status_code == 200
+    hdata = hist.json()["data"]
+    assert hdata["available"] is True
+    assert hdata["dataType"] == "REAL HISTORICAL DATA"
+    assert len(hdata["visibleCandles"]) == 40
+    assert len(hdata["hiddenOutcomeCandles"]) == 15
+
+    rand_s = client.get("/api/ai-buddy/mentor/random-scenario?level=INTERMEDIATE_TRADER")
+    assert rand_s.status_code == 200
+    sdata = rand_s.json()["data"]
+    assert sdata["dataType"] == "AI-GENERATED SIMULATION"
+    assert len(sdata["choices"]) >= 3
+
+    # Socratic hint on attempt 1 for bad choice, reveal on attempt 2
+    ev1 = client.post(
+        "/api/ai-buddy/mentor/evaluate-step",
+        json={
+            "archetype": "FALSE_BREAKOUT",
+            "selectedChoiceId": "ENTER_NOW",
+            "userReasoning": "FOMO",
+            "attemptNumber": 1,
+        },
+    )
+    assert ev1.status_code == 200
+    assert ev1.json()["data"]["allowRevision"] is True
+    assert ev1.json()["data"]["revealOutcome"] is False
+
+    # 4-Tier Risk Warning Engine: CRITICAL blocks simulation
+    rc = client.post(
+        "/api/ai-buddy/mentor/risk-check",
+        json={
+            "accountCapital": 100000,
+            "riskPercent": 1.0,
+            "entryPrice": 1000,
+            "stopLoss": 950,
+            "quantity": 60,
+            "leverage": 5.0,
+        },
+    )
+    assert rc.status_code == 200
+    assert rc.json()["data"]["classification"] == "CRITICAL"
+    assert rc.json()["data"]["blockSimulation"] is True
+
+    daily = client.get("/api/ai-buddy/mentor/daily-session?level=ABSOLUTE_BEGINNER")
+    assert daily.status_code == 200
+    assert len(daily.json()["data"]["steps"]) == 6
+
+    weekly = client.get("/api/ai-buddy/mentor/weekly-report?behavioral_score=76")
+    assert weekly.status_code == 200
+    assert "riskManagement" in weekly.json()["data"]["scores"]

@@ -132,6 +132,15 @@ export const RiskRealityCheckModal: React.FC<RiskRealityCheckModalProps> = ({
   const severityLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL' =
     riskScore >= 7 ? 'CRITICAL' : riskScore >= 5 ? 'HIGH' : riskScore >= 3 ? 'MODERATE' : 'LOW';
 
+  const warningTier: 'GREEN' | 'YELLOW' | 'RED' | 'CRITICAL' =
+    isExtremePosition || (isLeveraged && trade.leverageMultiplier >= 5) || (isLossChasing && isLargePosition)
+      ? 'CRITICAL'
+      : severityLevel === 'HIGH' || severityLevel === 'CRITICAL' || budgetBreaches.length > 0
+      ? 'RED'
+      : severityLevel === 'MODERATE'
+      ? 'YELLOW'
+      : 'GREEN';
+
   // Recommended safer quantity (5% - 8% of portfolio)
   const recommendedQty = Math.max(1, Math.floor((totalPortfolio * 0.08) / trade.price));
 
@@ -192,7 +201,7 @@ export const RiskRealityCheckModal: React.FC<RiskRealityCheckModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-mono font-bold text-xs uppercase tracking-wider">
-                  Risk Reality Assessment: {severityLevel} SEVERITY
+                  AI Risk Warning: {warningTier} ({severityLevel})
                 </span>
                 <Badge variant={severityLevel === 'CRITICAL' ? 'danger' : severityLevel === 'HIGH' ? 'warning' : 'secondary'} size="sm">
                   Risk Score: {riskScore}/10
@@ -479,6 +488,7 @@ export const RiskRealityCheckModal: React.FC<RiskRealityCheckModalProps> = ({
             <Button
               variant={severityLevel === 'CRITICAL' ? 'danger' : 'primary'}
               size="md"
+              disabled={warningTier === 'CRITICAL'}
               onClick={() => {
                 onConfirmTrade();
                 onClose();
@@ -486,7 +496,7 @@ export const RiskRealityCheckModal: React.FC<RiskRealityCheckModalProps> = ({
               icon={<CheckCircle2 size={15} />}
               className="w-1/2 sm:w-auto"
             >
-              I Understand Risks — Confirm Trade
+              {warningTier === 'CRITICAL' ? 'Blocked: Adjust Size / Leverage' : 'I Understand Risks — Confirm Trade'}
             </Button>
           </div>
         </div>
