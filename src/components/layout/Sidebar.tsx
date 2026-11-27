@@ -22,6 +22,7 @@ import {
   Bookmark,
   ShieldAlert,
   type LucideIcon,
+  Bot
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 
@@ -79,6 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
     id: 'learning',
     label: 'Learning',
     items: [
+      { name: 'AI Buddy', path: '/ai-buddy', icon: Bot, badge: 'FINANCE AI' },
       { name: 'Learn & Teach Academy', path: '/academy', icon: GraduationCap },
       { name: 'Behavioral Insights', path: '/behavioral-insights', icon: BrainCircuit },
       { name: 'Skill Assessment', path: '/onboarding', icon: Compass },

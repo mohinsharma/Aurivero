@@ -24,7 +24,8 @@ import {
   RotateCcw,
   Compass,
   Award,
-  Target
+  Target,
+  Bot
 } from 'lucide-react';
 import { useSimulator } from '../context/SimulatorContext';
 import { StatCard } from '../components/common/StatCard';
@@ -109,6 +110,16 @@ export const DashboardPage: React.FC = () => {
               </span>
             </div>
           </div>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => navigate('/ai-buddy')}
+            className="text-xs font-mono shadow-glow"
+          >
+            <Bot size={14} className="mr-1.5" />
+            Ask AI Buddy
+          </Button>
 
           <Button
             variant="outline"

@@ -187,6 +187,28 @@ class AITradeDebriefRequest(BaseModel):
     has_stop_loss: bool
     is_after_loss: bool
 
+# -----------------------------------------------------------------------------
+# MINDMARK AI BUDDY — FINANCE-ONLY CHATBOT
+# -----------------------------------------------------------------------------
+class AIBuddyHistoryItem(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., max_length=4000)
+
+class AIBuddyContext(BaseModel):
+    current_page: Optional[str] = None
+    learning_level: Optional[str] = None
+    completed_topics: Optional[List[str]] = None
+    selected_stock: Optional[str] = None
+    selected_stock_data: Optional[Dict[str, Any]] = None
+    replay_scenario: Optional[str] = None
+    replay_checkpoint: Optional[str] = None
+    allow_portfolio_access: bool = True
+
+class AIBuddyChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000)
+    history: List[AIBuddyHistoryItem] = Field(default_factory=list, max_length=20)
+    context: Optional[AIBuddyContext] = None
+
 class StandardAPIResponse(BaseModel):
     success: bool
     data: Optional[Any] = None
@@ -227,9 +249,26 @@ class BookmarkToggleRequest(BaseModel):
 class ForumThreadCreate(BaseModel):
     category: str
     subcategory: str
+    post_type: Literal[
+        "QUESTION", "EXPERIENCE", "SCAM_ALERT", "PRODUCT_REVIEW",
+        "POLL", "EDUCATIONAL", "FEEDBACK", "DISCUSSION"
+    ] = "QUESTION"
+    intent_badge: Optional[str] = None
+    region: str = "India / INR"
+    is_anonymous: bool = False
+    related_course_id: Optional[str] = None
+    disclosure_text: Optional[str] = None
     title: str = Field(..., min_length=5, max_length=180)
     content: str = Field(..., min_length=10)
     tags: str = "general"
+
+class ForumPrecheckRequest(BaseModel):
+    title: str = ""
+    content: str = ""
+    category: Optional[str] = None
+
+class ForumAcceptAnswerRequest(BaseModel):
+    comment_id: str
 
 class ForumCommentCreate(BaseModel):
     thread_id: str
@@ -246,6 +285,11 @@ class ForumReportRequest(BaseModel):
     content_id: str
     reason: str
     details: Optional[str] = None
+
+class ForumAppealCreate(BaseModel):
+    content_type: Literal["THREAD", "COMMENT"]
+    content_id: str
+    reason: str = Field(..., min_length=10, max_length=500)
 
 # 3. Academy
 class CourseCreateRequest(BaseModel):
@@ -289,6 +333,11 @@ class WatchlistAddRequest(BaseModel):
 class ModerationActionRequest(BaseModel):
     content_type: Literal["THREAD", "COMMENT", "REPORT"]
     content_id: str
-    action: Literal["APPROVE", "DELETE", "LOCK", "PIN", "DISMISS"]
+    action: Literal["APPROVE", "DELETE", "LOCK", "PIN", "DISMISS", "QUARANTINE"]
+    policy_citation: Optional[str] = None
     moderator_notes: Optional[str] = None
+
+class AppealResolveRequest(BaseModel):
+    status: Literal["APPROVED", "REJECTED"]
+    reviewer_notes: Optional[str] = None
 

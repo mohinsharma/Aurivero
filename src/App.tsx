@@ -23,6 +23,7 @@ import { PersonalHubPage } from './pages/PersonalHubPage';
 import { AdminPage } from './pages/AdminPage';
 import { MarketsPage } from './pages/MarketsPage';
 import { InstrumentDetailPage } from './pages/InstrumentDetailPage';
+import { AIBuddyPage } from './pages/AIBuddyPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 const HeatmapPage = lazy(() => import('./pages/HeatmapPage').then((m) => ({ default: m.HeatmapPage })));
@@ -46,6 +47,7 @@ export const App: React.FC = () => {
             {/* Main App Layout Shell with Collapsible Sidebar & Persistent Header */}
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/ai-buddy" element={<AIBuddyPage />} />
               <Route path="/learn" element={<LearnPage />} />
               <Route path="/simulator" element={<SimulatorPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />

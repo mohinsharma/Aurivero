@@ -186,6 +186,16 @@ def init_db():
         author_role TEXT DEFAULT 'Learner',
         category TEXT NOT NULL,
         subcategory TEXT NOT NULL,
+        post_type TEXT DEFAULT 'DISCUSSION',
+        intent_badge TEXT DEFAULT 'Discussion',
+        region TEXT DEFAULT 'Global',
+        origin_label TEXT DEFAULT 'User Opinion',
+        is_anonymous INTEGER DEFAULT 0,
+        has_accepted_answer INTEGER DEFAULT 0,
+        accepted_comment_id TEXT,
+        related_course_id TEXT,
+        disclosure_text TEXT,
+        flags_count INTEGER DEFAULT 0,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
         tags TEXT NOT NULL,
@@ -200,6 +210,24 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users (id)
     );
     """)
+
+    # Safely migrate existing forum_threads table if columns are missing
+    for alter_sql in [
+        "ALTER TABLE forum_threads ADD COLUMN post_type TEXT DEFAULT 'DISCUSSION';",
+        "ALTER TABLE forum_threads ADD COLUMN intent_badge TEXT DEFAULT 'Discussion';",
+        "ALTER TABLE forum_threads ADD COLUMN region TEXT DEFAULT 'Global';",
+        "ALTER TABLE forum_threads ADD COLUMN origin_label TEXT DEFAULT 'User Opinion';",
+        "ALTER TABLE forum_threads ADD COLUMN is_anonymous INTEGER DEFAULT 0;",
+        "ALTER TABLE forum_threads ADD COLUMN has_accepted_answer INTEGER DEFAULT 0;",
+        "ALTER TABLE forum_threads ADD COLUMN accepted_comment_id TEXT;",
+        "ALTER TABLE forum_threads ADD COLUMN related_course_id TEXT;",
+        "ALTER TABLE forum_threads ADD COLUMN disclosure_text TEXT;",
+        "ALTER TABLE forum_threads ADD COLUMN flags_count INTEGER DEFAULT 0;",
+    ]:
+        try:
+            cursor.execute(alter_sql)
+        except Exception:
+            pass
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS forum_comments (
@@ -247,9 +275,41 @@ def init_db():
         content_type TEXT NOT NULL,
         content_id TEXT NOT NULL,
         reason TEXT NOT NULL,
+        severity TEXT DEFAULT 'MEDIUM',
         details TEXT,
         status TEXT DEFAULT 'PENDING',
         moderator_notes TEXT,
+        created_at TEXT NOT NULL
+    );
+    """)
+    try:
+        cursor.execute("ALTER TABLE content_reports ADD COLUMN severity TEXT DEFAULT 'MEDIUM';")
+    except Exception:
+        pass
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS moderation_audit_logs (
+        id TEXT PRIMARY KEY,
+        moderator_id TEXT NOT NULL,
+        moderator_name TEXT NOT NULL,
+        content_type TEXT NOT NULL,
+        content_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        policy_citation TEXT,
+        notes TEXT,
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS moderation_appeals (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        content_type TEXT NOT NULL,
+        content_id TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        status TEXT DEFAULT 'PENDING',
+        reviewer_notes TEXT,
         created_at TEXT NOT NULL
     );
     """)
@@ -912,6 +972,60 @@ def seed_ecosystem_data(conn):
         INSERT INTO forum_comments (id, thread_id, parent_id, user_id, author_name, author_role, content, upvotes_count, is_solution, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, comments)
+
+    # 3b. Ensure 6 Launch Starter Spaces threads exist
+    cursor.execute("SELECT id FROM forum_threads WHERE id = 'thread-5'")
+    if not cursor.fetchone():
+        starter_threads = [
+            (
+                "thread-5", demo_user_id, "Arjun Sharma", "ADMIN",
+                "Money Basics & Personal Finance", "Emergency Funds & Insurance",
+                "EDUCATIONAL", "Educational", "India / INR", "Official MINDMARK", 0, 1, "comm-5-1", None, None,
+                "Start Here: Building a 6-Month Emergency Fund Before Investing a Single Rupee",
+                "Welcome to Money Basics! Before buying stocks, mutual funds, or crypto, protect your downside:\n1. Calculate 6 months of non-negotiable expenses (rent, groceries, EMIs).\n2. Keep this buffer in a high-liquidity savings account or liquid fund—not volatile equities.\n3. Never share account numbers, UPI PINs, or OTPs in this forum.",
+                "emergency-fund,beginners,start-here", 42, 1, 520, 1, 0, "PUBLISHED", now, now
+            ),
+            (
+                "thread-6", demo_user_id, "Neha Kapoor", "Contributor",
+                "Indian Equities & Mutual Funds", "Index Funds & Mutual Funds",
+                "QUESTION", "Question / Help", "India / INR", "User Opinion", 0, 0, None, None, None,
+                "Nifty 50 Index SIP vs. Flexi-Cap: How do you avoid portfolio overlap?",
+                "I have been running a ₹10,000/month Nifty 50 SIP in my paper simulation and noticed my flexi-cap fund also holds HDFC Bank, Reliance, and Infosys in its top 5. Should beginners stick to one broad index fund first?",
+                "nifty50,mutual-funds,sip,portfolio-overlap", 19, 0, 210, 0, 0, "PUBLISHED", now, now
+            ),
+            (
+                "thread-7", demo_user_id, "Trust & Safety Team", "ADMIN",
+                "Scam Alerts & Fraud Watch", "Fake Tipsters & Guaranteed Returns",
+                "SCAM_ALERT", "Scam / Fraud Alert", "India / INR", "Official MINDMARK", 0, 0, None, None, None,
+                "[SCAM ALERT] How to Spot Fake 'SEBI-Registered' Telegram Channels & Wallet Drainers",
+                "Red flags to report immediately using the Flag button:\n- Anyone promising '15-30% guaranteed monthly returns' or 'double your capital'.\n- Direct messages claiming to be MINDMARK Support asking for seed phrases, passwords, or OTPs.\n- Unsolicited referral links or 'VIP signal' groups.\n\nMINDMARK staff will NEVER DM you or ask for money.",
+                "scam-alert,sebi,phishing,safety", 67, 0, 890, 1, 0, "PUBLISHED", now, now
+            )
+        ]
+        cursor.executemany("""
+        INSERT INTO forum_threads (
+            id, user_id, author_name, author_role, category, subcategory,
+            post_type, intent_badge, region, origin_label, is_anonymous,
+            has_accepted_answer, accepted_comment_id, related_course_id, disclosure_text,
+            title, content, tags, upvotes_count, replies_count, views_count,
+            is_pinned, is_locked, status, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, starter_threads)
+
+        cursor.execute("""
+        INSERT OR IGNORE INTO forum_comments (id, thread_id, parent_id, user_id, author_name, author_role, content, upvotes_count, is_solution, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            "comm-5-1", "thread-5", None, demo_user_id, "Dr. Priya Venkat", "Web3 Architect",
+            "Great foundational checklist. Having a 6-month liquid buffer is also the #1 psychological defense against panic selling during a 30% market drawdown.",
+            18, 1, now
+        ))
+
+        # Enrich original threads with intent badges, origin labels, and course links
+        cursor.execute("UPDATE forum_threads SET post_type='EDUCATIONAL', intent_badge='Educational', region='Crypto-Native', origin_label='Verified Experience', related_course_id='course-blockchain-101', has_accepted_answer=1, accepted_comment_id='comm-1-1' WHERE id='thread-1'")
+        cursor.execute("UPDATE forum_threads SET post_type='DISCUSSION', intent_badge='Discussion', region='Global', origin_label='User Opinion', related_course_id='course-crypto-101', has_accepted_answer=1, accepted_comment_id='comm-2-1' WHERE id='thread-2'")
+        cursor.execute("UPDATE forum_threads SET post_type='DISCUSSION', intent_badge='Discussion', region='India / INR', origin_label='User Opinion', related_course_id='course-forex-101' WHERE id='thread-3'")
+        cursor.execute("UPDATE forum_threads SET post_type='EDUCATIONAL', intent_badge='Educational', region='Crypto-Native', origin_label='Verified Experience', related_course_id='course-blockchain-101' WHERE id='thread-4'")
 
     # 4. Watchlist Seeds
     cursor.execute("SELECT COUNT(*) FROM user_watchlists")

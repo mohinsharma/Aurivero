@@ -20,7 +20,8 @@ import {
   MessageSquare,
   GraduationCap,
   Bookmark,
-  ShieldAlert
+  ShieldAlert,
+  Bot
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 
@@ -42,6 +43,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
 
   const fullDrawerItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'MINDMARK AI Buddy', path: '/ai-buddy', icon: Bot },
     { name: 'Markets (Stocks, Crypto, FX)', path: '/markets', icon: Coins },
     { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: PieChart },
     { name: 'Market Screener', path: '/markets/screener', icon: Compass },

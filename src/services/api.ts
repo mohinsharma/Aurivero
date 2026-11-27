@@ -238,10 +238,23 @@ class ApiClient {
   // 11. Community Forums Endpoints
   public forums = {
     getCategories: () => this.request<any>('/api/forums/categories'),
-    getThreads: (params: { category?: string; subcategory?: string; search?: string; sort_by?: string; limit?: number; offset?: number } = {}) => {
+    getThreads: (params: {
+      category?: string;
+      subcategory?: string;
+      intent?: string;
+      region?: string;
+      unanswered?: boolean;
+      search?: string;
+      sort_by?: string;
+      limit?: number;
+      offset?: number;
+    } = {}) => {
       const q = new URLSearchParams();
       if (params.category && params.category !== 'All') q.append('category', params.category);
       if (params.subcategory && params.subcategory !== 'All') q.append('subcategory', params.subcategory);
+      if (params.intent && params.intent !== 'All') q.append('intent', params.intent);
+      if (params.region && params.region !== 'All') q.append('region', params.region);
+      if (params.unanswered) q.append('unanswered', 'true');
       if (params.search) q.append('search', params.search);
       if (params.sort_by) q.append('sort_by', params.sort_by);
       if (params.limit) q.append('limit', params.limit.toString());
@@ -250,9 +263,29 @@ class ApiClient {
       return this.request<any>(qs ? `/api/forums/threads?${qs}` : '/api/forums/threads');
     },
     getThreadDetail: (threadId: string) => this.request<any>(`/api/forums/threads/${threadId}`),
-    createThread: (payload: { category: string; subcategory: string; title: string; content: string; tags: string }) => this.request<any>('/api/forums/threads', {
+    precheck: (payload: { title: string; content: string; category?: string }) => this.request<any>('/api/forums/precheck', {
       method: 'POST',
       body: JSON.stringify(payload)
+    }),
+    createThread: (payload: {
+      category: string;
+      subcategory: string;
+      post_type?: string;
+      intent_badge?: string;
+      region?: string;
+      is_anonymous?: boolean;
+      related_course_id?: string;
+      disclosure_text?: string;
+      title: string;
+      content: string;
+      tags: string;
+    }) => this.request<any>('/api/forums/threads', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    acceptAnswer: (threadId: string, commentId: string) => this.request<any>(`/api/forums/threads/${threadId}/accept-answer`, {
+      method: 'POST',
+      body: JSON.stringify({ comment_id: commentId })
     }),
     addComment: (payload: { thread_id: string; parent_id?: string; content: string }) => this.request<any>('/api/forums/comments', {
       method: 'POST',
@@ -262,11 +295,14 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(payload)
     }),
-    toggleBookmark: (threadId: string) => this.request<any>('/api/forums/bookmark', {
-      method: 'POST',
-      body: JSON.stringify({ thread_id: threadId })
+    toggleBookmark: (threadId: string) => this.request<any>(`/api/forums/bookmark?thread_id=${encodeURIComponent(threadId)}`, {
+      method: 'POST'
     }),
     report: (payload: { content_type: 'THREAD' | 'COMMENT'; content_id: string; reason: string; details?: string }) => this.request<any>('/api/forums/report', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    submitAppeal: (payload: { content_type: 'THREAD' | 'COMMENT'; content_id: string; reason: string }) => this.request<any>('/api/forums/appeal', {
       method: 'POST',
       body: JSON.stringify(payload)
     })
@@ -322,7 +358,20 @@ class ApiClient {
   public admin = {
     getStats: () => this.request<any>('/api/admin/stats'),
     getReports: (status?: string) => this.request<any>(status ? `/api/admin/reports?status=${status}` : '/api/admin/reports'),
-    moderate: (payload: { content_type: 'THREAD' | 'COMMENT' | 'REPORT'; content_id: string; action: 'APPROVE' | 'DELETE' | 'LOCK' | 'PIN' | 'DISMISS'; moderator_notes?: string }) => this.request<any>('/api/admin/moderate', {
+    getQuarantined: () => this.request<any>('/api/admin/quarantined'),
+    getAuditLogs: (limit?: number) => this.request<any>(limit ? `/api/admin/audit-logs?limit=${limit}` : '/api/admin/audit-logs'),
+    getAppeals: () => this.request<any>('/api/admin/appeals'),
+    resolveAppeal: (appealId: string, status: 'APPROVED' | 'REJECTED', reviewer_notes?: string) => this.request<any>(`/api/admin/appeals/${appealId}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify({ status, reviewer_notes })
+    }),
+    moderate: (payload: {
+      content_type: 'THREAD' | 'COMMENT' | 'REPORT';
+      content_id: string;
+      action: 'APPROVE' | 'DELETE' | 'LOCK' | 'PIN' | 'DISMISS' | 'QUARANTINE';
+      policy_citation?: string;
+      moderator_notes?: string;
+    }) => this.request<any>('/api/admin/moderate', {
       method: 'POST',
       body: JSON.stringify(payload)
     }),
@@ -499,6 +548,29 @@ class ApiClient {
         body: JSON.stringify(payload),
       }),
     listBookmarks: () => this.request<any>('/api/financial-news/bookmarks'),
+  };
+
+  // 19. MINDMARK AI Buddy — Finance-Only Gemini Chatbot
+  public aiBuddy = {
+    getStatus: () => this.request<any>('/api/ai-buddy/status'),
+    chat: (payload: {
+      message: string;
+      history: { role: 'user' | 'assistant'; content: string }[];
+      context?: {
+        current_page?: string;
+        learning_level?: string;
+        completed_topics?: string[];
+        selected_stock?: string;
+        selected_stock_data?: Record<string, any>;
+        replay_scenario?: string;
+        replay_checkpoint?: string;
+        allow_portfolio_access?: boolean;
+      };
+    }) =>
+      this.request<any>('/api/ai-buddy/chat', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
   };
 }
 

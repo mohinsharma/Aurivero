@@ -298,8 +298,45 @@ def run_all_tests():
     assert admin_stats["total_users"] >= 1
     print(f"✓ [GET /api/admin/stats] Admin verified platform health: {admin_stats['platform_health']}.")
 
+    # 25. Forum Safety Scanner, Duplicate Check & Accepted Solution
+    res = client.get("/api/forums/categories")
+    assert res.status_code == 200
+    assert len(res.json()["data"]["categories"]) == 6
+
+    pre_unsafe = client.post("/api/forums/precheck", json={
+        "title": "Guaranteed profit scheme",
+        "content": "DM me on t.me/scamgroup with account 123456789012"
+    }).json()["data"]
+    assert pre_unsafe["safe"] is False
+    assert len(pre_unsafe["blockers"]) >= 2
+
+    blocked_post = client.post("/api/forums/threads", json={
+        "category": "Cryptocurrency",
+        "subcategory": "Bitcoin",
+        "post_type": "DISCUSSION",
+        "title": "Join for guaranteed profit",
+        "content": "Guaranteed return 20% monthly via t.me/vip"
+    }, headers=headers)
+    assert blocked_post.status_code == 400
+
+    pre_dup = client.post("/api/forums/precheck", json={
+        "title": "EIP-4844 Blobspace Rollup Economics",
+        "content": "Checking gas fees"
+    }).json()["data"]
+    assert pre_dup["safe"] is True
+    assert len(pre_dup["related_threads"]) >= 1
+
+    # Test Accepted Solution
+    accept_res = client.post(
+        f"/api/forums/threads/{first_thread_id}/accept-answer",
+        json={"comment_id": comment_res.json()["data"]["comment_id"]},
+        headers=headers
+    )
+    assert accept_res.status_code == 200
+    print("✓ [Forum Safety & Quality] 6 Starter Spaces, PII/Scam Blocker, Duplicate Check & Accepted Solution verified.")
+
     print("=" * 70)
-    print("🎉 ALL 24 BACKEND API ENDPOINTS & LOGIC TESTS PASSED PERFECTLY!")
+    print("🎉 ALL 25 BACKEND API ENDPOINTS & SAFETY TESTS PASSED PERFECTLY!")
     print("=" * 70)
 
 if __name__ == "__main__":

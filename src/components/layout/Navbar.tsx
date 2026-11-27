@@ -11,7 +11,8 @@ import {
   ShieldAlert,
   Wallet,
   Sparkles,
-  User
+  User,
+  Bot
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 import { INDIAN_INDICES } from '../../data/mockData';
@@ -198,6 +199,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
                 <RotateCcw size={13} />
               </button>
             </div>
+
+            {/* AI Buddy Quick Access Button */}
+            <Link
+              to="/ai-buddy"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-mono font-bold transition-colors"
+              title="Open MINDMARK AI Buddy (Finance Assistant)"
+            >
+              <Bot size={16} />
+              <span className="hidden sm:inline">AI Buddy</span>
+            </Link>
 
             {/* Notifications Button */}
             <div className="relative">

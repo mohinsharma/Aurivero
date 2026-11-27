@@ -44,7 +44,10 @@ class Settings(BaseSettings):
         return bool(self.SUPABASE_URL and self.SUPABASE_KEY and self.SUPABASE_URL.strip())
 
     class Config:
-        env_file = ".env"
+        env_file = (
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"),
+            ".env",
+        )
         extra = "ignore"
 
 settings = Settings()
