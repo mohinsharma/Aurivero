@@ -61,4 +61,48 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .ticker-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Bloomberg-style Left-to-Right infinite marquee */
+@keyframes tickerScrollLTR {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tickerFlashUp {
+  0% { background-color: rgba(69, 214, 181, 0.28); }
+  100% { background-color: transparent; }
+}
+
+@keyframes tickerFlashDown {
+  0% { background-color: rgba(241, 109, 117, 0.28); }
+  100% { background-color: transparent; }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: tickerScrollLTR 42s linear infinite;
+}
+
+.ticker-wrap:hover .ticker-track,
+.ticker-track[data-paused="true"] {
+  animation-play-state: paused;
+}
+
+.ticker-flash-up {
+  animation: tickerFlashUp 0.9s ease-out;
+}
+
+.ticker-flash-down {
+  animation: tickerFlashDown 0.9s ease-out;
 }

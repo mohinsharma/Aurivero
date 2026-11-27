@@ -58,6 +58,7 @@ INDIAN_STOCK_DIRECTORY: List[Dict[str, Any]] = [
     {"symbol": "NIFTY50", "displaySymbol": "NIFTY 50", "name": "NIFTY 50 Index", "exchange": "NSE", "providerSymbol": "^NSEI", "sector": "Index", "isIndex": True, "description": "Benchmark Indian equity index representing the weighted average of 50 of the largest Indian companies on NSE."},
     {"symbol": "BANKNIFTY", "displaySymbol": "BANK NIFTY", "name": "NIFTY Bank Index", "exchange": "NSE", "providerSymbol": "^NSEBANK", "sector": "Index", "isIndex": True, "description": "Index comprising the most liquid and large-capitalized Indian banking stocks on NSE."},
     {"symbol": "SENSEX", "displaySymbol": "SENSEX", "name": "BSE SENSEX Index", "exchange": "BSE", "providerSymbol": "^BSESN", "sector": "Index", "isIndex": True, "description": "Free-float market-weighted stock market index of 30 well-established companies listed on the Bombay Stock Exchange."},
+    {"symbol": "INDIAVIX", "displaySymbol": "INDIA VIX", "name": "India Volatility Index", "exchange": "NSE", "providerSymbol": "^INDIAVIX", "sector": "Index", "isIndex": True, "description": "NSE volatility index measuring expected 30-day annualized market volatility."},
     # NSE Equities
     {"symbol": "RELIANCE", "displaySymbol": "RELIANCE", "name": "Reliance Industries Ltd.", "exchange": "NSE", "providerSymbol": "RELIANCE.NS", "sector": "Energy & Retail", "isIndex": False, "description": "India's largest private-sector enterprise across energy, petrochemicals, retail, and Jio digital services."},
     {"symbol": "TCS", "displaySymbol": "TCS", "name": "Tata Consultancy Services Ltd.", "exchange": "NSE", "providerSymbol": "TCS.NS", "sector": "Information Technology", "isIndex": False, "description": "Flagship IT services, consulting, and enterprise solutions leader of the Tata Group."},
@@ -308,6 +309,9 @@ class IndianStocksProvider(BaseMarketProvider):
             "^NSEBANK": "BANKNIFTY",
             "SENSEX": "SENSEX",
             "^BSESN": "SENSEX",
+            "INDIAVIX": "INDIAVIX",
+            "INDIA VIX": "INDIAVIX",
+            "^INDIAVIX": "INDIAVIX",
         }
         target = aliases.get(clean, clean)
         for item in INDIAN_STOCK_DIRECTORY:

@@ -43,6 +43,30 @@ def _enforce_rate_limit(request: Request, scope: str) -> None:
         )
 
 
+@router.get("/ticker", response_model=StandardAPIResponse)
+async def get_live_market_ticker(request: Request):
+    _enforce_rate_limit(request, "ticker")
+    indices_syms = ["NIFTY50", "SENSEX", "BANKNIFTY", "INDIAVIX"]
+    crypto_syms = ["BTCUSDT", "ETHUSDT"]
+    forex_syms = ["USDINR", "EURUSD"]
+
+    idx_q, crp_q, fx_q = await asyncio.gather(
+        asyncio.gather(*(stocks_provider.get_quote(s) for s in indices_syms)),
+        asyncio.gather(*(crypto_provider.get_quote(s) for s in crypto_syms)),
+        asyncio.gather(*(forex_provider.get_quote(s) for s in forex_syms)),
+    )
+
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "indices": [q.model_dump() for q in idx_q],
+            "crypto": [q.model_dump() for q in crp_q],
+            "forex": [q.model_dump() for q in fx_q],
+            "indianSession": get_indian_market_session_details(),
+        },
+    )
+
+
 @router.get("/overview", response_model=StandardAPIResponse)
 async def get_market_overview(request: Request):
     _enforce_rate_limit(request, "overview")

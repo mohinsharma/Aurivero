@@ -15,10 +15,10 @@ import {
   Bot
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
-import { INDIAN_INDICES } from '../../data/mockData';
 import { SearchModal } from '../common/SearchModal';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import { LiveMarketTicker } from '../markets/LiveMarketTicker';
 import { api } from '../../services/api';
 
 interface NavbarProps {
@@ -58,62 +58,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
     setIsResetModalOpen(false);
   };
 
-  // Cross-market ticker items
-  const cryptoForexTickers = [
-    { name: 'BTC/USD', value: '$68,420.50', change: '+3.42%', isUp: true },
-    { name: 'ETH/USD', value: '$3,580.20', change: '+2.15%', isUp: true },
-    { name: 'USD/INR', value: '₹83.48', change: '+0.05%', isUp: true },
-    { name: 'EUR/USD', value: '$1.0845', change: '-0.20%', isUp: false },
-  ];
-
   return (
     <>
       <header className="sticky top-0 z-30 w-full border-b border-border/80 bg-surface/90 backdrop-blur-md">
-        {/* Top Mini Ticker Strip */}
-        <div className="hidden lg:flex items-center justify-between px-6 py-1 border-b border-border/40 text-[11px] font-mono bg-background/50 text-text-secondary overflow-x-auto">
-          <div className="flex items-center gap-6">
-            <span className="flex items-center gap-1.5 text-primary font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              NSE / BSE LIVE (SIMULATED)
-            </span>
-
-            {INDIAN_INDICES.map((idx) => {
-              const isUp = idx.change >= 0;
-              return (
-                <div key={idx.name} className="flex items-center gap-1.5">
-                  <span className="text-text-muted">{idx.name}:</span>
-                  <span className="font-semibold text-text-primary">{idx.value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                  <span className={`inline-flex items-center text-[10px] ${isUp ? 'text-primary' : 'text-danger'}`}>
-                    {isUp ? <TrendingUp size={11} className="mr-0.5" /> : <TrendingDown size={11} className="mr-0.5" />}
-                    {isUp ? '+' : ''}{idx.changePercent.toFixed(2)}%
-                  </span>
-                </div>
-              );
-            })}
-
-            {/* Crypto & Forex Live Quotes */}
-            <span className="h-3 w-px bg-border/60" />
-            <span className="text-secondary font-semibold">CRYPTO & FX:</span>
-            {cryptoForexTickers.map((item) => (
-              <div key={item.name} className="flex items-center gap-1.5">
-                <span className="text-text-muted">{item.name}:</span>
-                <span className="font-semibold text-text-primary">{item.value}</span>
-                <span className={`inline-flex items-center text-[10px] ${item.isUp ? 'text-primary' : 'text-danger'}`}>
-                  {item.isUp ? <TrendingUp size={11} className="mr-0.5" /> : <TrendingDown size={11} className="mr-0.5" />}
-                  {item.change}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-4 text-text-muted">
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-              IST 09:15 – 15:30 Regular Market Session
-            </span>
-            <span className="text-warning/80">SEBI Sandbox Educational Environment</span>
-          </div>
-        </div>
+        {/* Live Left-to-Right Bloomberg-Style Market Ticker */}
+        <LiveMarketTicker />
 
         {/* Main Navbar */}
         <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">

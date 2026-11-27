@@ -383,6 +383,7 @@ class ApiClient {
 
   // 15. Unified Multi-Asset Markets Endpoints
   public markets = {
+    getTicker: () => this.request<any>('/api/markets/ticker'),
     getOverview: () => this.request<any>('/api/markets/overview'),
     search: (q: string, assetClass?: string, limit = 15) => {
       const params = new URLSearchParams();

@@ -420,3 +420,17 @@ def test_historical_risk_analytics_and_ml_walk_forward():
     assert mdata["evaluation"]["testSamples"] > 0
     assert mdata["evaluation"]["modelMaePct"] >= 0
     assert mdata["evaluation"]["baselineMaePct"] >= 0
+
+
+def test_live_market_ticker_endpoint():
+    res = client.get("/api/markets/ticker")
+    assert res.status_code == 200
+    data = res.json()["data"]
+    assert [q["symbol"] for q in data["indices"]] == ["NIFTY50", "SENSEX", "BANKNIFTY", "INDIAVIX"]
+    assert [q["symbol"] for q in data["crypto"]] == ["BTCUSDT", "ETHUSDT"]
+    assert [q["symbol"] for q in data["forex"]] == ["USDINR", "EURUSD"]
+    assert data["indianSession"]["timezone"] == "Asia/Kolkata"
+    assert data["indianSession"]["utcOffset"] == "+05:30"
+    for idx_q in data["indices"]:
+        assert idx_q["status"] != "LIVE"
+        assert idx_q["price"] is not None and idx_q["price"] > 0
