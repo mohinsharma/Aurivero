@@ -12,7 +12,13 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from backend.app.main import app
-from backend.app.services.providers.base import CandleSeriesResponse, NormalizedCandle, NormalizedQuote, utc_now_iso
+from backend.app.services.providers.base import (
+    CandleSeriesResponse,
+    NormalizedCandle,
+    NormalizedQuote,
+    utc_now_iso,
+    validate_and_normalize_candles,
+)
 from backend.app.services.providers.cache_and_limiter import market_cache
 from backend.app.services.providers.stocks_provider import get_indian_market_session
 
@@ -236,3 +242,38 @@ def test_websocket_crypto_live_stream():
         assert received_tick["status"] == "LIVE"
         assert received_tick["source"] == "Binance WebSocket"
         assert received_tick["price"] > 0
+
+
+def test_universal_search_international_and_altcoins():
+    # International stock via Yahoo Finance Search
+    r_aapl = client.get("/api/markets/search?q=AAPL&asset_class=STOCK")
+    assert r_aapl.status_code == 200
+    assert any(r["symbol"] == "AAPL" for r in r_aapl.json()["data"]["results"])
+
+    # Altcoin via Binance ExchangeInfo
+    r_doge = client.get("/api/markets/search?q=PEPE&asset_class=CRYPTO")
+    assert r_doge.status_code == 200
+    assert any("PEPE" in r["symbol"] for r in r_doge.json()["data"]["results"])
+
+
+def test_groww_historical_ranges_and_candle_validation():
+    for r_key in ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y", "ALL"]:
+        res = client.get(f"/api/markets/candles/CRYPTO/BTCUSDT?range={r_key}&limit=100")
+        assert res.status_code == 200
+        data = res.json()["data"]
+        assert data["range"] == r_key
+        assert len(data["candles"]) > 0
+
+    # Invalid range returns 400
+    bad = client.get("/api/markets/candles/CRYPTO/BTCUSDT?range=10Y")
+    assert bad.status_code == 400
+
+    # Candle validation rejects malformed candles and deduplicates/sorts
+    validated = validate_and_normalize_candles([
+        NormalizedCandle(time=200, open=10, high=12, low=9, close=11, volume=5),
+        NormalizedCandle(time=100, open=10, high=11, low=9, close=10.5, volume=3),
+        NormalizedCandle(time=150, open=10, high=8, low=9, close=10, volume=1),   # invalid high < low
+        NormalizedCandle(time=160, open=15, high=12, low=9, close=10, volume=1),  # invalid open > high
+        NormalizedCandle(time=-5, open=10, high=12, low=9, close=10, volume=1),   # invalid timestamp
+    ])
+    assert [c.time for c in validated] == [100, 200]

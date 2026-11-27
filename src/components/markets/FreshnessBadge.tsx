@@ -31,6 +31,11 @@ export const FreshnessBadge: React.FC<FreshnessBadgeProps> = ({
       classes: 'bg-warning/15 text-warning border-warning/30',
       icon: <Clock size={11} />,
     },
+    POLLING: {
+      label: 'POLLING',
+      classes: 'bg-warning/15 text-warning border-warning/30',
+      icon: <Clock size={11} />,
+    },
     CACHED: {
       label: 'CACHED',
       classes: 'bg-secondary/15 text-secondary border-secondary/30',
@@ -40,6 +45,16 @@ export const FreshnessBadge: React.FC<FreshnessBadgeProps> = ({
       label: 'MARKET CLOSED',
       classes: 'bg-surface-elevated text-text-secondary border-border',
       icon: <Moon size={11} />,
+    },
+    HISTORICAL: {
+      label: 'HISTORICAL',
+      classes: 'bg-surface-elevated text-text-secondary border-border',
+      icon: <Database size={11} />,
+    },
+    CONNECTION_LOST: {
+      label: 'CONNECTION LOST',
+      classes: 'bg-danger/15 text-danger border-danger/30',
+      icon: <AlertTriangle size={11} />,
     },
     UNAVAILABLE: {
       label: 'UNAVAILABLE',

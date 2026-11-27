@@ -1,13 +1,28 @@
 export type DataFreshnessStatus =
   | 'LIVE'
   | 'DELAYED'
+  | 'POLLING'
   | 'CACHED'
   | 'MARKET_CLOSED'
+  | 'HISTORICAL'
+  | 'CONNECTION_LOST'
   | 'UNAVAILABLE';
 
 export type AssetClass = 'STOCK' | 'CRYPTO' | 'FOREX';
 
 export type Timeframe = '1m' | '5m' | '15m' | '30m' | '1h' | '4h' | '1d' | '1w';
+
+export type HistoricalRange =
+  | '1D'
+  | '1W'
+  | '1M'
+  | '3M'
+  | '6M'
+  | 'YTD'
+  | '1Y'
+  | '3Y'
+  | '5Y'
+  | 'ALL';
 
 export const SUPPORTED_TIMEFRAMES: Timeframe[] = [
   '1m',
@@ -19,6 +34,32 @@ export const SUPPORTED_TIMEFRAMES: Timeframe[] = [
   '1d',
   '1w',
 ];
+
+export const SUPPORTED_RANGES: HistoricalRange[] = [
+  '1D',
+  '1W',
+  '1M',
+  '3M',
+  '6M',
+  'YTD',
+  '1Y',
+  '3Y',
+  '5Y',
+  'ALL',
+];
+
+export const RANGE_DEFAULT_TIMEFRAME: Record<HistoricalRange, Timeframe> = {
+  '1D': '5m',
+  '1W': '15m',
+  '1M': '1h',
+  '3M': '4h',
+  '6M': '1d',
+  YTD: '1d',
+  '1Y': '1d',
+  '3Y': '1w',
+  '5Y': '1w',
+  ALL: '1w',
+};
 
 export interface InstrumentMeta {
   symbol: string;
@@ -81,6 +122,8 @@ export interface CandleSeriesResponse {
   symbol: string;
   assetClass: AssetClass;
   timeframe: Timeframe;
+  range?: HistoricalRange | null;
+  rangeReturnPercent?: number | null;
   exchange: string;
   currency: string;
   candles: NormalizedCandle[];

@@ -11,12 +11,15 @@ from backend.app.services.providers.base import (
     BaseMarketProvider,
     CandleSeriesResponse,
     DataFreshnessStatus,
+    HistoricalRange,
     InstrumentMeta,
     NormalizedCandle,
     NormalizedQuote,
     ProviderHealth,
     Timeframe,
+    compute_range_window,
     utc_now_iso,
+    validate_and_normalize_candles,
 )
 from backend.app.services.providers.cache_and_limiter import CircuitBreaker, market_cache
 from backend.app.services.providers.stocks_provider import (
@@ -324,6 +327,7 @@ class ForexMarketProvider(BaseMarketProvider):
         timeframe: Timeframe = "1d",
         limit: int = 200,
         before: Optional[int] = None,
+        range_key: Optional[HistoricalRange] = None,
     ) -> CandleSeriesResponse:
         meta = await self.get_metadata(symbol)
         if meta is None:
@@ -331,6 +335,7 @@ class ForexMarketProvider(BaseMarketProvider):
                 symbol=symbol.upper(),
                 assetClass="FOREX",
                 timeframe=timeframe,
+                range=range_key,
                 exchange="FX",
                 currency="USD",
                 candles=[],
@@ -343,7 +348,7 @@ class ForexMarketProvider(BaseMarketProvider):
         y_interval, y_range = _YAHOO_TF_CONFIG.get(timeframe, ("1d", "2y"))
         safe_limit = max(1, min(limit, 500))
         decimals = int(meta.extra.get("decimals", 4))
-        cache_key = f"forex:candles:{meta.symbol}:{timeframe}:{safe_limit}:{before or 'latest'}"
+        cache_key = f"forex:candles:{meta.symbol}:{timeframe}:{range_key or 'default'}:{safe_limit}:{before or 'latest'}"
 
         fresh = market_cache.get_fresh(cache_key)
         if fresh is not None:
@@ -359,6 +364,13 @@ class ForexMarketProvider(BaseMarketProvider):
                 period1 = max(0, period2 - span_days * 86400)
                 params["period1"] = period1
                 params["period2"] = period2
+            elif range_key is not None:
+                if range_key == "ALL":
+                    params["range"] = "max"
+                else:
+                    p1, p2 = compute_range_window(range_key)
+                    params["period1"] = p1
+                    params["period2"] = p2
             else:
                 params["range"] = y_range
 
@@ -403,9 +415,13 @@ class ForexMarketProvider(BaseMarketProvider):
             if timeframe == "4h":
                 candles = _resample_4h(candles)
 
-            candles.sort(key=lambda c: c.time)
+            candles = validate_and_normalize_candles(candles)
             if len(candles) > safe_limit:
                 candles = candles[-safe_limit:]
+
+            range_return = None
+            if len(candles) >= 2 and candles[0].open > 0:
+                range_return = round(((candles[-1].close - candles[0].open) / candles[0].open) * 100, 2)
 
             oldest = candles[0].time if candles else None
             latest_ts = (
@@ -419,6 +435,8 @@ class ForexMarketProvider(BaseMarketProvider):
                 symbol=meta.symbol,
                 assetClass="FOREX",
                 timeframe=timeframe,
+                range=range_key,
+                rangeReturnPercent=range_return,
                 exchange="FX",
                 currency=meta.currency,
                 candles=candles,

@@ -161,3 +161,23 @@ export function calculateMACD(
   }
   return result;
 }
+
+export function calculateVWAP(candles: NormalizedCandle[]): IndicatorPoint[] {
+  if (candles.length === 0) return [];
+  const result: IndicatorPoint[] = [];
+  let cumPV = 0;
+  let cumVol = 0;
+  for (const c of candles) {
+    const vol = c.volume > 0 ? c.volume : 0;
+    const typical = (c.high + c.low + c.close) / 3;
+    cumPV += typical * vol;
+    cumVol += vol;
+    if (cumVol > 0) {
+      result.push({
+        time: c.time,
+        value: Number((cumPV / cumVol).toFixed(6)),
+      });
+    }
+  }
+  return result;
+}

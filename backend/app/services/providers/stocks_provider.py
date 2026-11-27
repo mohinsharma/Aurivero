@@ -12,12 +12,15 @@ from backend.app.services.providers.base import (
     BaseMarketProvider,
     CandleSeriesResponse,
     DataFreshnessStatus,
+    HistoricalRange,
     InstrumentMeta,
     NormalizedCandle,
     NormalizedQuote,
     ProviderHealth,
     Timeframe,
+    compute_range_window,
     utc_now_iso,
+    validate_and_normalize_candles,
 )
 from backend.app.services.providers.cache_and_limiter import CircuitBreaker, market_cache
 
@@ -25,6 +28,7 @@ logger = logging.getLogger("mindmark.providers.stocks")
 
 IST = ZoneInfo("Asia/Kolkata")
 YAHOO_CHART_BASE = "https://query1.finance.yahoo.com/v8/finance/chart"
+YAHOO_SEARCH_BASE = "https://query1.finance.yahoo.com/v1/finance/search"
 YAHOO_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
@@ -153,9 +157,81 @@ class IndianStocksProvider(BaseMarketProvider):
             description=item.get("description"),
         )
 
+    async def _yahoo_search(self, query: str, limit: int = 15) -> List[InstrumentMeta]:
+        q = query.strip()
+        if not q:
+            return []
+        cache_key = f"stock:ysearch:{q.lower()}:{limit}"
+        fresh = market_cache.get_fresh(cache_key)
+        if fresh is not None:
+            return [InstrumentMeta(**m) for m in fresh]
+
+        try:
+            async with httpx.AsyncClient(timeout=6.0, headers=YAHOO_HEADERS) as client:
+                resp = await client.get(
+                    YAHOO_SEARCH_BASE,
+                    params={"q": q, "quotesCount": limit, "newsCount": 0},
+                )
+                resp.raise_for_status()
+                quotes = resp.json().get("quotes") or []
+        except Exception as exc:
+            logger.debug("yahoo_search_failed q=%s err=%s", q, exc)
+            return []
+
+        results: List[InstrumentMeta] = []
+        for item in quotes:
+            qtype = item.get("quoteType", "")
+            if qtype not in ("EQUITY", "INDEX", "ETF"):
+                continue
+            ysymbol = item.get("symbol", "")
+            if not ysymbol:
+                continue
+            exch_disp = item.get("exchDisp") or item.get("exchange") or "NSE"
+            if ysymbol.endswith(".NS"):
+                clean_sym = ysymbol[:-3]
+                exch = "NSE"
+                curr = "INR"
+            elif ysymbol.endswith(".BO"):
+                clean_sym = ysymbol
+                exch = "BSE"
+                curr = "INR"
+            elif ysymbol.startswith("^"):
+                clean_sym = ysymbol
+                exch = exch_disp
+                curr = "INR" if ysymbol in ("^NSEI", "^NSEBANK", "^BSESN") else "USD"
+            else:
+                clean_sym = ysymbol
+                exch = exch_disp
+                curr = "USD"
+
+            results.append(
+                InstrumentMeta(
+                    symbol=clean_sym,
+                    displaySymbol=clean_sym.replace(".BO", " (BSE)"),
+                    name=item.get("shortname") or item.get("longname") or clean_sym,
+                    assetClass="STOCK",
+                    exchange=exch,
+                    currency=curr,
+                    sectorOrCategory=item.get("sectorDisp") or item.get("typeDisp") or qtype,
+                    isIndex=(qtype == "INDEX"),
+                    providerSymbol=ysymbol,
+                )
+            )
+
+        market_cache.set(
+            cache_key,
+            [r.model_dump() for r in results],
+            ttl_seconds=180,
+            asset_class="STOCK",
+            symbol=q.upper(),
+            source="Yahoo Finance Search",
+            persist_sqlite=False,
+        )
+        return results
+
     async def search_instruments(self, query: str, limit: int = 20) -> List[InstrumentMeta]:
         q = query.strip().lower()
-        matches = [
+        local_matches = [
             self._entry_to_meta(item)
             for item in INDIAN_STOCK_DIRECTORY
             if not q
@@ -164,7 +240,17 @@ class IndianStocksProvider(BaseMarketProvider):
             or q in item["name"].lower()
             or q in item["sector"].lower()
         ]
-        return matches[:limit]
+        if not q:
+            return local_matches[:limit]
+
+        remote_matches = await self._yahoo_search(query, limit=limit)
+        seen = {m.providerSymbol.upper() for m in local_matches}
+        merged = list(local_matches)
+        for rm in remote_matches:
+            if rm.providerSymbol.upper() not in seen:
+                merged.append(rm)
+                seen.add(rm.providerSymbol.upper())
+        return merged[:limit]
 
     async def list_instruments(self, limit: int = 50, offset: int = 0) -> List[InstrumentMeta]:
         return [self._entry_to_meta(item) for item in INDIAN_STOCK_DIRECTORY[offset : offset + limit]]
@@ -184,7 +270,7 @@ class IndianStocksProvider(BaseMarketProvider):
         for item in INDIAN_STOCK_DIRECTORY:
             if item["symbol"] == target or item["providerSymbol"].upper() == clean:
                 return self._entry_to_meta(item)
-        # Allow arbitrary NSE/BSE ticker lookup (e.g., ZOMATO or ZOMATO.NS or ZOMATO.BO)
+
         if clean:
             if clean.endswith(".BO"):
                 return InstrumentMeta(
@@ -196,15 +282,32 @@ class IndianStocksProvider(BaseMarketProvider):
                     currency="INR",
                     providerSymbol=clean,
                 )
-            base = clean.replace(".NS", "")
+            if clean.endswith(".NS"):
+                base = clean[:-3]
+                return InstrumentMeta(
+                    symbol=base,
+                    displaySymbol=base,
+                    name=base,
+                    assetClass="STOCK",
+                    exchange="NSE",
+                    currency="INR",
+                    providerSymbol=clean,
+                )
+            # Check Yahoo Finance Search for exact international or Indian equity match (e.g. AAPL, TSLA, ZOMATO)
+            remote = await self._yahoo_search(clean, limit=5)
+            for r in remote:
+                if r.symbol.upper() == clean or r.providerSymbol.upper() == clean:
+                    return r
+            if remote:
+                return remote[0]
             return InstrumentMeta(
-                symbol=base,
-                displaySymbol=base,
-                name=base,
+                symbol=clean,
+                displaySymbol=clean,
+                name=clean,
                 assetClass="STOCK",
                 exchange="NSE",
                 currency="INR",
-                providerSymbol=f"{base}.NS",
+                providerSymbol=f"{clean}.NS",
             )
         return None
 
@@ -373,6 +476,7 @@ class IndianStocksProvider(BaseMarketProvider):
         timeframe: Timeframe = "1d",
         limit: int = 200,
         before: Optional[int] = None,
+        range_key: Optional[HistoricalRange] = None,
     ) -> CandleSeriesResponse:
         meta = await self.get_metadata(symbol)
         if meta is None:
@@ -380,6 +484,7 @@ class IndianStocksProvider(BaseMarketProvider):
                 symbol=symbol.upper(),
                 assetClass="STOCK",
                 timeframe=timeframe,
+                range=range_key,
                 exchange="NSE",
                 currency="INR",
                 candles=[],
@@ -391,7 +496,7 @@ class IndianStocksProvider(BaseMarketProvider):
 
         y_interval, y_range = _YAHOO_TF_CONFIG.get(timeframe, ("1d", "2y"))
         safe_limit = max(1, min(limit, 500))
-        cache_key = f"stock:candles:{meta.symbol}:{timeframe}:{safe_limit}:{before or 'latest'}"
+        cache_key = f"stock:candles:{meta.symbol}:{timeframe}:{range_key or 'default'}:{safe_limit}:{before or 'latest'}"
 
         fresh = market_cache.get_fresh(cache_key)
         if fresh is not None:
@@ -410,8 +515,9 @@ class IndianStocksProvider(BaseMarketProvider):
                 symbol=meta.symbol,
                 assetClass="STOCK",
                 timeframe=timeframe,
+                range=range_key,
                 exchange=meta.exchange,
-                currency="INR",
+                currency=meta.currency,
                 candles=[],
                 source="Yahoo Finance (NSE/BSE Delayed Feed)",
                 retrievedAt=utc_now_iso(),
@@ -428,6 +534,13 @@ class IndianStocksProvider(BaseMarketProvider):
                 period1 = max(0, period2 - span_days * 86400)
                 params["period1"] = period1
                 params["period2"] = period2
+            elif range_key is not None:
+                if range_key == "ALL":
+                    params["range"] = "max"
+                else:
+                    p1, p2 = compute_range_window(range_key)
+                    params["period1"] = p1
+                    params["period2"] = p2
             else:
                 params["range"] = y_range
 
@@ -475,9 +588,13 @@ class IndianStocksProvider(BaseMarketProvider):
             if timeframe == "4h":
                 candles = _resample_4h(candles)
 
-            candles.sort(key=lambda c: c.time)
+            candles = validate_and_normalize_candles(candles)
             if len(candles) > safe_limit:
                 candles = candles[-safe_limit:]
+
+            range_return = None
+            if len(candles) >= 2 and candles[0].open > 0:
+                range_return = round(((candles[-1].close - candles[0].open) / candles[0].open) * 100, 2)
 
             oldest = candles[0].time if candles else None
             latest_ts = (
@@ -491,8 +608,10 @@ class IndianStocksProvider(BaseMarketProvider):
                 symbol=meta.symbol,
                 assetClass="STOCK",
                 timeframe=timeframe,
+                range=range_key,
+                rangeReturnPercent=range_return,
                 exchange=meta.exchange,
-                currency="INR",
+                currency=meta.currency,
                 candles=candles,
                 hasMore=len(candles) >= 20,
                 oldestTimestamp=oldest,

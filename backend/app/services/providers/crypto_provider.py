@@ -10,12 +10,15 @@ import httpx
 from backend.app.services.providers.base import (
     BaseMarketProvider,
     CandleSeriesResponse,
+    HistoricalRange,
     InstrumentMeta,
     NormalizedCandle,
     NormalizedQuote,
     ProviderHealth,
     Timeframe,
+    compute_range_window,
     utc_now_iso,
+    validate_and_normalize_candles,
 )
 from backend.app.services.providers.cache_and_limiter import CircuitBreaker, market_cache
 
@@ -179,9 +182,42 @@ class CryptoMarketProvider(BaseMarketProvider):
             extra={"base": item["base"], "coingeckoId": item["coingeckoId"]},
         )
 
+    async def _get_binance_usdt_symbols(self) -> List[Dict[str, str]]:
+        cache_key = "crypto:binance:exchange_info_usdt"
+        fresh = market_cache.get_fresh(cache_key)
+        if fresh is not None:
+            return fresh
+        try:
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                resp = await client.get(f"{BINANCE_BASE}/exchangeInfo", params={"permissions": "SPOT"})
+                resp.raise_for_status()
+                symbols = resp.json().get("symbols") or []
+                usdt_pairs = [
+                    {
+                        "symbol": s["symbol"],
+                        "base": s["baseAsset"],
+                        "quote": s["quoteAsset"],
+                    }
+                    for s in symbols
+                    if s.get("status") == "TRADING" and s.get("quoteAsset") == "USDT"
+                ]
+                market_cache.set(
+                    cache_key,
+                    usdt_pairs,
+                    ttl_seconds=3600,
+                    asset_class="CRYPTO",
+                    symbol="EXCHANGE_INFO",
+                    source="Binance ExchangeInfo",
+                    persist_sqlite=False,
+                )
+                return usdt_pairs
+        except Exception as exc:
+            logger.debug("binance_exchange_info_failed err=%s", exc)
+            return market_cache.get_stale(cache_key) or []
+
     async def search_instruments(self, query: str, limit: int = 20) -> List[InstrumentMeta]:
-        q = query.strip().lower()
-        matches = [
+        q = query.strip().lower().replace("/", "").replace("-", "")
+        local_matches = [
             self._entry_to_meta(item)
             for item in CRYPTO_DIRECTORY
             if not q
@@ -191,7 +227,35 @@ class CryptoMarketProvider(BaseMarketProvider):
             or q in item["name"].lower()
             or q in item["category"].lower()
         ]
-        return matches[:limit]
+        if not q:
+            return local_matches[:limit]
+
+        all_usdt = await self._get_binance_usdt_symbols()
+        seen = {m.symbol for m in local_matches}
+        merged = list(local_matches)
+        for pair in all_usdt:
+            sym = pair["symbol"]
+            base = pair["base"]
+            if sym in seen:
+                continue
+            if q in sym.lower() or q in base.lower():
+                merged.append(
+                    InstrumentMeta(
+                        symbol=sym,
+                        displaySymbol=f"{base}/USDT",
+                        name=base,
+                        assetClass="CRYPTO",
+                        exchange="BINANCE",
+                        currency="USDT",
+                        sectorOrCategory="Spot Pair",
+                        providerSymbol=sym,
+                        extra={"base": base},
+                    )
+                )
+                seen.add(sym)
+                if len(merged) >= limit:
+                    break
+        return merged[:limit]
 
     async def list_instruments(self, limit: int = 50, offset: int = 0) -> List[InstrumentMeta]:
         return [self._entry_to_meta(item) for item in CRYPTO_DIRECTORY[offset : offset + limit]]
@@ -403,6 +467,7 @@ class CryptoMarketProvider(BaseMarketProvider):
         timeframe: Timeframe = "1d",
         limit: int = 200,
         before: Optional[int] = None,
+        range_key: Optional[HistoricalRange] = None,
     ) -> CandleSeriesResponse:
         meta = await self.get_metadata(symbol)
         if meta is None:
@@ -410,6 +475,7 @@ class CryptoMarketProvider(BaseMarketProvider):
                 symbol=symbol.upper(),
                 assetClass="CRYPTO",
                 timeframe=timeframe,
+                range=range_key,
                 exchange="BINANCE",
                 currency="USDT",
                 candles=[],
@@ -422,7 +488,7 @@ class CryptoMarketProvider(BaseMarketProvider):
         norm = meta.symbol
         interval = _TIMEFRAME_MAP.get(timeframe, "1d")
         safe_limit = max(1, min(limit, 500))
-        cache_key = f"crypto:candles:{norm}:{interval}:{safe_limit}:{before or 'latest'}"
+        cache_key = f"crypto:candles:{norm}:{interval}:{range_key or 'default'}:{safe_limit}:{before or 'latest'}"
 
         fresh = market_cache.get_fresh(cache_key)
         if fresh is not None:
@@ -439,6 +505,7 @@ class CryptoMarketProvider(BaseMarketProvider):
                 symbol=norm,
                 assetClass="CRYPTO",
                 timeframe=timeframe,
+                range=range_key,
                 exchange="BINANCE",
                 currency="USDT",
                 candles=[],
@@ -456,13 +523,17 @@ class CryptoMarketProvider(BaseMarketProvider):
             }
             if before is not None:
                 params["endTime"] = (before - 1) * 1000
+            elif range_key is not None and range_key != "ALL":
+                start_s, end_s = compute_range_window(range_key)
+                params["startTime"] = start_s * 1000
+                params["endTime"] = end_s * 1000
 
             async with httpx.AsyncClient(timeout=10.0) as client:
                 resp = await client.get(f"{BINANCE_BASE}/klines", params=params)
                 resp.raise_for_status()
                 raw_klines = resp.json()
 
-            candles = [
+            candles = validate_and_normalize_candles([
                 NormalizedCandle(
                     time=int(k[0] // 1000),
                     open=float(k[1]),
@@ -472,8 +543,10 @@ class CryptoMarketProvider(BaseMarketProvider):
                     volume=float(k[5]),
                 )
                 for k in raw_klines
-            ]
-            candles.sort(key=lambda c: c.time)
+            ])
+            range_return = None
+            if len(candles) >= 2 and candles[0].open > 0:
+                range_return = round(((candles[-1].close - candles[0].open) / candles[0].open) * 100, 2)
             oldest = candles[0].time if candles else None
             latest_ts = (
                 datetime.fromtimestamp(candles[-1].time, tz=timezone.utc).isoformat()
@@ -486,6 +559,8 @@ class CryptoMarketProvider(BaseMarketProvider):
                 symbol=norm,
                 assetClass="CRYPTO",
                 timeframe=timeframe,
+                range=range_key,
+                rangeReturnPercent=range_return,
                 exchange="BINANCE",
                 currency="USDT",
                 candles=candles,

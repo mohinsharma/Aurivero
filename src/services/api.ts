@@ -357,11 +357,12 @@ class ApiClient {
     getCandles: (
       assetClass: 'STOCK' | 'CRYPTO' | 'FOREX',
       symbol: string,
-      params?: { timeframe?: string; limit?: number; before?: number },
+      params?: { timeframe?: string; range?: string; limit?: number; before?: number },
       signal?: AbortSignal
     ) => {
       const sp = new URLSearchParams();
       if (params?.timeframe) sp.append('timeframe', params.timeframe);
+      if (params?.range) sp.append('range', params.range);
       if (params?.limit) sp.append('limit', String(params.limit));
       if (params?.before) sp.append('before', String(params.before));
       const qs = sp.toString();

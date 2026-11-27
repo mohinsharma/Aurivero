@@ -1,15 +1,67 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Literal, Optional
+from datetime import datetime, timedelta, timezone
+import math
+from typing import Any, Dict, List, Literal, Optional, Tuple
 from pydantic import BaseModel, Field
 
-DataFreshnessStatus = Literal["LIVE", "DELAYED", "CACHED", "MARKET_CLOSED", "UNAVAILABLE"]
+DataFreshnessStatus = Literal[
+    "LIVE",
+    "DELAYED",
+    "POLLING",
+    "CACHED",
+    "MARKET_CLOSED",
+    "HISTORICAL",
+    "CONNECTION_LOST",
+    "UNAVAILABLE",
+]
 AssetClass = Literal["STOCK", "CRYPTO", "FOREX"]
 Timeframe = Literal["1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w"]
+HistoricalRange = Literal["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y", "ALL"]
 
 SUPPORTED_TIMEFRAMES: List[Timeframe] = ["1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w"]
+SUPPORTED_RANGES: List[HistoricalRange] = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y", "ALL"]
+
+RANGE_DEFAULT_TIMEFRAME: Dict[HistoricalRange, Timeframe] = {
+    "1D": "5m",
+    "1W": "15m",
+    "1M": "1h",
+    "3M": "4h",
+    "6M": "1d",
+    "YTD": "1d",
+    "1Y": "1d",
+    "3Y": "1w",
+    "5Y": "1w",
+    "ALL": "1w",
+}
+
+
+def compute_range_window(range_key: HistoricalRange, now_utc: Optional[datetime] = None) -> Tuple[int, int]:
+    """Returns (start_unix_sec, end_unix_sec) for a Groww-style historical range."""
+    end_dt = now_utc or datetime.now(timezone.utc)
+    end_ts = int(end_dt.timestamp())
+    if range_key == "1D":
+        start_dt = end_dt - timedelta(days=2)  # 2 days ensures full last trading session even on weekends/pre-open
+    elif range_key == "1W":
+        start_dt = end_dt - timedelta(days=7)
+    elif range_key == "1M":
+        start_dt = end_dt - timedelta(days=30)
+    elif range_key == "3M":
+        start_dt = end_dt - timedelta(days=90)
+    elif range_key == "6M":
+        start_dt = end_dt - timedelta(days=180)
+    elif range_key == "YTD":
+        start_dt = datetime(end_dt.year, 1, 1, tzinfo=timezone.utc)
+    elif range_key == "1Y":
+        start_dt = end_dt - timedelta(days=365)
+    elif range_key == "3Y":
+        start_dt = end_dt - timedelta(days=365 * 3)
+    elif range_key == "5Y":
+        start_dt = end_dt - timedelta(days=365 * 5)
+    else:  # ALL
+        start_dt = datetime(2005, 1, 1, tzinfo=timezone.utc)
+    return int(start_dt.timestamp()), end_ts
 
 
 def utc_now_iso() -> str:
@@ -86,6 +138,8 @@ class CandleSeriesResponse(BaseModel):
     symbol: str
     assetClass: AssetClass
     timeframe: Timeframe
+    range: Optional[HistoricalRange] = None
+    rangeReturnPercent: Optional[float] = None
     exchange: str
     currency: str
     candles: List[NormalizedCandle]
@@ -99,6 +153,23 @@ class CandleSeriesResponse(BaseModel):
     status: DataFreshnessStatus
     delaySeconds: Optional[int] = None
     warning: Optional[str] = None
+
+
+def validate_and_normalize_candles(candles: List[NormalizedCandle]) -> List[NormalizedCandle]:
+    """Rejects malformed OHLC candles, deduplicates by timestamp, and sorts chronologically."""
+    dedup: Dict[int, NormalizedCandle] = {}
+    for c in candles:
+        if c.time <= 0:
+            continue
+        vals = (c.open, c.high, c.low, c.close, c.volume)
+        if any(math.isnan(v) or math.isinf(v) for v in vals):
+            continue
+        if c.high < c.low:
+            continue
+        if c.open < c.low or c.open > c.high or c.close < c.low or c.close > c.high:
+            continue
+        dedup[c.time] = c
+    return [dedup[t] for t in sorted(dedup.keys())]
 
 
 class ProviderHealth(BaseModel):
@@ -140,6 +211,7 @@ class BaseMarketProvider(ABC):
         timeframe: Timeframe = "1d",
         limit: int = 200,
         before: Optional[int] = None,
+        range_key: Optional[HistoricalRange] = None,
     ) -> CandleSeriesResponse:
         ...
 

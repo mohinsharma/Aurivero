@@ -8,7 +8,10 @@ from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSock
 
 from backend.app.models import StandardAPIResponse
 from backend.app.services.providers import (
+    RANGE_DEFAULT_TIMEFRAME,
+    SUPPORTED_RANGES,
     SUPPORTED_TIMEFRAMES,
+    HistoricalRange,
     Timeframe,
     crypto_provider,
     forex_provider,
@@ -172,16 +175,34 @@ async def get_instrument_candles(
     request: Request,
     asset_class: str,
     symbol: str,
-    timeframe: str = Query("1d"),
+    timeframe: Optional[str] = Query(None),
+    range: Optional[str] = Query(None),
     limit: int = Query(200, ge=10, le=500),
     before: Optional[int] = Query(None),
 ):
     _enforce_rate_limit(request, "candles")
-    if timeframe not in SUPPORTED_TIMEFRAMES:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported timeframe '{timeframe}'. Supported: {', '.join(SUPPORTED_TIMEFRAMES)}",
-        )
+    resolved_range: Optional[HistoricalRange] = None
+    if range is not None:
+        r_up = range.upper().strip()
+        if r_up not in SUPPORTED_RANGES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported range '{range}'. Supported: {', '.join(SUPPORTED_RANGES)}",
+            )
+        resolved_range = r_up  # type: ignore[assignment]
+
+    if timeframe is not None:
+        if timeframe not in SUPPORTED_TIMEFRAMES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported timeframe '{timeframe}'. Supported: {', '.join(SUPPORTED_TIMEFRAMES)}",
+            )
+        resolved_tf: Timeframe = timeframe  # type: ignore[assignment]
+    elif resolved_range is not None:
+        resolved_tf = RANGE_DEFAULT_TIMEFRAME[resolved_range]
+    else:
+        resolved_tf = "1d"
+
     try:
         provider = get_provider(asset_class)
     except ValueError as exc:
@@ -189,9 +210,10 @@ async def get_instrument_candles(
 
     series = await provider.get_candles(
         symbol=symbol,
-        timeframe=timeframe,  # type: ignore[arg-type]
+        timeframe=resolved_tf,
         limit=limit,
         before=before,
+        range_key=resolved_range,
     )
     return StandardAPIResponse(success=True, data=series.model_dump())
 

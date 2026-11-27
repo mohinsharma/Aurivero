@@ -18,12 +18,25 @@ import { api } from '../services/api';
 import {
   AssetClass,
   DataFreshnessStatus,
+  HistoricalRange,
   InstrumentMeta,
   NormalizedCandle,
   NormalizedQuote,
+  RANGE_DEFAULT_TIMEFRAME,
   Timeframe,
   Watchlist,
 } from '../types/markets';
+
+const TIMEFRAME_SECONDS: Record<Timeframe, number> = {
+  '1m': 60,
+  '5m': 300,
+  '15m': 900,
+  '30m': 1800,
+  '1h': 3600,
+  '4h': 14400,
+  '1d': 86400,
+  '1w': 604800,
+};
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { FreshnessBadge } from '../components/markets/FreshnessBadge';
@@ -53,6 +66,8 @@ export const InstrumentDetailPage: React.FC = () => {
   const [liveCandle, setLiveCandle] = useState<NormalizedCandle | null>(null);
 
   const [timeframe, setTimeframe] = useState<Timeframe>('1d');
+  const [selectedRange, setSelectedRange] = useState<HistoricalRange>('1Y');
+  const [rangeReturnPercent, setRangeReturnPercent] = useState<number | null>(null);
   const [candleStatus, setCandleStatus] = useState<DataFreshnessStatus>('DELAYED');
   const [candleSource, setCandleSource] = useState<string>('');
   const [candleDelay, setCandleDelay] = useState<number | null>(null);
@@ -96,12 +111,18 @@ export const InstrumentDetailPage: React.FC = () => {
       setLoadingCandles(true);
       setCandles([]);
       setLiveCandle(null);
-      const reqKey = `${assetClass}:${symbol}:${timeframe}`;
-      const res = await api.markets.getCandles(assetClass, symbol, { timeframe, limit: 200 }, signal);
+      const reqKey = `${assetClass}:${symbol}:${timeframe}:${selectedRange}`;
+      const res = await api.markets.getCandles(
+        assetClass,
+        symbol,
+        { timeframe, range: selectedRange, limit: 350 },
+        signal
+      );
       if (signal?.aborted || activeKeyRef.current !== reqKey) return;
 
       if (res.success && res.data) {
         setCandles(res.data.candles || []);
+        setRangeReturnPercent(res.data.rangeReturnPercent ?? null);
         setHasMore(Boolean(res.data.hasMore));
         setOldestTs(res.data.oldestTimestamp || null);
         setCandleStatus(res.data.status || 'UNAVAILABLE');
@@ -114,8 +135,16 @@ export const InstrumentDetailPage: React.FC = () => {
       }
       setLoadingCandles(false);
     },
-    [assetClass, symbol, timeframe]
+    [assetClass, symbol, timeframe, selectedRange]
   );
+
+  // Keep activeKeyRef synchronized with range as well
+  activeKeyRef.current = `${assetClass}:${symbol}:${timeframe}:${selectedRange}`;
+
+  const handleRangeChange = (nextRange: HistoricalRange) => {
+    setSelectedRange(nextRange);
+    setTimeframe(RANGE_DEFAULT_TIMEFRAME[nextRange]);
+  };
 
   // Fetch quote & candles with AbortController on instrument/timeframe switch
   useEffect(() => {
@@ -176,9 +205,38 @@ export const InstrumentDetailPage: React.FC = () => {
                   }
                 : prev
             );
-            if (timeframe === '1m') {
-              setLiveCandle(msg.candle);
-            }
+            // Universal candle aggregation & rollover across any selected timeframe
+            const bucketSize = TIMEFRAME_SECONDS[timeframe] || 60;
+            const bucketTime = Math.floor(msg.candle.time / bucketSize) * bucketSize;
+            setLiveCandle((prevLive) => {
+              const base =
+                prevLive && prevLive.time === bucketTime
+                  ? prevLive
+                  : candles.length > 0 && candles[candles.length - 1].time === bucketTime
+                    ? candles[candles.length - 1]
+                    : null;
+              if (base) {
+                return {
+                  time: bucketTime,
+                  open: base.open,
+                  high: Math.max(base.high, msg.price),
+                  low: Math.min(base.low, msg.price),
+                  close: msg.price,
+                  volume:
+                    timeframe === '1m'
+                      ? msg.candle.volume
+                      : base.volume + (msg.candle.volume || 0) * 0.01,
+                };
+              }
+              return {
+                time: bucketTime,
+                open: msg.price,
+                high: msg.price,
+                low: msg.price,
+                close: msg.price,
+                volume: msg.candle.volume || 0,
+              };
+            });
             setCandleStatus(msg.status);
           } else if (msg.type === 'QUOTE_UPDATE') {
             setQuote((prev) =>
@@ -208,6 +266,11 @@ export const InstrumentDetailPage: React.FC = () => {
       ws.onclose = () => {
         if (pingTimer) window.clearInterval(pingTimer);
         if (!disposed) {
+          if (assetClass === 'CRYPTO') {
+            setCandleStatus('CONNECTION_LOST');
+            setQuote((prev) => (prev ? { ...prev, status: 'CONNECTION_LOST' } : prev));
+            setWarningMsg('Live stream connection lost. Reconnecting with exponential backoff...');
+          }
           reconnectTimer = window.setTimeout(() => {
             backoffMs = Math.min(backoffMs * 2, 30000);
             connect();
@@ -455,6 +518,9 @@ export const InstrumentDetailPage: React.FC = () => {
         liveCandle={liveCandle}
         timeframe={timeframe}
         onTimeframeChange={setTimeframe}
+        selectedRange={selectedRange}
+        onRangeChange={handleRangeChange}
+        rangeReturnPercent={rangeReturnPercent}
         loading={loadingCandles}
         loadingMore={loadingMore}
         hasMore={hasMore}

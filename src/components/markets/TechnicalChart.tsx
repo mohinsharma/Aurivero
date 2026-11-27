@@ -23,7 +23,9 @@ import {
 import {
   AssetClass,
   DataFreshnessStatus,
+  HistoricalRange,
   NormalizedCandle,
+  SUPPORTED_RANGES,
   SUPPORTED_TIMEFRAMES,
   Timeframe,
 } from '../../types/markets';
@@ -33,6 +35,7 @@ import {
   calculateMACD,
   calculateRSI,
   calculateSMA,
+  calculateVWAP,
 } from '../../utils/indicators';
 import { FreshnessBadge } from './FreshnessBadge';
 
@@ -41,6 +44,7 @@ export type ChartMode = 'CANDLE' | 'LINE' | 'AREA';
 export interface IndicatorConfig {
   sma: { enabled: boolean; period: number };
   ema: { enabled: boolean; period: number };
+  vwap: { enabled: boolean };
   bollinger: { enabled: boolean; period: number; stdDev: number };
   rsi: { enabled: boolean; period: number };
   macd: { enabled: boolean };
@@ -55,6 +59,9 @@ interface TechnicalChartProps {
   liveCandle?: NormalizedCandle | null;
   timeframe: Timeframe;
   onTimeframeChange: (tf: Timeframe) => void;
+  selectedRange?: HistoricalRange;
+  onRangeChange?: (range: HistoricalRange) => void;
+  rangeReturnPercent?: number | null;
   loading?: boolean;
   loadingMore?: boolean;
   hasMore?: boolean;
@@ -68,6 +75,7 @@ interface TechnicalChartProps {
 const DEFAULT_INDICATORS: IndicatorConfig = {
   sma: { enabled: true, period: 20 },
   ema: { enabled: false, period: 50 },
+  vwap: { enabled: false },
   bollinger: { enabled: false, period: 20, stdDev: 2 },
   rsi: { enabled: false, period: 14 },
   macd: { enabled: false },
@@ -82,6 +90,9 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
   liveCandle,
   timeframe,
   onTimeframeChange,
+  selectedRange = '1Y',
+  onRangeChange,
+  rangeReturnPercent,
   loading = false,
   loadingMore = false,
   hasMore = false,
@@ -119,6 +130,10 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
   const emaData = useMemo(
     () => (indicators.ema.enabled ? calculateEMA(candles, indicators.ema.period) : []),
     [candles, indicators.ema]
+  );
+  const vwapData = useMemo(
+    () => (indicators.vwap.enabled ? calculateVWAP(candles) : []),
+    [candles, indicators.vwap.enabled]
   );
   const bbData = useMemo(
     () =>
@@ -249,6 +264,15 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
       s.setData(emaData.map((p) => ({ time: p.time as UTCTimestamp, value: p.value })));
     }
 
+    if (indicators.vwap.enabled && vwapData.length > 0) {
+      const v = chart.addSeries(LineSeries, {
+        color: '#C084FC',
+        lineWidth: 1,
+        title: 'VWAP',
+      });
+      v.setData(vwapData.map((p) => ({ time: p.time as UTCTimestamp, value: p.value })));
+    }
+
     if (indicators.bollinger.enabled && bbData.length > 0) {
       const upper = chart.addSeries(LineSeries, {
         color: 'rgba(120, 169, 255, 0.65)',
@@ -308,7 +332,7 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
       mainSeriesRef.current = null;
       volSeriesRef.current = null;
     };
-  }, [candles, chartMode, indicators, smaData, emaData, bbData, timeframe, isFullscreen, hasMore, loadingMore, onLoadMoreHistory]);
+  }, [candles, chartMode, indicators, smaData, emaData, vwapData, bbData, timeframe, isFullscreen, hasMore, loadingMore, onLoadMoreHistory]);
 
   // Incremental live candle update without recreating chart
   useEffect(() => {
@@ -562,6 +586,20 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
                 </label>
 
                 <label className="flex items-center justify-between gap-2 cursor-pointer">
+                  <span className="text-text-primary">VWAP</span>
+                  <input
+                    type="checkbox"
+                    checked={indicators.vwap.enabled}
+                    onChange={(e) =>
+                      setIndicators((prev) => ({
+                        ...prev,
+                        vwap: { enabled: e.target.checked },
+                      }))
+                    }
+                  />
+                </label>
+
+                <label className="flex items-center justify-between gap-2 cursor-pointer">
                   <span className="text-text-primary">Bollinger Bands (20, 2)</span>
                   <input
                     type="checkbox"
@@ -715,18 +753,46 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
         </div>
       )}
 
-      {/* Required TradingView Lightweight Charts Attribution */}
-      <div className="px-4 py-2 border-t border-border/60 bg-surface-elevated/40 flex flex-wrap items-center justify-between gap-2 text-[11px] text-text-muted">
-        <span>
-          {assetClass === 'CRYPTO'
-            ? 'Scroll left to load earlier Binance candles.'
-            : 'Scroll left to paginate historical candles where supported by provider.'}
-        </span>
+      {/* Groww-style Historical Range Selector & Attribution */}
+      <div className="px-4 py-2.5 border-t border-border/60 bg-surface-elevated/40 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+        {onRangeChange ? (
+          <div className="flex items-center gap-1 flex-wrap" role="group" aria-label="Historical Ranges">
+            {SUPPORTED_RANGES.map((r) => (
+              <button
+                key={r}
+                onClick={() => onRangeChange(r)}
+                className={`px-2 py-1 rounded-md font-mono font-semibold transition-colors ${
+                  selectedRange === r
+                    ? 'bg-primary/15 text-primary border border-primary/30'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+            {rangeReturnPercent !== undefined && rangeReturnPercent !== null && (
+              <span
+                className={`ml-2 font-mono font-bold ${
+                  rangeReturnPercent >= 0 ? 'text-primary' : 'text-danger'
+                }`}
+              >
+                {selectedRange}: {rangeReturnPercent >= 0 ? '+' : ''}
+                {rangeReturnPercent.toFixed(2)}%
+              </span>
+            )}
+          </div>
+        ) : (
+          <span className="text-text-muted">
+            {assetClass === 'CRYPTO'
+              ? 'Scroll left to load earlier Binance candles.'
+              : 'Scroll left to paginate historical candles.'}
+          </span>
+        )}
         <a
           href="https://www.tradingview.com/lightweight-charts/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-text-secondary transition-colors underline underline-offset-2"
+          className="text-text-muted hover:text-text-secondary transition-colors underline underline-offset-2"
         >
           Powered by TradingView Lightweight Charts™
         </a>
