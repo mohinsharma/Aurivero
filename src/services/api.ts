@@ -194,6 +194,143 @@ class ApiClient {
       body: JSON.stringify(payload)
     })
   };
+
+  // 9. Crypto & Forex Market Intelligence Endpoints
+  public marketIntelligence = {
+    getCrypto: (category?: string, search?: string) => {
+      const params = new URLSearchParams();
+      if (category && category !== 'All') params.append('category', category);
+      if (search) params.append('search', search);
+      const qs = params.toString();
+      return this.request<any>(qs ? `/api/market-intelligence/crypto?${qs}` : '/api/market-intelligence/crypto');
+    },
+    getCryptoDetail: (symbol: string) => this.request<any>(`/api/market-intelligence/crypto/${symbol}`),
+    getForex: (search?: string) => {
+      const qs = search ? `?search=${encodeURIComponent(search)}` : '';
+      return this.request<any>(`/api/market-intelligence/forex${qs}`);
+    },
+    convertCurrency: (from_currency: string, to_currency: string, amount: number) => this.request<any>('/api/market-intelligence/convert', {
+      method: 'POST',
+      body: JSON.stringify({ from_currency, to_currency, amount })
+    })
+  };
+
+  // 10. Hot Topics & News Endpoints
+  public hotTopics = {
+    getCategories: () => this.request<any>('/api/hot-topics/categories'),
+    getArticles: (params: { category?: string; search?: string; trending?: boolean; breaking?: boolean; limit?: number; offset?: number } = {}) => {
+      const q = new URLSearchParams();
+      if (params.category && params.category !== 'All') q.append('category', params.category);
+      if (params.search) q.append('search', params.search);
+      if (params.trending) q.append('trending', 'true');
+      if (params.breaking) q.append('breaking', 'true');
+      if (params.limit) q.append('limit', params.limit.toString());
+      if (params.offset) q.append('offset', params.offset.toString());
+      const qs = q.toString();
+      return this.request<any>(qs ? `/api/hot-topics?${qs}` : '/api/hot-topics');
+    },
+    getArticleDetail: (articleId: string) => this.request<any>(`/api/hot-topics/${articleId}`),
+    toggleBookmark: (articleId: string) => this.request<any>(`/api/hot-topics/${articleId}/bookmark`, {
+      method: 'POST'
+    })
+  };
+
+  // 11. Community Forums Endpoints
+  public forums = {
+    getCategories: () => this.request<any>('/api/forums/categories'),
+    getThreads: (params: { category?: string; subcategory?: string; search?: string; sort_by?: string; limit?: number; offset?: number } = {}) => {
+      const q = new URLSearchParams();
+      if (params.category && params.category !== 'All') q.append('category', params.category);
+      if (params.subcategory && params.subcategory !== 'All') q.append('subcategory', params.subcategory);
+      if (params.search) q.append('search', params.search);
+      if (params.sort_by) q.append('sort_by', params.sort_by);
+      if (params.limit) q.append('limit', params.limit.toString());
+      if (params.offset) q.append('offset', params.offset.toString());
+      const qs = q.toString();
+      return this.request<any>(qs ? `/api/forums/threads?${qs}` : '/api/forums/threads');
+    },
+    getThreadDetail: (threadId: string) => this.request<any>(`/api/forums/threads/${threadId}`),
+    createThread: (payload: { category: string; subcategory: string; title: string; content: string; tags: string }) => this.request<any>('/api/forums/threads', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    addComment: (payload: { thread_id: string; parent_id?: string; content: string }) => this.request<any>('/api/forums/comments', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    react: (payload: { thread_id?: string; comment_id?: string; reaction_type?: 'UPVOTE' | 'LIKE' }) => this.request<any>('/api/forums/react', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    toggleBookmark: (threadId: string) => this.request<any>('/api/forums/bookmark', {
+      method: 'POST',
+      body: JSON.stringify({ thread_id: threadId })
+    }),
+    report: (payload: { content_type: 'THREAD' | 'COMMENT'; content_id: string; reason: string; details?: string }) => this.request<any>('/api/forums/report', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  };
+
+  // 12. Learn & Teach Academy Endpoints
+  public academy = {
+    getTracks: () => this.request<any>('/api/academy/tracks'),
+    getCourses: (params: { track?: string; level?: string; search?: string } = {}) => {
+      const q = new URLSearchParams();
+      if (params.track && params.track !== 'ALL') q.append('track', params.track);
+      if (params.level && params.level !== 'All') q.append('level', params.level);
+      if (params.search) q.append('search', params.search);
+      const qs = q.toString();
+      return this.request<any>(qs ? `/api/academy/courses?${qs}` : '/api/academy/courses');
+    },
+    getCourseDetail: (courseId: string) => this.request<any>(`/api/academy/courses/${courseId}`),
+    getLessonDetail: (lessonId: string) => this.request<any>(`/api/academy/lessons/${lessonId}`),
+    markProgress: (lessonId: string, courseId: string) => this.request<any>(`/api/academy/progress?lesson_id=${lessonId}&course_id=${courseId}`, {
+      method: 'POST'
+    }),
+    getQuiz: (quizId: string) => this.request<any>(`/api/academy/quizzes/${quizId}`),
+    submitQuiz: (quizId: string, answers: Record<number, number>) => this.request<any>(`/api/academy/quizzes/${quizId}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ quiz_id: quizId, answers })
+    }),
+    createCourse: (payload: { track: string; title: string; description: string; level: string; duration_minutes?: number; prerequisites?: string; thumbnail_url?: string }) => this.request<any>('/api/academy/courses', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  };
+
+  // 13. Personalization & Watchlists Endpoints
+  public personalization = {
+    getHub: () => this.request<any>('/api/personalization/hub'),
+    getNotifications: () => this.request<any>('/api/personalization/notifications'),
+    markNotificationRead: (notifId: string) => this.request<any>(`/api/personalization/notifications/${notifId}/read`, {
+      method: 'POST'
+    }),
+    addToWatchlist: (payload: { asset_type: 'CRYPTO' | 'FOREX' | 'STOCK'; symbol: string; name: string; target_price?: number; alert_enabled?: boolean; notes?: string }) => this.request<any>('/api/personalization/watchlists', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    removeFromWatchlist: (symbol: string) => this.request<any>(`/api/personalization/watchlists/${symbol}`, {
+      method: 'DELETE'
+    }),
+    toggleFollowTopic: (topic: string) => this.request<any>(`/api/personalization/follow-topic?topic=${encodeURIComponent(topic)}`, {
+      method: 'POST'
+    })
+  };
+
+  // 14. Admin Moderation Endpoints
+  public admin = {
+    getStats: () => this.request<any>('/api/admin/stats'),
+    getReports: (status?: string) => this.request<any>(status ? `/api/admin/reports?status=${status}` : '/api/admin/reports'),
+    moderate: (payload: { content_type: 'THREAD' | 'COMMENT' | 'REPORT'; content_id: string; action: 'APPROVE' | 'DELETE' | 'LOCK' | 'PIN' | 'DISMISS'; moderator_notes?: string }) => this.request<any>('/api/admin/moderate', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+    getUsers: (limit?: number) => this.request<any>(limit ? `/api/admin/users?limit=${limit}` : '/api/admin/users'),
+    updateUserRole: (userId: string, newRole: string) => this.request<any>(`/api/admin/users/${userId}/role?new_role=${newRole}`, {
+      method: 'POST'
+    })
+  };
 }
 
 export const api = new ApiClient();

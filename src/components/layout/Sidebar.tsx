@@ -16,7 +16,13 @@ import {
   ShieldCheck,
   Compass,
   Sparkles,
-  Lock
+  Lock,
+  Coins,
+  Flame,
+  MessageSquare,
+  GraduationCap,
+  Bookmark,
+  ShieldAlert
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 
@@ -29,8 +35,14 @@ export const Sidebar: React.FC = () => {
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
   ];
 
+  const intelligenceNavItems = [
+    { name: 'Market Intelligence', path: '/market-intelligence', icon: Coins, badge: 'CRYPTO/FX' },
+    { name: 'Hot Topics & News', path: '/hot-topics', icon: Flame, badge: 'LIVE' },
+    { name: 'Community Forums', path: '/forums', icon: MessageSquare, badge: 'ACTIVE' },
+  ];
+
   const educationNavItems = [
-    { name: 'Learn & Courses', path: '/learn', icon: BookOpen, badge: '5 Tracks' },
+    { name: 'Learn & Teach Academy', path: '/academy', icon: GraduationCap, badge: 'COURSES' },
     { name: 'Behavioral Insights', path: '/behavioral-insights', icon: BrainCircuit, highlight: true },
     { name: 'Market Replay', path: '/market-replay', icon: History, badge: 'Crash Sim' },
     { name: 'News Explainer', path: '/news-explainer', icon: Newspaper },
@@ -38,6 +50,8 @@ export const Sidebar: React.FC = () => {
   ];
 
   const utilityNavItems = [
+    { name: 'Personal Hub', path: '/hub', icon: Bookmark },
+    { name: 'Admin & Moderation', path: '/admin', icon: ShieldAlert, badge: 'STAFF' },
     { name: 'Skill Assessment', path: '/onboarding', icon: Compass },
     { name: 'Profile & Settings', path: '/settings', icon: Settings },
   ];
@@ -110,6 +124,43 @@ export const Sidebar: React.FC = () => {
                     <span>{item.name}</span>
                     {item.badge && (
                       <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 font-semibold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        {/* Intelligence, Web3 & Community */}
+        <div>
+          {!sidebarCollapsed && (
+            <div className="px-3 pb-1.5 text-[10px] font-mono uppercase tracking-wider text-text-muted">
+              Crypto, Forex & Forums
+            </div>
+          )}
+          <nav className="space-y-1">
+            {intelligenceNavItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
+                    isActive
+                      ? 'bg-primary/10 text-primary border border-primary/25 shadow-glow'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated/80'
+                  } ${sidebarCollapsed ? 'justify-center px-0' : ''}`
+                }
+                title={sidebarCollapsed ? item.name : undefined}
+              >
+                <item.icon size={18} className="flex-shrink-0 transition-transform group-hover:scale-105" />
+                {!sidebarCollapsed && (
+                  <span className="flex-1 flex items-center justify-between">
+                    <span>{item.name}</span>
+                    {item.badge && (
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-secondary/20 text-secondary border border-secondary/30 font-semibold">
                         {item.badge}
                       </span>
                     )}

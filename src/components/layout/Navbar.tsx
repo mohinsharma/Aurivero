@@ -18,6 +18,7 @@ import { INDIAN_INDICES } from '../../data/mockData';
 import { SearchModal } from '../common/SearchModal';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import { api } from '../../services/api';
 
 interface NavbarProps {
   onToggleMobileMenu: () => void;
@@ -28,12 +29,41 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    api.personalization.getNotifications().then((res) => {
+      if (res.success && res.data) {
+        setNotifications(res.data.notifications || []);
+        setUnreadCount(res.data.unread_count || 0);
+      }
+    });
+  }, []);
+
+  const handleMarkAsRead = async (notifId: string, actionUrl?: string) => {
+    await api.personalization.markNotificationRead(notifId);
+    setNotifications((prev) => prev.map((n) => (n.id === notifId ? { ...n, is_read: 1 } : n)));
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+    if (actionUrl) {
+      setShowNotificationPopup(false);
+      navigate(actionUrl);
+    }
+  };
 
   const handleConfirmReset = () => {
     resetPortfolio();
     setIsResetModalOpen(false);
   };
+
+  // Cross-market ticker items
+  const cryptoForexTickers = [
+    { name: 'BTC/USD', value: '$68,420.50', change: '+3.42%', isUp: true },
+    { name: 'ETH/USD', value: '$3,580.20', change: '+2.15%', isUp: true },
+    { name: 'USD/INR', value: '₹83.48', change: '+0.05%', isUp: true },
+    { name: 'EUR/USD', value: '$1.0845', change: '-0.20%', isUp: false },
+  ];
 
   return (
     <>
@@ -59,6 +89,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
                 </div>
               );
             })}
+
+            {/* Crypto & Forex Live Quotes */}
+            <span className="h-3 w-px bg-border/60" />
+            <span className="text-secondary font-semibold">CRYPTO & FX:</span>
+            {cryptoForexTickers.map((item) => (
+              <div key={item.name} className="flex items-center gap-1.5">
+                <span className="text-text-muted">{item.name}:</span>
+                <span className="font-semibold text-text-primary">{item.value}</span>
+                <span className={`inline-flex items-center text-[10px] ${item.isUp ? 'text-primary' : 'text-danger'}`}>
+                  {item.isUp ? <TrendingUp size={11} className="mr-0.5" /> : <TrendingDown size={11} className="mr-0.5" />}
+                  {item.change}
+                </span>
+              </div>
+            ))}
           </div>
 
           <div className="flex items-center gap-4 text-text-muted">
@@ -163,43 +207,57 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
                 aria-label="View notifications"
               >
                 <Bell size={18} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-secondary ring-2 ring-background animate-pulse" />
+                )}
               </button>
 
               {showNotificationPopup && (
                 <div className="absolute right-0 mt-2 w-80 rounded-xl bg-surface-elevated border border-border shadow-2xl p-4 z-40 text-xs">
                   <div className="flex items-center justify-between pb-2 border-b border-border/50">
-                    <span className="font-bold text-text-primary">Market Simulator Alerts</span>
-                    <span className="text-[10px] font-mono text-primary">2 Unread</span>
+                    <span className="font-bold text-text-primary flex items-center gap-1.5">
+                      <Bell size={13} className="text-secondary" />
+                      Platform Notifications
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-secondary/15 text-secondary">
+                      {unreadCount} Unread
+                    </span>
                   </div>
-                  <div className="mt-3 space-y-2.5">
-                    <div className="p-2 rounded-lg bg-surface border border-border/40">
-                      <div className="font-semibold text-text-primary flex items-center gap-1.5">
-                        <Sparkles size={12} className="text-secondary" />
-                        <span>Behavioral Insight Generated</span>
-                      </div>
-                      <p className="text-text-muted text-[11px] mt-0.5">
-                        Your disciplined stop-loss placement has raised your Trader Health Score to 88/100.
-                      </p>
-                    </div>
-                    <div className="p-2 rounded-lg bg-surface border border-border/40">
-                      <div className="font-semibold text-text-primary flex items-center gap-1.5">
-                        <TrendingUp size={12} className="text-primary" />
-                        <span>TCS Crossed Target Milestone</span>
-                      </div>
-                      <p className="text-text-muted text-[11px] mt-0.5">
-                        TCS reached ₹4,180 (+3.22%). Review your profit-taking discipline.
-                      </p>
-                    </div>
+                  <div className="mt-3 space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    {notifications.length === 0 ? (
+                      <div className="text-center py-4 text-text-muted">No new alerts.</div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => handleMarkAsRead(n.id, n.action_url)}
+                          className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
+                            n.is_read
+                              ? 'bg-surface/50 border-border/30 opacity-75'
+                              : 'bg-surface border-secondary/30 hover:border-secondary shadow-sm'
+                          }`}
+                        >
+                          <div className="font-semibold text-text-primary flex items-center justify-between">
+                            <span className="truncate">{n.title}</span>
+                            {!n.is_read && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0" />
+                            )}
+                          </div>
+                          <p className="text-text-muted text-[11px] mt-1 leading-snug">
+                            {n.message}
+                          </p>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <button
                     onClick={() => {
                       setShowNotificationPopup(false);
-                      navigate('/behavioral-insights');
+                      navigate('/hub');
                     }}
-                    className="w-full mt-3 py-1.5 text-center text-[11px] text-secondary hover:underline font-mono"
+                    className="w-full mt-3 py-1.5 text-center text-[11px] text-secondary hover:underline font-mono border-t border-border/40 pt-2"
                   >
-                    View All Behavioral Insights →
+                    Open Personal Hub & Saved Items →
                   </button>
                 </div>
               )}

@@ -224,3 +224,125 @@ CREATE POLICY "Users can view own lesson progress" ON public.user_lesson_progres
 
 CREATE POLICY "Users can view own quest progress" ON public.user_quest_progress
     FOR ALL USING (auth.uid() = user_id);
+
+-- -----------------------------------------------------------------------------
+-- 10. BLOCKCHAIN, CRYPTO & FOREX ECOSYSTEM TABLES
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.hot_topics (
+    id VARCHAR(100) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    summary TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    subcategory VARCHAR(100),
+    source VARCHAR(150) NOT NULL,
+    source_url TEXT NOT NULL,
+    image_url TEXT,
+    read_time_minutes INTEGER DEFAULT 4,
+    sentiment VARCHAR(50) DEFAULT 'Neutral',
+    related_assets VARCHAR(255),
+    related_course_id VARCHAR(100),
+    related_forum_tag VARCHAR(100),
+    views_count INTEGER DEFAULT 0,
+    bookmarks_count INTEGER DEFAULT 0,
+    is_breaking BOOLEAN DEFAULT FALSE,
+    is_trending BOOLEAN DEFAULT FALSE,
+    published_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.news_bookmarks (
+    id VARCHAR(120) PRIMARY KEY,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    article_id VARCHAR(100) REFERENCES public.hot_topics(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT unique_user_news_bookmark UNIQUE (user_id, article_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.forum_threads (
+    id VARCHAR(100) PRIMARY KEY,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    author_name VARCHAR(255) NOT NULL,
+    author_role VARCHAR(100) DEFAULT 'Learner',
+    category VARCHAR(100) NOT NULL,
+    subcategory VARCHAR(100) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    tags VARCHAR(255) NOT NULL,
+    upvotes_count INTEGER DEFAULT 0,
+    replies_count INTEGER DEFAULT 0,
+    views_count INTEGER DEFAULT 0,
+    is_pinned BOOLEAN DEFAULT FALSE,
+    is_locked BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) DEFAULT 'PUBLISHED',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.forum_comments (
+    id VARCHAR(100) PRIMARY KEY,
+    thread_id VARCHAR(100) REFERENCES public.forum_threads(id) ON DELETE CASCADE,
+    parent_id VARCHAR(100) REFERENCES public.forum_comments(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    author_name VARCHAR(255) NOT NULL,
+    author_role VARCHAR(100) DEFAULT 'Learner',
+    content TEXT NOT NULL,
+    upvotes_count INTEGER DEFAULT 0,
+    is_solution BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.academy_courses (
+    id VARCHAR(100) PRIMARY KEY,
+    track VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    level VARCHAR(50) NOT NULL,
+    instructor_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    instructor_name VARCHAR(255) NOT NULL,
+    duration_minutes INTEGER NOT NULL,
+    lessons_count INTEGER NOT NULL,
+    students_enrolled INTEGER DEFAULT 0,
+    rating NUMERIC(3, 2) DEFAULT 4.9,
+    is_featured BOOLEAN DEFAULT FALSE,
+    is_approved BOOLEAN DEFAULT TRUE,
+    thumbnail_url TEXT,
+    prerequisites TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.academy_lessons (
+    id VARCHAR(100) PRIMARY KEY,
+    course_id VARCHAR(100) REFERENCES public.academy_courses(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    duration_minutes INTEGER NOT NULL,
+    lesson_order INTEGER NOT NULL,
+    content_type VARCHAR(50) DEFAULT 'ARTICLE',
+    content_markdown TEXT NOT NULL,
+    video_url TEXT,
+    resource_url TEXT
+);
+
+CREATE TABLE IF NOT EXISTS public.user_watchlists (
+    id VARCHAR(100) PRIMARY KEY,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    asset_type VARCHAR(50) NOT NULL,
+    symbol VARCHAR(30) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    target_price NUMERIC(15, 4),
+    alert_enabled BOOLEAN DEFAULT FALSE,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT unique_user_asset UNIQUE (user_id, symbol)
+);
+
+CREATE TABLE IF NOT EXISTS public.user_notifications (
+    id VARCHAR(100) PRIMARY KEY,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    category VARCHAR(50) DEFAULT 'SYSTEM',
+    action_url TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);

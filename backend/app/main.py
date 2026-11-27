@@ -17,6 +17,14 @@ from backend.app.routers.news import router as news_router
 from backend.app.routers.challenges import router as challenges_router
 from backend.app.routers.ai import router as ai_router
 
+# Blockchain, Crypto, Forex & Community Ecosystem Routers
+from backend.app.routers.crypto_forex import router as crypto_forex_router
+from backend.app.routers.hot_topics import router as hot_topics_router
+from backend.app.routers.forums import router as forums_router
+from backend.app.routers.academy import router as academy_router
+from backend.app.routers.personalization import router as personalization_router
+from backend.app.routers.admin import router as admin_router
+
 app = FastAPI(
     title="MINDMARK API — AI Financial Market Learning Simulator",
     description="Backend architecture for paper trading simulation, behavioral pattern audits, historical market replays, and Gemini AI pedagogical explainers.",
@@ -60,6 +68,14 @@ app.include_router(replay_router)
 app.include_router(news_router)
 app.include_router(challenges_router)
 app.include_router(ai_router)
+
+# Register Ecosystem Routers
+app.include_router(crypto_forex_router)
+app.include_router(hot_topics_router)
+app.include_router(forums_router)
+app.include_router(academy_router)
+app.include_router(personalization_router)
+app.include_router(admin_router)
 
 @app.get("/")
 def root():

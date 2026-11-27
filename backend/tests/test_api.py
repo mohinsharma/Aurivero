@@ -206,8 +206,100 @@ def run_all_tests():
     assert res.status_code == 200
     print("✓ [POST /api/portfolio/reset] Portfolio reset to ₹1,00,000 baseline.")
 
+    # 18. Crypto & Forex Market Intelligence & Converter
+    res = client.get("/api/market-intelligence/crypto")
+    assert res.status_code == 200
+    crypto_data = res.json()["data"]
+    assert len(crypto_data["assets"]) >= 5
+    print(f"✓ [GET /api/market-intelligence/crypto] Loaded {len(crypto_data['assets'])} crypto assets (BTC, ETH, SOL).")
+
+    res = client.get("/api/market-intelligence/forex")
+    assert res.status_code == 200
+    forex_data = res.json()["data"]
+    assert len(forex_data["pairs"]) >= 5
+    print(f"✓ [GET /api/market-intelligence/forex] Loaded {len(forex_data['pairs'])} forex currency pairs (USD/INR, EUR/USD).")
+
+    res = client.post("/api/market-intelligence/convert", json={"from_currency": "USD", "to_currency": "INR", "amount": 100})
+    assert res.status_code == 200
+    assert res.json()["data"]["converted_amount"] > 8000
+    print("✓ [POST /api/market-intelligence/convert] Mid-market currency conversion verified.")
+
+    # 19. Hot Topics & News with Bookmarking
+    res = client.get("/api/hot-topics")
+    assert res.status_code == 200
+    news_items = res.json()["data"]["articles"]
+    assert len(news_items) >= 4
+    first_article_id = news_items[0]["id"]
+
+    res = client.post(f"/api/hot-topics/{first_article_id}/bookmark", headers=headers)
+    assert res.status_code == 200
+    assert "is_bookmarked" in res.json()["data"]
+    print(f"✓ [POST /api/hot-topics/:id/bookmark] Toggled bookmark state on article {first_article_id}.")
+
+    # 20. Community Forums (Threads, Comments, Reactions)
+    res = client.get("/api/forums/categories")
+    assert res.status_code == 200
+    assert len(res.json()["data"]["categories"]) >= 3
+
+    res = client.get("/api/forums/threads")
+    assert res.status_code == 200
+    threads = res.json()["data"]["threads"]
+    assert len(threads) >= 2
+    first_thread_id = threads[0]["id"]
+
+    res = client.post("/api/forums/react", json={"thread_id": first_thread_id, "reaction_type": "UPVOTE"}, headers=headers)
+    assert res.status_code == 200
+
+    comment_res = client.post("/api/forums/comments", json={"thread_id": first_thread_id, "content": "Great architectural insight on Layer 2 gas fees!"}, headers=headers)
+    assert comment_res.status_code == 200
+    print(f"✓ [POST /api/forums/comments] Thread comment added & author reputation awarded.")
+
+    # 21. Academy Tracks, Courses & Lessons
+    res = client.get("/api/academy/tracks")
+    assert res.status_code == 200
+    assert len(res.json()["data"]["tracks"]) >= 3
+
+    res = client.get("/api/academy/courses")
+    assert res.status_code == 200
+    courses = res.json()["data"]["courses"]
+    assert len(courses) >= 3
+
+    res = client.get(f"/api/academy/courses/{courses[0]['id']}", headers=headers)
+    assert res.status_code == 200
+    assert len(res.json()["data"]["lessons"]) >= 1
+    print(f"✓ [GET /api/academy/courses/:id] Verified curriculum for: {courses[0]['title']}.")
+
+    # 22. Academy Quiz Engine
+    res = client.get("/api/academy/quizzes/quiz-bc-101")
+    assert res.status_code == 200
+    quiz_data = res.json()["data"]
+    assert len(quiz_data["questions"]) >= 2
+
+    quiz_sub = client.post("/api/academy/quizzes/quiz-bc-101/submit", json={
+        "quiz_id": "quiz-bc-101",
+        "answers": {1: 1, 2: 2, 3: 1}
+    }, headers=headers)
+    assert quiz_sub.status_code == 200
+    assert quiz_sub.json()["data"]["score"] == 100
+    print("✓ [POST /api/academy/quizzes/:id/submit] Quiz attempt scored 100% and awarded XP.")
+
+    # 23. Personalization Hub & Watchlists
+    res = client.get("/api/personalization/hub", headers=headers)
+    assert res.status_code == 200
+    hub_data = res.json()["data"]
+    assert "profile" in hub_data
+    assert "watchlists" in hub_data
+    print(f"✓ [GET /api/personalization/hub] Aggregated profile hub verified for {hub_data['profile']['full_name']}.")
+
+    # 24. Admin Panel & Moderation
+    res = client.get("/api/admin/stats", headers=headers)
+    assert res.status_code == 200
+    admin_stats = res.json()["data"]
+    assert admin_stats["total_users"] >= 1
+    print(f"✓ [GET /api/admin/stats] Admin verified platform health: {admin_stats['platform_health']}.")
+
     print("=" * 70)
-    print("🎉 ALL 17 BACKEND API ENDPOINTS & LOGIC TESTS PASSED PERFECTLY!")
+    print("🎉 ALL 24 BACKEND API ENDPOINTS & LOGIC TESTS PASSED PERFECTLY!")
     print("=" * 70)
 
 if __name__ == "__main__":

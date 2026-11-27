@@ -15,6 +15,12 @@ import { MarketReplayPage } from './pages/MarketReplayPage';
 import { NewsExplainerPage } from './pages/NewsExplainerPage';
 import { ChallengesPage } from './pages/ChallengesPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { MarketIntelligencePage } from './pages/MarketIntelligencePage';
+import { HotTopicsPage } from './pages/HotTopicsPage';
+import { CommunityForumsPage } from './pages/CommunityForumsPage';
+import { AcademyPage } from './pages/AcademyPage';
+import { PersonalHubPage } from './pages/PersonalHubPage';
+import { AdminPage } from './pages/AdminPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export const App: React.FC = () => {
@@ -38,6 +44,15 @@ export const App: React.FC = () => {
               <Route path="/market-replay" element={<MarketReplayPage />} />
               <Route path="/news-explainer" element={<NewsExplainerPage />} />
               <Route path="/challenges" element={<ChallengesPage />} />
+
+              {/* Blockchain, Crypto & Forex Ecosystem Routes */}
+              <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
+              <Route path="/hot-topics" element={<HotTopicsPage />} />
+              <Route path="/forums" element={<CommunityForumsPage />} />
+              <Route path="/academy" element={<AcademyPage />} />
+              <Route path="/hub" element={<PersonalHubPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 

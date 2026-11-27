@@ -14,7 +14,13 @@ import {
   Settings,
   Compass,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  Coins,
+  Flame,
+  MessageSquare,
+  GraduationCap,
+  Bookmark,
+  ShieldAlert
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 
@@ -29,19 +35,25 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
   const bottomBarItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Simulator', path: '/simulator', icon: CandlestickChart },
-    { name: 'Learn', path: '/learn', icon: BookOpen },
-    { name: 'Psychology', path: '/behavioral-insights', icon: BrainCircuit },
+    { name: 'Markets', path: '/market-intelligence', icon: Coins },
+    { name: 'Forums', path: '/forums', icon: MessageSquare },
+    { name: 'Academy', path: '/academy', icon: GraduationCap },
   ];
 
   const fullDrawerItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Paper Trading Simulator', path: '/simulator', icon: CandlestickChart },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
-    { name: 'Learn & Courses', path: '/learn', icon: BookOpen },
+    { name: 'Market Intelligence (Crypto/FX)', path: '/market-intelligence', icon: Coins },
+    { name: 'Hot Topics & News', path: '/hot-topics', icon: Flame },
+    { name: 'Community Forums', path: '/forums', icon: MessageSquare },
+    { name: 'Learn & Teach Academy', path: '/academy', icon: GraduationCap },
+    { name: 'Personal Hub & Bookmarks', path: '/hub', icon: Bookmark },
     { name: 'Behavioral Insights', path: '/behavioral-insights', icon: BrainCircuit },
     { name: 'Historical Market Replay', path: '/market-replay', icon: History },
     { name: 'Market News Explainer', path: '/news-explainer', icon: Newspaper },
     { name: 'Challenges & XP', path: '/challenges', icon: Trophy },
+    { name: 'Admin & Moderation', path: '/admin', icon: ShieldAlert },
     { name: 'Knowledge Assessment', path: '/onboarding', icon: Compass },
     { name: 'Profile & Settings', path: '/settings', icon: Settings },
   ];
