@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import math
+import statistics
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-import numpy as np
-
 from backend.app.services.providers import get_provider
 from backend.app.services.providers.base import NormalizedCandle, utc_now_iso
+
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except Exception:
+    np = None  # type: ignore[assignment]
+    HAS_NUMPY = False
 
 try:
     from sklearn.ensemble import RandomForestRegressor
@@ -16,20 +22,29 @@ except Exception:
     HAS_SKLEARN = False
 
 
+def _std(vals: List[float]) -> float:
+    return statistics.stdev(vals) if len(vals) >= 2 else 0.0
+
+
+def _mean(vals: List[float]) -> float:
+    return sum(vals) / len(vals) if vals else 0.0
+
+
 def _build_volatility_features(candles: List[NormalizedCandle], annual_factor: int):
     """
     Constructs strictly causal (non-leaking) feature rows at index `i`
     to predict forward 5-day realized annualized volatility `y_{i -> i+5}`.
     """
-    closes = np.array([c.close for c in candles], dtype=float)
-    highs = np.array([c.high for c in candles], dtype=float)
-    lows = np.array([c.low for c in candles], dtype=float)
-    vols = np.array([c.volume for c in candles], dtype=float)
+    closes = [c.close for c in candles]
+    highs = [c.high for c in candles]
+    lows = [c.low for c in candles]
+    vols = [c.volume for c in candles]
 
-    rets = np.zeros_like(closes)
-    rets[1:] = np.diff(closes) / np.where(closes[:-1] > 0, closes[:-1], 1.0)
+    rets = [0.0] * len(candles)
+    for i in range(1, len(candles)):
+        rets[i] = (closes[i] - closes[i - 1]) / closes[i - 1] if closes[i - 1] > 0 else 0.0
 
-    trs = np.zeros_like(closes)
+    trs = [0.0] * len(candles)
     trs[0] = highs[0] - lows[0]
     for i in range(1, len(candles)):
         trs[i] = max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
@@ -39,53 +54,42 @@ def _build_volatility_features(candles: List[NormalizedCandle], annual_factor: i
     min_hist = 60
 
     for i in range(min_hist, len(candles) - horizon):
-        r5 = np.std(rets[i - 5 : i], ddof=1) * math.sqrt(annual_factor)
-        r20 = np.std(rets[i - 20 : i], ddof=1) * math.sqrt(annual_factor)
-        r60 = np.std(rets[i - 60 : i], ddof=1) * math.sqrt(annual_factor)
-        atr_pct = float(np.mean(trs[i - 14 : i]) / max(1e-9, closes[i]))
-        ret_5d = float((closes[i] - closes[i - 5]) / max(1e-9, closes[i - 5]))
-        peak20 = float(np.max(closes[i - 20 : i + 1]))
-        dd20 = float((peak20 - closes[i]) / max(1e-9, peak20))
+        r5 = _std(rets[i - 5 : i]) * math.sqrt(annual_factor)
+        r20 = _std(rets[i - 20 : i]) * math.sqrt(annual_factor)
+        r60 = _std(rets[i - 60 : i]) * math.sqrt(annual_factor)
+        atr_pct = _mean(trs[i - 14 : i]) / max(1e-9, closes[i])
+        ret_5d = (closes[i] - closes[i - 5]) / max(1e-9, closes[i - 5])
+        peak20 = max(closes[i - 20 : i + 1])
+        dd20 = (peak20 - closes[i]) / max(1e-9, peak20)
         vol_ratio = r5 / max(1e-6, r20)
-        vol_z = 0.0
         v_slice = vols[i - 20 : i]
-        if np.std(v_slice) > 0:
-            vol_z = float((vols[i] - np.mean(v_slice)) / np.std(v_slice))
+        v_std = _std(v_slice)
+        vol_z = (vols[i] - _mean(v_slice)) / v_std if v_std > 0 else 0.0
 
-        target_fwd = float(np.std(rets[i + 1 : i + 1 + horizon], ddof=1) * math.sqrt(annual_factor))
+        target_fwd = _std(rets[i + 1 : i + 1 + horizon]) * math.sqrt(annual_factor)
         if not all(math.isfinite(v) for v in (r5, r20, r60, atr_pct, ret_5d, dd20, vol_ratio, vol_z, target_fwd)):
             continue
 
         X.append([r5, r20, r60, atr_pct, abs(rets[i]), ret_5d, dd20, vol_ratio, vol_z])
         y.append(target_fwd)
-        base_preds.append(r20)  # Persistent 20d volatility baseline
+        base_preds.append(r20)
         dates.append(candles[i].time)
 
-    # Latest causal feature vector (for current state assessment)
     i = len(candles) - 1
-    r5_now = float(np.std(rets[i - 5 : i + 1], ddof=1) * math.sqrt(annual_factor))
-    r20_now = float(np.std(rets[i - 20 : i + 1], ddof=1) * math.sqrt(annual_factor))
-    r60_now = float(np.std(rets[i - 60 : i + 1], ddof=1) * math.sqrt(annual_factor))
-    atr_now = float(np.mean(trs[i - 14 : i + 1]) / max(1e-9, closes[i]))
-    ret5_now = float((closes[i] - closes[i - 5]) / max(1e-9, closes[i - 5]))
-    peak20_now = float(np.max(closes[i - 20 : i + 1]))
-    dd20_now = float((peak20_now - closes[i]) / max(1e-9, peak20_now))
+    r5_now = _std(rets[i - 5 : i + 1]) * math.sqrt(annual_factor)
+    r20_now = _std(rets[i - 20 : i + 1]) * math.sqrt(annual_factor)
+    r60_now = _std(rets[i - 60 : i + 1]) * math.sqrt(annual_factor)
+    atr_now = _mean(trs[i - 14 : i + 1]) / max(1e-9, closes[i])
+    ret5_now = (closes[i] - closes[i - 5]) / max(1e-9, closes[i - 5])
+    peak20_now = max(closes[i - 20 : i + 1])
+    dd20_now = (peak20_now - closes[i]) / max(1e-9, peak20_now)
     vol_ratio_now = r5_now / max(1e-6, r20_now)
     v_slice_now = vols[i - 20 : i]
-    vol_z_now = float((vols[i] - np.mean(v_slice_now)) / np.std(v_slice_now)) if np.std(v_slice_now) > 0 else 0.0
-    latest_x = np.array([[r5_now, r20_now, r60_now, atr_now, abs(rets[i]), ret5_now, dd20_now, vol_ratio_now, vol_z_now]])
+    v_std_now = _std(v_slice_now)
+    vol_z_now = (vols[i] - _mean(v_slice_now)) / v_std_now if v_std_now > 0 else 0.0
+    latest_x = [[r5_now, r20_now, r60_now, atr_now, abs(rets[i]), ret5_now, dd20_now, vol_ratio_now, vol_z_now]]
 
-    return (
-        np.array(X, dtype=float),
-        np.array(y, dtype=float),
-        np.array(base_preds, dtype=float),
-        dates,
-        latest_x,
-        rets,
-        r20_now,
-        r60_now,
-        vol_z_now,
-    )
+    return X, y, base_preds, dates, latest_x, rets, r20_now, r60_now, vol_z_now
 
 
 async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[str, Any]:
@@ -126,35 +130,40 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
     X_test, y_test = X[split_idx:], y[split_idx:]
     base_test = base_preds[split_idx:]
 
-    if HAS_SKLEARN:
+    if HAS_SKLEARN and HAS_NUMPY:
         model = RandomForestRegressor(n_estimators=80, max_depth=5, min_samples_leaf=5, random_state=42)
-        model.fit(X_train, y_train)
-        test_preds = model.predict(X_test)
-        # Re-fit on full available history up to today for latest estimate
+        model.fit(np.array(X_train), np.array(y_train))
+        test_preds = list(model.predict(np.array(X_test)))
         model_full = RandomForestRegressor(n_estimators=80, max_depth=5, min_samples_leaf=5, random_state=42)
-        model_full.fit(X, y)
-        est_vol = float(model_full.predict(latest_x)[0])
+        model_full.fit(np.array(X), np.array(y))
+        est_vol = float(model_full.predict(np.array(latest_x))[0])
         model_name = "RandomForestRegressor (scikit-learn)"
-    else:
-        # Ridge regression closed-form fallback in pure NumPy
+    elif HAS_NUMPY:
         lam = 1.0
-        Xb = np.hstack([np.ones((len(X_train), 1)), X_train])
-        w = np.linalg.solve(Xb.T @ Xb + lam * np.eye(Xb.shape[1]), Xb.T @ y_train)
-        test_preds = np.hstack([np.ones((len(X_test), 1)), X_test]) @ w
-        Xb_full = np.hstack([np.ones((len(X), 1)), X])
-        w_full = np.linalg.solve(Xb_full.T @ Xb_full + lam * np.eye(Xb_full.shape[1]), Xb_full.T @ y)
-        est_vol = float((np.hstack([np.ones((1, 1)), latest_x]) @ w_full)[0])
+        Xtr = np.array(X_train)
+        Xte = np.array(X_test)
+        Xf = np.array(X)
+        Xb = np.hstack([np.ones((len(Xtr), 1)), Xtr])
+        w = np.linalg.solve(Xb.T @ Xb + lam * np.eye(Xb.shape[1]), Xb.T @ np.array(y_train))
+        test_preds = list(np.hstack([np.ones((len(Xte), 1)), Xte]) @ w)
+        Xb_full = np.hstack([np.ones((len(Xf), 1)), Xf])
+        w_full = np.linalg.solve(Xb_full.T @ Xb_full + lam * np.eye(Xb_full.shape[1]), Xb_full.T @ np.array(y))
+        est_vol = float((np.hstack([np.ones((1, 1)), np.array(latest_x)]) @ w_full)[0])
         model_name = "Ridge Regression (NumPy)"
+    else:
+        # Pure-Python EWMA Volatility Baseline (no external ML packages required)
+        test_preds = [0.65 * row[1] + 0.35 * row[2] for row in X_test]
+        est_vol = 0.65 * r20_now + 0.35 * r60_now
+        model_name = "EWMA Volatility Blend (Pure Python)"
 
-    model_mae = float(np.mean(np.abs(test_preds - y_test)))
-    baseline_mae = float(np.mean(np.abs(base_test - y_test)))
-    model_rmse = float(np.sqrt(np.mean((test_preds - y_test) ** 2)))
-    baseline_rmse = float(np.sqrt(np.mean((base_test - y_test) ** 2)))
+    model_mae = _mean([abs(p - a) for p, a in zip(test_preds, y_test)])
+    baseline_mae = _mean([abs(p - a) for p, a in zip(base_test, y_test)])
+    model_rmse = math.sqrt(_mean([(p - a) ** 2 for p, a in zip(test_preds, y_test)]))
+    baseline_rmse = math.sqrt(_mean([(p - a) ** 2 for p, a in zip(base_test, y_test)]))
     beats_baseline = model_mae < baseline_mae
 
     # Volatility regime classification via historical percentile
-    hist_vols = y
-    pct_rank = float(np.mean(hist_vols <= r20_now) * 100)
+    pct_rank = (sum(1 for hv in y if hv <= r20_now) / len(y)) * 100.0
     if pct_rank >= 75:
         regime = "HIGH"
     elif pct_rank >= 35:
@@ -171,8 +180,9 @@ async def evaluate_ml_risk_intelligence(asset_class: str, symbol: str) -> Dict[s
         vol_trend = "STABLE"
 
     # Unusual movement anomaly detection (latest 1D return Z-score vs 60d)
-    ret_60_std = float(np.std(rets[-61:-1], ddof=1)) if len(rets) > 61 else float(np.std(rets, ddof=1))
-    ret_z = float((rets[-1] - np.mean(rets[-61:-1])) / max(1e-9, ret_60_std))
+    ret_window = rets[-61:-1] if len(rets) > 61 else rets[:-1]
+    ret_60_std = _std(ret_window)
+    ret_z = (rets[-1] - _mean(ret_window)) / max(1e-9, ret_60_std)
     anomaly_detected = abs(ret_z) >= 2.2 or abs(vol_z_now) >= 2.5
 
     train_start = datetime.fromtimestamp(dates[0], tz=timezone.utc).strftime("%Y-%m-%d")

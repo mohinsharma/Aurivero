@@ -23,3 +23,7 @@ google-generativeai>=0.4.0  # Official Google Gemini 1.5 Flash SDK (with determi
 
 # Configuration Management
 python-dotenv>=1.0.0        # Automatic loading of .env environment files
+
+# Quantitative Risk & Walk-Forward ML (Optional — pure-Python fallback included)
+numpy>=1.26.0
+scikit-learn>=1.4.0
