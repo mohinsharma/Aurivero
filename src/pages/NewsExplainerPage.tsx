@@ -93,7 +93,7 @@ export const NewsExplainerPage: React.FC = () => {
 
   const handleCopySummary = (item: MarketNewsItem, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const text = `📰 ${item.headline} (${item.source})\n\n💡 WHAT HAPPENED:\n${item.whatHappened}\n\n🔍 WHY IT HAPPENED:\n${item.whyDidItHappen}\n\n📊 WHAT IT MEANS:\n${item.whatDoesItMean}\n\n📚 CONCEPT: ${item.learnTheConcept.conceptName} — Explained on MINDMARK`;
+    const text = `📰 ${item.headline} (${item.source})\n\n💡 WHAT HAPPENED:\n${item.whatHappened}\n\n🔍 WHY IT HAPPENED:\n${item.whyDidItHappen}\n\n📊 WHAT IT MEANS:\n${item.whatDoesItMean}\n\n📚 CONCEPT: ${item.learnTheConcept.conceptName} — Explained on Aurivero`;
     navigator.clipboard?.writeText(text);
     setCopiedId(item.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -129,19 +129,19 @@ export const NewsExplainerPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-surface border border-border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      <div className="p-6 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono uppercase tracking-wider text-primary font-semibold flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-[#2962FF] flex items-center gap-1.5">
               <Newspaper size={14} /> AI Market Event Explainer
             </span>
             <Badge variant="primary" size="sm">Jargon-Free Financial Literacy</Badge>
-            <Badge variant="secondary" size="sm">Indian Market Intelligence</Badge>
+            <Badge variant="neutral" size="sm">Indian Market Intelligence</Badge>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#131722] mt-1">
             Plain-English Financial News & Concept Bridge
           </h1>
-          <p className="text-xs text-text-secondary mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#64748B] mt-1 max-w-2xl leading-relaxed">
             Financial headlines are written for institutional traders, packed with terms like "Repo Rate", "Operating Margins", and "P/E Expansion". We deconstruct each event into plain English, link it to foundational investing principles, and test your comprehension.
           </p>
         </div>
@@ -159,21 +159,21 @@ export const NewsExplainerPage: React.FC = () => {
       </div>
 
       {/* Search & Category Filter Controls */}
-      <div className="p-4 rounded-xl bg-surface border border-border space-y-3">
+      <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-sm space-y-3.5">
         {/* Search bar */}
         <div className="relative">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search headlines, stock tickers (TCS, HDFC, Asian Paints), economic concepts (Inflation, Repo, VIX)..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#131722] placeholder:text-[#64748B] focus:outline-none focus:border-[#2962FF] transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#131722] text-xs"
             >
               Clear
             </button>
@@ -181,17 +181,17 @@ export const NewsExplainerPage: React.FC = () => {
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           {CATEGORIES.map((cat) => {
             const isSelected = selectedCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border ${
                   isSelected
-                    ? 'bg-primary text-background font-bold shadow-glow'
-                    : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
+                    ? 'bg-[#2962FF] text-white border-[#2962FF] font-semibold'
+                    : 'bg-[#F8FAFC] text-[#64748B] hover:text-[#131722] border-[#E2E8F0]'
                 }`}
               >
                 {cat}
@@ -202,21 +202,21 @@ export const NewsExplainerPage: React.FC = () => {
       </div>
 
       {/* Feed Summary HUD */}
-      <div className="flex items-center justify-between text-xs font-mono text-text-muted px-1">
+      <div className="flex items-center justify-between text-xs text-[#64748B] px-1 tabular-nums">
         <span>
-          Showing <strong className="text-text-primary">{filteredNews.length}</strong> verified market events
-          {selectedCategory !== 'All' && <span> in <strong className="text-primary">{selectedCategory}</strong></span>}
-          {showBookmarksOnly && <span className="text-warning"> (Bookmarks only)</span>}
+          Showing <strong className="text-[#131722]">{filteredNews.length}</strong> verified market events
+          {selectedCategory !== 'All' && <span> in <strong className="text-[#2962FF]">{selectedCategory}</strong></span>}
+          {showBookmarksOnly && <span className="text-amber-600"> (Bookmarks only)</span>}
         </span>
-        <span className="text-[11px]">Click any article to open AI Concept Breakdown</span>
+        <span className="text-xs">Click any article to open AI Concept Breakdown</span>
       </div>
 
       {/* News Feed Cards Grid */}
       {filteredNews.length === 0 ? (
-        <Card variant="elevated" className="p-12 text-center space-y-3">
-          <Compass size={32} className="mx-auto text-text-muted opacity-60" />
-          <h3 className="text-base font-bold text-text-primary">No Matching Market Events Found</h3>
-          <p className="text-xs text-text-secondary max-w-md mx-auto">
+        <Card className="p-12 text-center space-y-3">
+          <Compass size={32} className="mx-auto text-[#64748B] opacity-60" />
+          <h3 className="text-base font-bold text-[#131722]">No Matching Market Events Found</h3>
+          <p className="text-xs text-[#64748B] max-w-md mx-auto">
             Try adjusting your search keywords or switching category filters to explore other economic events.
           </p>
           <Button
@@ -232,7 +232,7 @@ export const NewsExplainerPage: React.FC = () => {
           </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredNews.map((item) => {
             const isBookmarked = bookmarkedIds.includes(item.id);
             const sentimentVariant = item.marketSentiment === 'Bullish' ? 'primary' : item.marketSentiment === 'Bearish' ? 'danger' : 'neutral';
@@ -240,20 +240,19 @@ export const NewsExplainerPage: React.FC = () => {
             return (
               <Card
                 key={item.id}
-                variant="elevated"
-                className="p-5 border-border hover:border-primary/50 transition-all cursor-pointer flex flex-col justify-between group space-y-4"
+                className="p-6 hover:border-[#2962FF]/40 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group space-y-4"
                 onClick={() => handleOpenExplainer(item)}
               >
                 <div className="space-y-2.5">
                   {/* Top metadata */}
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-mono text-text-muted flex items-center gap-1">
-                        <Building size={11} className="text-text-muted" /> {item.source}
+                      <span className="text-[11px] text-[#64748B] flex items-center gap-1">
+                        <Building size={11} /> {item.source}
                       </span>
-                      <span className="text-text-muted">•</span>
-                      <span className="text-[10px] font-mono text-text-muted flex items-center gap-1">
-                        <Clock size={11} className="text-text-muted" /> {item.publishedAt}
+                      <span className="text-[#64748B]">•</span>
+                      <span className="text-[11px] text-[#64748B] flex items-center gap-1 tabular-nums">
+                        <Clock size={11} /> {item.publishedAt}
                       </span>
                     </div>
 
@@ -263,10 +262,10 @@ export const NewsExplainerPage: React.FC = () => {
                       </Badge>
                       <button
                         onClick={(e) => toggleBookmark(item.id, e)}
-                        className={`p-1 rounded-md transition-colors ${
+                        className={`p-1.5 rounded-lg border transition-colors ${
                           isBookmarked
-                            ? 'text-warning bg-warning/10'
-                            : 'text-text-muted hover:text-text-primary bg-surface-elevated'
+                            ? 'text-amber-600 bg-amber-50 border-amber-200'
+                            : 'text-[#64748B] hover:text-[#131722] bg-[#F8FAFC] border-[#E2E8F0]'
                         }`}
                         title={isBookmarked ? 'Remove bookmark' : 'Bookmark for later'}
                       >
@@ -276,23 +275,23 @@ export const NewsExplainerPage: React.FC = () => {
                   </div>
 
                   {/* Headline */}
-                  <h3 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-primary transition-colors leading-snug">
+                  <h3 className="text-sm sm:text-base font-bold text-[#131722] group-hover:text-[#2962FF] transition-colors leading-snug">
                     {item.headline}
                   </h3>
 
                   {/* Plain English What Happened preview */}
-                  <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
                     {item.whatHappened}
                   </p>
                 </div>
 
-                <div className="space-y-3 pt-3 border-t border-border/40">
+                <div className="space-y-3 pt-3 border-t border-[#E2E8F0]">
                   {/* Affected Sector & Concept Pill */}
-                  <div className="flex items-center justify-between gap-2 text-[11px] font-mono flex-wrap">
-                    <span className="text-text-muted truncate max-w-[220px]">
-                      Target: <strong className="text-text-primary">{item.relevantStockOrSector.split(',')[0]}</strong>
+                  <div className="flex items-center justify-between gap-2 text-xs flex-wrap">
+                    <span className="text-[#64748B] truncate max-w-[220px]">
+                      Target: <strong className="text-[#131722]">{item.relevantStockOrSector.split(',')[0]}</strong>
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-primary font-semibold flex items-center gap-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#2962FF]/10 text-[#2962FF] font-semibold flex items-center gap-1 text-[11px]">
                       <Sparkles size={11} /> {item.learnTheConcept.conceptName}
                     </span>
                   </div>
@@ -301,11 +300,11 @@ export const NewsExplainerPage: React.FC = () => {
                   <div className="flex items-center justify-between pt-1">
                     <button
                       onClick={(e) => handleCopySummary(item, e)}
-                      className="text-[11px] text-text-muted hover:text-text-primary flex items-center gap-1 font-mono transition-colors"
+                      className="text-xs text-[#64748B] hover:text-[#131722] flex items-center gap-1 transition-colors"
                     >
                       {copiedId === item.id ? (
                         <>
-                          <Check size={12} className="text-primary" /> Copied summary
+                          <Check size={12} className="text-[#089981]" /> Copied summary
                         </>
                       ) : (
                         <>
@@ -317,7 +316,7 @@ export const NewsExplainerPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs text-primary group-hover:translate-x-0.5 transition-transform"
+                      className="text-xs text-[#2962FF] group-hover:translate-x-0.5 transition-transform"
                       icon={<ArrowRight size={14} />}
                       iconPosition="right"
                     >
@@ -339,11 +338,11 @@ export const NewsExplainerPage: React.FC = () => {
           title={selectedNews.headline}
           maxWidth="2xl"
         >
-          <div className="space-y-6 text-text-primary">
+          <div className="space-y-5 text-[#131722]">
             {/* Metadata Bar */}
-            <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-border/60 text-xs font-mono">
+            <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-[#E2E8F0] text-xs">
               <div className="flex items-center gap-2">
-                <span className="text-text-muted">{selectedNews.source} • {selectedNews.publishedAt}</span>
+                <span className="text-[#64748B]">{selectedNews.source} • {selectedNews.publishedAt}</span>
                 <Badge variant={selectedNews.marketSentiment === 'Bullish' ? 'primary' : 'neutral'} size="sm">
                   {selectedNews.marketSentiment} Sentiment
                 </Badge>
@@ -352,11 +351,11 @@ export const NewsExplainerPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => toggleBookmark(selectedNews.id)}
-                  className="px-2.5 py-1 rounded bg-surface border border-border text-xs flex items-center gap-1 hover:border-warning transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-xs flex items-center gap-1 hover:border-[#2962FF]/40 transition-colors"
                 >
                   {bookmarkedIds.includes(selectedNews.id) ? (
                     <>
-                      <BookmarkCheck size={13} className="text-warning" /> Saved
+                      <BookmarkCheck size={13} className="text-amber-600" /> Saved
                     </>
                   ) : (
                     <>
@@ -366,48 +365,48 @@ export const NewsExplainerPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleCopySummary(selectedNews)}
-                  className="px-2.5 py-1 rounded bg-surface border border-border text-xs flex items-center gap-1 hover:border-primary transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-xs flex items-center gap-1 hover:border-[#2962FF]/40 transition-colors"
                 >
-                  {copiedId === selectedNews.id ? <Check size={13} className="text-primary" /> : <Share2 size={13} />}
+                  {copiedId === selectedNews.id ? <Check size={13} className="text-[#089981]" /> : <Share2 size={13} />}
                   {copiedId === selectedNews.id ? 'Copied' : 'Copy'}
                 </button>
               </div>
             </div>
 
             {/* Affected Stock & Sectors pill */}
-            <div className="p-3 rounded-xl bg-background border border-border/60 flex items-center justify-between gap-3 text-xs font-mono">
-              <span className="text-text-muted">Directly Impacted Assets:</span>
-              <span className="text-text-primary font-semibold">{selectedNews.relevantStockOrSector}</span>
+            <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between gap-3 text-xs">
+              <span className="text-[#64748B]">Directly Impacted Assets:</span>
+              <span className="text-[#131722] font-semibold">{selectedNews.relevantStockOrSector}</span>
             </div>
 
             {/* AI Explainer 5-Point Core Structure */}
             <div className="space-y-4">
               {/* 1. WHAT HAPPENED? */}
-              <div className="p-4 rounded-xl bg-surface border border-border space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-primary uppercase">
-                  <Sparkles size={14} className="text-primary" /> 1. What Happened?
+              <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#2962FF]">
+                  <Sparkles size={14} /> 1. What Happened?
                 </div>
-                <p className="text-xs sm:text-sm text-text-primary leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-[#131722] leading-relaxed">
                   {selectedNews.whatHappened}
                 </p>
               </div>
 
               {/* 2. WHY DID IT HAPPEN? */}
-              <div className="p-4 rounded-xl bg-surface border border-border space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-secondary uppercase">
-                  <Info size={14} className="text-secondary" /> 2. Why Did It Happen?
+              <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#131722]">
+                  <Info size={14} className="text-[#2962FF]" /> 2. Why Did It Happen?
                 </div>
-                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                   {selectedNews.whyDidItHappen}
                 </p>
               </div>
 
               {/* 3. WHAT DOES IT MEAN? */}
-              <div className="p-4 rounded-xl bg-surface border border-border space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-warning uppercase">
-                  <Layers size={14} className="text-warning" /> 3. What Does It Mean For Investors?
+              <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700">
+                  <Layers size={14} /> 3. What Does It Mean For Investors?
                 </div>
-                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                   {selectedNews.whatDoesItMean}
                 </p>
 
@@ -415,16 +414,16 @@ export const NewsExplainerPage: React.FC = () => {
                 {selectedNews.impactedSectors && selectedNews.impactedSectors.length > 0 && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-2">
                     {selectedNews.impactedSectors.map((sec, idx) => (
-                      <div key={idx} className="p-2.5 rounded-lg bg-background border border-border/40 text-[11px]">
-                        <div className="flex items-center justify-between font-mono mb-0.5">
-                          <span className="font-bold text-text-primary">{sec.name}</span>
+                      <div key={idx} className="p-3 rounded-lg bg-white border border-[#E2E8F0] text-xs">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-[#131722]">{sec.name}</span>
                           <span className={`text-[10px] font-semibold ${
-                            sec.impact === 'positive' ? 'text-primary' : sec.impact === 'negative' ? 'text-danger' : 'text-text-muted'
+                            sec.impact === 'positive' ? 'text-[#089981]' : sec.impact === 'negative' ? 'text-[#F23645]' : 'text-[#64748B]'
                           }`}>
                             {sec.impact.toUpperCase()}
                           </span>
                         </div>
-                        <p className="text-text-secondary leading-tight">{sec.rationale}</p>
+                        <p className="text-[#64748B] leading-snug text-[11px]">{sec.rationale}</p>
                       </div>
                     ))}
                   </div>
@@ -432,10 +431,10 @@ export const NewsExplainerPage: React.FC = () => {
               </div>
 
               {/* 4. LEARN THE CONCEPT */}
-              <div className="p-4 rounded-xl bg-surface-elevated border border-primary/40 space-y-3">
+              <div className="p-4 rounded-xl bg-[#2962FF]/[0.05] border border-[#2962FF]/20 space-y-3">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-primary uppercase">
-                    <BookOpen size={14} className="text-primary" /> 4. Learn The Core Concept: {selectedNews.learnTheConcept.conceptName}
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#2962FF]">
+                    <BookOpen size={14} /> 4. Learn The Core Concept: {selectedNews.learnTheConcept.conceptName}
                   </div>
                   <Button
                     variant="outline"
@@ -446,43 +445,43 @@ export const NewsExplainerPage: React.FC = () => {
                     }}
                     icon={<ExternalLink size={12} />}
                     iconPosition="right"
-                    className="text-xs font-mono"
+                    className="text-xs"
                   >
                     Open Curriculum
                   </Button>
                 </div>
 
                 <div className="space-y-1.5 text-xs">
-                  <p className="text-text-primary leading-relaxed font-sans">
+                  <p className="text-[#131722] leading-relaxed">
                     <strong>Definition:</strong> {selectedNews.learnTheConcept.definition}
                   </p>
-                  <div className="p-2.5 rounded-lg bg-background border border-border/50 text-[11px] text-text-secondary leading-relaxed font-sans">
-                    <strong className="text-primary font-mono block mb-0.5">Key Investor Takeaway:</strong>
+                  <div className="p-3 rounded-lg bg-white border border-[#E2E8F0] text-xs text-[#64748B] leading-relaxed">
+                    <strong className="text-[#2962FF] block mb-0.5">Key Investor Takeaway:</strong>
                     {selectedNews.learnTheConcept.keyTakeaway}
                   </div>
                 </div>
               </div>
 
               {/* 5. UNDERSTAND THE RISK */}
-              <div className="p-4 rounded-xl bg-danger/10 border border-danger/30 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-danger uppercase">
-                  <ShieldAlert size={14} className="text-danger" /> 5. Understand The Risk & Uncertainty
+              <div className="p-4 rounded-xl bg-[#F23645]/10 border border-[#F23645]/25 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#F23645]">
+                  <ShieldAlert size={14} /> 5. Understand The Risk & Uncertainty
                 </div>
-                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                   {selectedNews.understandTheRisk}
                 </p>
               </div>
 
               {/* 6. KNOWLEDGE CHECK QUIZ */}
-              <div className="p-4 rounded-xl bg-surface border border-secondary/40 space-y-3">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-secondary uppercase flex items-center gap-1.5">
-                    <HelpCircle size={14} className="text-secondary" /> 6. Comprehension Knowledge Check
+                  <span className="text-xs font-bold text-[#2962FF] flex items-center gap-1.5">
+                    <HelpCircle size={14} /> 6. Comprehension Knowledge Check
                   </span>
-                  <span className="text-[10px] font-mono text-text-muted">Instant Feedback</span>
+                  <span className="text-[11px] text-[#64748B]">Instant Feedback</span>
                 </div>
 
-                <h4 className="text-xs sm:text-sm font-bold text-text-primary leading-snug">
+                <h4 className="text-xs sm:text-sm font-bold text-[#131722] leading-snug">
                   {selectedNews.knowledgeCheck.question}
                 </h4>
 
@@ -490,16 +489,16 @@ export const NewsExplainerPage: React.FC = () => {
                   {selectedNews.knowledgeCheck.options.map((opt, idx) => {
                     const isSelected = selectedQuizAnswer === idx;
                     const isCorrect = idx === selectedNews.knowledgeCheck.correctIndex;
-                    let styleClass = 'bg-background border-border text-text-secondary hover:border-text-secondary/40';
+                    let styleClass = 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]';
 
                     if (isQuizSubmitted) {
                       if (isCorrect) {
-                        styleClass = 'bg-primary/15 border-primary text-text-primary font-semibold';
+                        styleClass = 'bg-[#089981]/10 border-[#089981] text-[#131722] font-semibold';
                       } else if (isSelected && !isCorrect) {
-                        styleClass = 'bg-danger/15 border-danger text-text-primary';
+                        styleClass = 'bg-[#F23645]/10 border-[#F23645] text-[#131722]';
                       }
                     } else if (isSelected) {
-                      styleClass = 'bg-secondary/15 border-secondary text-text-primary';
+                      styleClass = 'bg-[#2962FF]/10 border-[#2962FF] text-[#131722] font-medium';
                     }
 
                     return (
@@ -510,14 +509,14 @@ export const NewsExplainerPage: React.FC = () => {
                             setSelectedQuizAnswer(idx);
                           }
                         }}
-                        className={`p-3 rounded-lg border text-xs cursor-pointer transition-all flex items-start gap-2.5 ${styleClass}`}
+                        className={`p-3 rounded-lg border text-xs cursor-pointer transition-colors flex items-start gap-2.5 ${styleClass}`}
                       >
-                        <span className="font-mono text-text-muted shrink-0 font-bold">
+                        <span className="text-[#64748B] shrink-0 font-bold">
                           {String.fromCharCode(65 + idx)}.
                         </span>
                         <span className="flex-1 leading-snug">{opt}</span>
-                        {isQuizSubmitted && isCorrect && <CheckCircle2 size={15} className="text-primary shrink-0" />}
-                        {isQuizSubmitted && isSelected && !isCorrect && <XCircle size={15} className="text-danger shrink-0" />}
+                        {isQuizSubmitted && isCorrect && <CheckCircle2 size={15} className="text-[#089981] shrink-0" />}
+                        {isQuizSubmitted && isSelected && !isCorrect && <XCircle size={15} className="text-[#F23645] shrink-0" />}
                       </div>
                     );
                   })}
@@ -526,7 +525,7 @@ export const NewsExplainerPage: React.FC = () => {
                 {!isQuizSubmitted ? (
                   <div className="flex justify-end pt-2">
                     <Button
-                      variant="secondary"
+                      variant="primary"
                       size="sm"
                       disabled={selectedQuizAnswer === null}
                       onClick={() => setIsQuizSubmitted(true)}
@@ -535,19 +534,19 @@ export const NewsExplainerPage: React.FC = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="p-3 rounded-lg bg-background border border-border/50 text-xs space-y-1 animate-in fade-in duration-200">
-                    <div className="flex items-center gap-1.5 font-bold font-mono">
+                  <div className="p-3 rounded-lg bg-white border border-[#E2E8F0] text-xs space-y-1 animate-in fade-in duration-200">
+                    <div className="flex items-center gap-1.5 font-bold">
                       {selectedQuizAnswer === selectedNews.knowledgeCheck.correctIndex ? (
-                        <span className="text-primary flex items-center gap-1">
+                        <span className="text-[#089981] flex items-center gap-1">
                           <CheckCircle2 size={14} /> Correct! Well understood.
                         </span>
                       ) : (
-                        <span className="text-danger flex items-center gap-1">
+                        <span className="text-[#F23645] flex items-center gap-1">
                           <XCircle size={14} /> Not quite right.
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-text-secondary leading-relaxed font-sans">
+                    <p className="text-xs text-[#64748B] leading-relaxed">
                       {selectedNews.knowledgeCheck.explanation}
                     </p>
                   </div>
@@ -556,8 +555,8 @@ export const NewsExplainerPage: React.FC = () => {
             </div>
 
             {/* Bottom Actions */}
-            <div className="flex items-center justify-between pt-3 border-t border-border/60">
-              <span className="text-[10px] font-mono text-text-muted">
+            <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0]">
+              <span className="text-[11px] text-[#64748B]">
                 SEBI Pedagogical Notice: Educational analysis only; not investment advice.
               </span>
               <Button

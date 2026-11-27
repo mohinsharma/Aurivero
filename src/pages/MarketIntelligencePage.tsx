@@ -191,7 +191,7 @@ export const MarketIntelligencePage: React.FC = () => {
             onClick={() => setActiveTab('crypto')}
             className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
               activeTab === 'crypto'
-                ? 'bg-primary text-background shadow-glow'
+                ? 'bg-primary text-white shadow-glow'
                 : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/60'
             }`}
           >
@@ -203,7 +203,7 @@ export const MarketIntelligencePage: React.FC = () => {
             onClick={() => setActiveTab('forex')}
             className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
               activeTab === 'forex'
-                ? 'bg-secondary text-background shadow-md'
+                ? 'bg-secondary text-white shadow-md'
                 : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/60'
             }`}
           >
@@ -215,7 +215,7 @@ export const MarketIntelligencePage: React.FC = () => {
             onClick={() => setActiveTab('converter')}
             className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
               activeTab === 'converter'
-                ? 'bg-warning text-background font-bold shadow-md'
+                ? 'bg-warning text-white font-bold shadow-md'
                 : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/60'
             }`}
           >
@@ -307,7 +307,7 @@ export const MarketIntelligencePage: React.FC = () => {
                       onClick={() => setSelectedTimeframe(tf)}
                       className={`px-2.5 py-1 rounded-lg transition-colors ${
                         selectedTimeframe === tf
-                          ? 'bg-primary text-background font-bold'
+                          ? 'bg-primary text-white font-bold'
                           : 'bg-surface text-text-muted hover:text-text-primary'
                       }`}
                     >

@@ -260,7 +260,7 @@ export const RiskCalculatorPage: React.FC = () => {
               onClick={() => setActiveTab(t.id as RiskTab)}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold border whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${
                 active
-                  ? 'bg-primary text-background border-primary'
+                  ? 'bg-primary text-white border-primary'
                   : 'bg-surface text-text-secondary border-border hover:text-text-primary'
               }`}
             >
@@ -282,7 +282,7 @@ export const RiskCalculatorPage: React.FC = () => {
                   type="button"
                   onClick={() => setDirection('LONG')}
                   className={`px-3 py-1 font-bold ${
-                    direction === 'LONG' ? 'bg-primary text-background' : 'bg-background text-text-muted'
+                    direction === 'LONG' ? 'bg-primary text-white' : 'bg-background text-text-muted'
                   }`}
                 >
                   ▲ LONG
@@ -291,7 +291,7 @@ export const RiskCalculatorPage: React.FC = () => {
                   type="button"
                   onClick={() => setDirection('SHORT')}
                   className={`px-3 py-1 font-bold ${
-                    direction === 'SHORT' ? 'bg-danger text-background' : 'bg-background text-text-muted'
+                    direction === 'SHORT' ? 'bg-danger text-white' : 'bg-background text-text-muted'
                   }`}
                 >
                   ▼ SHORT

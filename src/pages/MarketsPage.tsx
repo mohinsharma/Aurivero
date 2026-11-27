@@ -237,7 +237,7 @@ export const MarketsPage: React.FC = () => {
                 onClick={() => switchTab(t.id as MarketTab)}
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border ${
                   isActive
-                    ? 'bg-primary text-background border-primary shadow-glow'
+                    ? 'bg-primary text-white border-primary shadow-glow'
                     : 'bg-background/60 text-text-secondary border-border hover:text-text-primary hover:bg-surface'
                 }`}
               >

@@ -63,29 +63,29 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
         <div className="max-h-[60vh] overflow-y-auto space-y-4 pr-1">
           {/* Live Multi-Asset Market Search */}
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-text-muted mb-2 flex items-center gap-1.5">
+            <div className="text-xs font-semibold text-text-secondary mb-2 flex items-center gap-1.5">
               <Globe size={13} />
-              <span>Stocks, Crypto & Forex</span>
+              <span>Stocks, Crypto &amp; Forex</span>
             </div>
             {searchingMarkets ? (
-              <div className="p-3 text-xs font-mono text-text-muted">Searching market providers...</div>
+              <div className="p-3 text-xs text-text-secondary">Searching market providers...</div>
             ) : marketResults.length === 0 ? (
-              <div className="p-3 text-xs text-text-muted">No matching market instruments found.</div>
+              <div className="p-3 text-xs text-text-secondary">No matching market instruments found.</div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {marketResults.slice(0, 6).map(item => (
                   <div
                     key={`${item.assetClass}-${item.symbol}`}
                     onClick={() => handleSelect(`/markets/${item.assetClass.toLowerCase()}/${encodeURIComponent(item.symbol)}`)}
-                    className="p-2.5 rounded-lg bg-surface hover:bg-surface/80 border border-border/60 hover:border-primary/50 cursor-pointer flex items-center justify-between group transition-all"
+                    className="p-2.5 rounded-xl bg-background hover:bg-surface-elevated border border-border hover:border-primary/40 cursor-pointer flex items-center justify-between group transition-all"
                   >
                     <div className="min-w-0">
-                      <div className="font-mono font-bold text-xs text-text-primary group-hover:text-primary transition-colors">
+                      <div className="font-bold text-xs text-text-primary group-hover:text-primary transition-colors">
                         {item.displaySymbol}
                       </div>
-                      <div className="text-[11px] text-text-muted truncate max-w-[160px]">{item.name}</div>
+                      <div className="text-[11px] text-text-secondary truncate max-w-[160px]">{item.name}</div>
                     </div>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-background border border-border text-text-secondary">
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface border border-border text-text-secondary">
                       {item.assetClass} • {item.exchange}
                     </span>
                   </div>
@@ -96,7 +96,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
 
           {/* Courses */}
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-text-muted mb-2 flex items-center gap-1.5">
+            <div className="text-xs font-semibold text-text-secondary mb-2 flex items-center gap-1.5">
               <BookOpen size={13} />
               <span>Learning Modules</span>
             </div>
@@ -105,22 +105,22 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 <div
                   key={mod.id}
                   onClick={() => handleSelect('/learn')}
-                  className="p-2.5 rounded-lg bg-surface hover:bg-surface/80 border border-border/60 hover:border-secondary/50 cursor-pointer flex items-center justify-between group transition-all"
+                  className="p-2.5 rounded-xl bg-background hover:bg-surface-elevated border border-border hover:border-primary/40 cursor-pointer flex items-center justify-between group transition-all"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-md bg-secondary/10 text-secondary">
+                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                       <BookOpen size={14} />
                     </div>
                     <div>
-                      <div className="font-semibold text-xs text-text-primary group-hover:text-secondary transition-colors">
+                      <div className="font-semibold text-xs text-text-primary group-hover:text-primary transition-colors">
                         {mod.trackTitle}
                       </div>
-                      <div className="text-[11px] text-text-muted truncate max-w-[280px]">
+                      <div className="text-[11px] text-text-secondary truncate max-w-[280px]">
                         {mod.description}
                       </div>
                     </div>
                   </div>
-                  <ArrowRight size={14} className="text-text-muted group-hover:text-secondary group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight size={14} className="text-text-secondary group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                 </div>
               ))}
             </div>
@@ -128,7 +128,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
 
           {/* Market Replays */}
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-text-muted mb-2 flex items-center gap-1.5">
+            <div className="text-xs font-semibold text-text-secondary mb-2 flex items-center gap-1.5">
               <History size={13} />
               <span>Historical Crash Replays</span>
             </div>
@@ -137,22 +137,22 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 <div
                   key={evt.id}
                   onClick={() => handleSelect('/market-replay')}
-                  className="p-2.5 rounded-lg bg-surface hover:bg-surface/80 border border-border/60 hover:border-warning/50 cursor-pointer flex items-center justify-between group transition-all"
+                  className="p-2.5 rounded-xl bg-background hover:bg-surface-elevated border border-border hover:border-primary/40 cursor-pointer flex items-center justify-between group transition-all"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-md bg-warning/10 text-warning">
+                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                       <History size={14} />
                     </div>
                     <div>
-                      <div className="font-semibold text-xs text-text-primary group-hover:text-warning transition-colors">
+                      <div className="font-semibold text-xs text-text-primary group-hover:text-primary transition-colors">
                         {evt.title}
                       </div>
-                      <div className="text-[11px] text-text-muted truncate max-w-[280px]">
+                      <div className="text-[11px] text-text-secondary truncate max-w-[280px]">
                         {evt.subtitle}
                       </div>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono text-danger font-semibold">{evt.dropPercentage}</span>
+                  <span className="text-xs text-loss font-semibold tabular-nums">{evt.dropPercentage}</span>
                 </div>
               ))}
             </div>

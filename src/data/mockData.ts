@@ -1260,7 +1260,7 @@ export const ETHICAL_LEADERBOARD: LeaderboardEntry[] = [
   {
     rank: 3,
     id: 'user-3',
-    name: 'You (MINDMARK Explorer)',
+    name: 'You (Aurivero Explorer)',
     city: 'New Delhi',
     levelName: 'Risk Navigator',
     levelNumber: 3,

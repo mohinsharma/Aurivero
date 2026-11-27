@@ -24,6 +24,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
+import { AuriveroLogo } from '../common/AuriveroLogo';
 
 interface MobileNavProps {
   isMenuOpen: boolean;
@@ -43,7 +44,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
 
   const fullDrawerItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'MINDMARK AI Buddy', path: '/ai-buddy', icon: Bot },
+    { name: 'Aurivero AI Buddy', path: '/ai-buddy', icon: Bot },
     { name: 'Markets (Stocks, Crypto, FX)', path: '/markets', icon: Coins },
     { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: PieChart },
     { name: 'Market Screener', path: '/markets/screener', icon: Compass },
@@ -69,27 +70,27 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
   return (
     <>
       {/* Quick Action Bottom Navigation Bar (Thumb friendly for mobile) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-lg border-t border-border px-2 py-2 flex items-center justify-around">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border px-2 py-1.5 flex items-center justify-around">
         {bottomBarItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
               `flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium transition-colors ${
-                isActive ? 'text-primary' : 'text-text-muted hover:text-text-secondary'
+                isActive ? 'text-primary font-semibold' : 'text-text-secondary hover:text-text-primary'
               }`
             }
           >
-            <item.icon size={19} />
+            <item.icon size={18} />
             <span>{item.name}</span>
           </NavLink>
         ))}
 
         <button
           onClick={onCloseMenu}
-          className="flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium text-text-muted hover:text-text-secondary"
+          className="flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium text-text-secondary hover:text-text-primary"
         >
-          <Menu size={19} />
+          <Menu size={18} />
           <span>More</span>
         </button>
       </div>
@@ -99,28 +100,22 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-900/45 backdrop-blur-xs transition-opacity"
             onClick={onCloseMenu}
           />
 
           {/* Drawer Content */}
-          <div className="fixed inset-y-0 left-0 w-4/5 max-w-xs bg-surface-elevated border-r border-border p-5 flex flex-col justify-between shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+          <div className="fixed inset-y-0 left-0 w-4/5 max-w-xs bg-surface border-r border-border p-5 flex flex-col justify-between shadow-xl z-10 animate-in slide-in-from-left duration-200">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-border/60">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-background font-bold">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="12" r="6" />
-                      <circle cx="12" cy="12" r="2" />
-                    </svg>
-                  </div>
-                  <span className="font-mono font-bold text-text-primary tracking-wider">MINDMARK</span>
+              <div className="flex items-center justify-between pb-4 border-b border-border">
+                <div className="flex items-center gap-2.5">
+                  <AuriveroLogo size="sm" />
+                  <span className="font-bold text-text-primary tracking-tight">Aurivero</span>
                 </div>
                 <button
                   onClick={onCloseMenu}
-                  className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface"
+                  className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
                   aria-label="Close menu"
                 >
                   <X size={18} />
@@ -128,9 +123,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
               </div>
 
               {/* Capital overview */}
-              <div className="mt-4 p-3 rounded-xl bg-surface border border-primary/20">
-                <span className="text-[10px] font-mono text-text-muted uppercase">Virtual Paper Balance</span>
-                <div className="text-base font-bold font-mono text-primary text-tabular mt-0.5">
+              <div className="mt-4 p-3.5 rounded-2xl bg-[#14171D] dark:bg-[#090D16] border border-transparent dark:border-slate-800 text-white">
+                <span className="text-[11px] font-medium text-slate-300">Virtual Capital</span>
+                <div className="text-base font-bold text-white tabular-nums mt-0.5">
                   ₹{virtualCash.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
               </div>
@@ -143,10 +138,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
                     to={item.path}
                     onClick={onCloseMenu}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
                         isActive
-                          ? 'bg-primary/10 text-primary border border-primary/25'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated'
                       }`
                     }
                   >
@@ -158,10 +153,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
             </div>
 
             {/* Bottom Disclaimer */}
-            <div className="pt-4 border-t border-border/50 text-[10px] text-text-muted space-y-2">
-              <div className="flex items-center gap-1.5 text-warning font-semibold font-mono">
+            <div className="pt-4 border-t border-border text-[11px] text-text-secondary space-y-1.5">
+              <div className="flex items-center gap-1.5 text-primary font-semibold">
                 <ShieldCheck size={13} />
-                <span>SEBI EDUCATIONAL COMPLIANCE</span>
+                <span>Educational Sandbox</span>
               </div>
               <p>Virtual money simulation only. No real money advisory.</p>
             </div>

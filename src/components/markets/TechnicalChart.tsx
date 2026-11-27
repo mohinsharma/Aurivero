@@ -511,7 +511,7 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
                   aria-pressed={selectedRange === r}
                   className={`px-2 py-1 rounded-md text-[11px] font-mono font-semibold transition-colors whitespace-nowrap ${
                     selectedRange === r
-                      ? 'bg-primary text-background'
+                      ? 'bg-primary text-white'
                       : 'text-text-secondary hover:text-text-primary hover:bg-surface'
                   }`}
                 >

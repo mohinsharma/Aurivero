@@ -36,42 +36,42 @@ export const LearnPage: React.FC = () => {
 
   const getTrackIcon = (trackId: string) => {
     switch (trackId) {
-      case 'foundations': return <Compass size={20} className="text-primary" />;
-      case 'reading-charts': return <TrendingUp size={20} className="text-secondary" />;
-      case 'fundamental-analysis': return <FileText size={20} className="text-warning" />;
-      case 'risk-management': return <Shield size={20} className="text-primary" />;
-      case 'derivatives-warning': return <AlertTriangle size={20} className="text-danger" />;
-      default: return <BookOpen size={20} className="text-primary" />;
+      case 'foundations': return <Compass size={20} className="text-[#2962FF]" />;
+      case 'reading-charts': return <TrendingUp size={20} className="text-[#089981]" />;
+      case 'fundamental-analysis': return <FileText size={20} className="text-amber-600" />;
+      case 'risk-management': return <Shield size={20} className="text-[#2962FF]" />;
+      case 'derivatives-warning': return <AlertTriangle size={20} className="text-[#F23645]" />;
+      default: return <BookOpen size={20} className="text-[#2962FF]" />;
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-6 rounded-2xl bg-surface border border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-6 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-primary font-semibold">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-semibold text-[#2962FF]">
               Financial Literacy Curriculum
             </span>
-            <Badge variant="secondary" size="sm">Dalal Street Edition</Badge>
+            <Badge variant="primary" size="sm">Dalal Street Edition</Badge>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#131722] mt-1">
             Structured Market Education for Indian Beginners
           </h1>
-          <p className="text-xs text-text-secondary mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#64748B] mt-1 max-w-2xl leading-relaxed">
             Move step-by-step from understanding how exchanges and Demat accounts operate, to valuation formulas, risk controls, and avoiding the F&O derivatives trap.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-surface-elevated border border-border text-center">
-            <div className="text-lg font-bold font-mono text-primary">5 Tracks</div>
-            <div className="text-[10px] text-text-muted">Comprehensive</div>
+          <div className="px-4 py-2.5 rounded-xl bg-[#F8FAFC] text-center">
+            <div className="text-lg font-bold text-[#2962FF] tabular-nums">5 Tracks</div>
+            <div className="text-[11px] text-[#64748B]">Comprehensive</div>
           </div>
-          <div className="p-3 rounded-xl bg-surface-elevated border border-border text-center">
-            <div className="text-lg font-bold font-mono text-secondary">20 Modules</div>
-            <div className="text-[10px] text-text-muted">Interactive</div>
+          <div className="px-4 py-2.5 rounded-xl bg-[#F8FAFC] text-center">
+            <div className="text-lg font-bold text-[#131722] tabular-nums">20 Modules</div>
+            <div className="text-[11px] text-[#64748B]">Interactive</div>
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ export const LearnPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Track List (4 cols) */}
         <div className="lg:col-span-4 space-y-3">
-          <div className="text-xs font-mono uppercase tracking-wider text-text-muted px-1">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#64748B] px-1">
             Learning Pathways
           </div>
 
@@ -90,42 +90,42 @@ export const LearnPage: React.FC = () => {
               <div
                 key={module.id}
                 onClick={() => setSelectedModule(module)}
-                className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                className={`p-4 rounded-xl border transition-colors cursor-pointer flex flex-col justify-between shadow-sm ${
                   isSelected
-                    ? 'bg-surface-elevated border-primary/50 shadow-glow'
-                    : 'bg-surface border-border hover:border-text-secondary/40 hover:bg-surface-elevated/60'
+                    ? 'bg-[#2962FF]/[0.05] border-[#2962FF]/50'
+                    : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]'
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-background border border-border/60">
+                  <div className="p-2 rounded-lg bg-[#F8FAFC]">
                     {getTrackIcon(module.trackId)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-surface border border-border text-text-muted">
+                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748B]">
                         {module.level}
                       </span>
-                      <span className="text-[10px] font-mono text-text-muted flex items-center gap-1">
+                      <span className="text-[11px] text-[#64748B] flex items-center gap-1 tabular-nums">
                         <Clock size={11} /> {module.duration}
                       </span>
                     </div>
-                    <h3 className="font-bold text-xs text-text-primary mt-1.5">
+                    <h3 className="font-bold text-xs text-[#131722] mt-2">
                       {module.trackTitle}
                     </h3>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-border/40">
-                  <div className="flex justify-between text-[10px] font-mono text-text-muted mb-1">
+                <div className="mt-3.5 pt-3 border-t border-[#E2E8F0]">
+                  <div className="flex justify-between text-[11px] text-[#64748B] mb-1.5 tabular-nums">
                     <span>Progress</span>
-                    <span className={module.progress === 100 ? 'text-primary font-semibold' : ''}>
+                    <span className={module.progress === 100 ? 'text-[#089981] font-semibold' : 'font-semibold text-[#131722]'}>
                       {module.progress}%
                     </span>
                   </div>
-                  <div className="w-full bg-background rounded-full h-1 overflow-hidden">
+                  <div className="w-full bg-[#F1F5F9] rounded-full h-1.5 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        module.progress === 100 ? 'bg-primary' : 'bg-secondary'
+                        module.progress === 100 ? 'bg-[#089981]' : 'bg-[#2962FF]'
                       }`}
                       style={{ width: `${module.progress}%` }}
                     />
@@ -138,13 +138,13 @@ export const LearnPage: React.FC = () => {
 
         {/* Right Active Track Detail & Lesson Items (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
-          <Card variant="elevated" className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-border/60">
+          <Card className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#E2E8F0]">
               <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-primary">
+                <span className="text-xs font-semibold text-[#2962FF]">
                   {selectedModule.level} Pathway
                 </span>
-                <h2 className="text-lg font-bold text-text-primary mt-0.5">
+                <h2 className="text-lg font-bold text-[#131722] mt-0.5">
                   {selectedModule.trackTitle}
                 </h2>
               </div>
@@ -153,22 +153,22 @@ export const LearnPage: React.FC = () => {
               </Badge>
             </div>
 
-            <p className="text-xs text-text-secondary mt-3 leading-relaxed">
+            <p className="text-xs text-[#64748B] mt-3 leading-relaxed">
               {selectedModule.description}
             </p>
 
-            <div className="mt-4 p-3 rounded-xl bg-surface border border-primary/20 text-xs">
-              <span className="font-semibold text-primary font-mono flex items-center gap-1.5">
+            <div className="mt-4 p-4 rounded-xl bg-[#F8FAFC] text-xs">
+              <span className="font-semibold text-[#2962FF] flex items-center gap-1.5">
                 <Sparkles size={13} /> Golden Market Axiom:
               </span>
-              <p className="text-text-primary mt-1 italic">
+              <p className="text-[#131722] mt-1 italic">
                 "{selectedModule.keyTakeaway}"
               </p>
             </div>
 
             {/* Lesson Cards */}
-            <div className="mt-6 space-y-3">
-              <div className="text-xs font-mono uppercase tracking-wider text-text-muted">
+            <div className="mt-6 space-y-2.5">
+              <div className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">
                 Curriculum Lessons
               </div>
 
@@ -176,35 +176,35 @@ export const LearnPage: React.FC = () => {
                 <div
                   key={lesson.id}
                   onClick={() => handleOpenLesson(lesson)}
-                  className="p-3.5 rounded-xl bg-surface border border-border/70 hover:border-primary/40 hover:bg-surface-elevated transition-all cursor-pointer flex items-center justify-between group"
+                  className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#2962FF]/40 hover:bg-white transition-colors cursor-pointer flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold tabular-nums ${
                       lesson.completed
-                        ? 'bg-primary/10 text-primary border border-primary/20'
-                        : 'bg-background text-text-muted border border-border'
+                        ? 'bg-[#089981]/10 text-[#089981]'
+                        : 'bg-white text-[#64748B] border border-[#E2E8F0]'
                     }`}>
-                      {lesson.completed ? <CheckCircle2 size={15} /> : idx + 1}
+                      {lesson.completed ? <CheckCircle2 size={16} /> : idx + 1}
                     </div>
 
                     <div>
-                      <h4 className="font-semibold text-xs text-text-primary group-hover:text-primary transition-colors">
+                      <h4 className="font-semibold text-xs text-[#131722] group-hover:text-[#2962FF] transition-colors">
                         {lesson.title}
                       </h4>
-                      <p className="text-[11px] text-text-muted truncate max-w-sm sm:max-w-md">
+                      <p className="text-[11px] text-[#64748B] truncate max-w-sm sm:max-w-md mt-0.5">
                         {lesson.description}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-[11px] font-mono text-text-muted hidden sm:inline">
+                    <span className="text-xs text-[#64748B] hidden sm:inline tabular-nums">
                       {lesson.duration}
                     </span>
                     <Button
                       variant={lesson.completed ? 'ghost' : 'outline'}
                       size="sm"
-                      className="text-[11px]"
+                      className="text-xs"
                     >
                       {lesson.completed ? 'Review' : 'Start'}
                     </Button>
@@ -226,7 +226,7 @@ export const LearnPage: React.FC = () => {
           maxWidth="lg"
         >
           <div className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-surface border border-border text-xs leading-relaxed text-text-secondary space-y-2">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] text-xs leading-relaxed text-[#64748B] space-y-2">
               <p>
                 In the Indian equity ecosystem, every trade you execute passes through regulated channels governed by SEBI. When you invest in companies like Reliance Industries or TCS, your ownership is registered with CDSL or NSDL depositories in your Demat account.
               </p>
@@ -236,15 +236,15 @@ export const LearnPage: React.FC = () => {
             </div>
 
             {/* Checkpoint Question */}
-            <div className="p-4 rounded-xl bg-surface border border-primary/20 space-y-3">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-primary font-semibold flex items-center gap-1.5">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#2962FF] font-semibold flex items-center gap-1.5">
                   <Award size={14} /> Quick Understanding Checkpoint
                 </span>
-                <span className="text-text-muted">+50 XP</span>
+                <span className="text-[#64748B] font-medium tabular-nums">+50 XP</span>
               </div>
 
-              <p className="text-xs font-semibold text-text-primary">
+              <p className="text-xs font-semibold text-[#131722]">
                 Why does SEBI mandate T+1 settlement in Indian financial markets?
               </p>
 
@@ -259,10 +259,10 @@ export const LearnPage: React.FC = () => {
                     onClick={() => {
                       if (!quizSubmitted) setQuizAnswer(idx);
                     }}
-                    className={`p-2.5 rounded-lg border cursor-pointer transition-all ${
+                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                       quizAnswer === idx
-                        ? 'bg-primary/10 border-primary text-text-primary'
-                        : 'bg-surface-elevated border-border text-text-secondary hover:border-text-secondary/40'
+                        ? 'bg-[#2962FF]/10 border-[#2962FF] text-[#131722] font-medium'
+                        : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]'
                     }`}
                   >
                     {opt}
@@ -271,7 +271,7 @@ export const LearnPage: React.FC = () => {
               </div>
 
               {quizSubmitted && (
-                <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary font-mono">
+                <div className="p-3 rounded-lg bg-[#089981]/10 text-xs text-[#089981] font-medium">
                   ✓ Correct! India transitioned to T+1 settlement to give retail and institutional investors rapid access to their capital and minimize clearing defaults.
                 </div>
               )}

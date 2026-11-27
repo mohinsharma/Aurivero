@@ -13,6 +13,9 @@ interface SimulatorContextType {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
   executeTrade: (params: {
     symbol: string;
     type: 'BUY' | 'SELL';
@@ -194,6 +197,25 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('aurivero_theme');
+      return saved === 'dark' ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    try {
+      localStorage.setItem('aurivero_theme', theme);
+    } catch {
+      // Ignore storage write errors
+    }
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
 
   useEffect(() => {
     try {
@@ -436,6 +458,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         sidebarCollapsed,
         setSidebarCollapsed,
         toggleSidebar,
+        theme,
+        setTheme,
+        toggleTheme,
         executeTrade,
         squareOffPosition,
         resetPortfolio,

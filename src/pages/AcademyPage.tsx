@@ -226,7 +226,7 @@ export const AcademyPage: React.FC = () => {
               onClick={() => setSelectedTrack(t)}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
                 selectedTrack === t
-                  ? 'bg-primary text-background'
+                  ? 'bg-primary text-white'
                   : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
               }`}
             >
@@ -372,7 +372,7 @@ export const AcademyPage: React.FC = () => {
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono flex-shrink-0 mt-0.5 ${
                         lesson.is_completed
-                          ? 'bg-primary text-background font-bold'
+                          ? 'bg-primary text-white font-bold'
                           : 'bg-surface border border-border text-text-muted'
                       }`}
                     >
@@ -528,7 +528,7 @@ export const AcademyPage: React.FC = () => {
                             <span>{opt}</span>
                             <div
                               className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                isSelected ? 'border-primary bg-primary text-background' : 'border-border'
+                                isSelected ? 'border-primary bg-primary text-white' : 'border-border'
                               }`}
                             >
                               {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-background" />}
@@ -619,7 +619,7 @@ export const AcademyPage: React.FC = () => {
         isOpen={isInstructorModalOpen}
         onClose={() => setIsInstructorModalOpen(false)}
         title="Instructor Studio — Author Educational Course"
-        description="Contribute verified curriculum to the MINDMARK community."
+        description="Contribute verified curriculum to the Aurivero community."
         maxWidth="lg"
       >
         <form onSubmit={handleCreateCourse} className="space-y-4 text-xs font-mono">

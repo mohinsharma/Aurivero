@@ -155,7 +155,7 @@ export const FinancialNewsPage: React.FC = () => {
               onClick={() => { setPage(1); setCategory(c); }}
               className={`px-3 py-1 rounded-full text-xs whitespace-nowrap border transition-colors ${
                 category === c
-                  ? 'bg-primary text-background border-primary font-semibold'
+                  ? 'bg-primary text-white border-primary font-semibold'
                   : 'bg-background text-text-secondary border-border hover:text-text-primary'
               }`}
             >

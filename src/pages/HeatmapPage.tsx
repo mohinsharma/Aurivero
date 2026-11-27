@@ -212,7 +212,7 @@ export const HeatmapPage: React.FC = () => {
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border transition-colors ${
                 universe === u
-                  ? 'bg-primary text-background border-primary'
+                  ? 'bg-primary text-white border-primary'
                   : 'bg-background/60 text-text-secondary border-border hover:text-text-primary'
               }`}
             >
@@ -229,7 +229,7 @@ export const HeatmapPage: React.FC = () => {
               onClick={() => setTimeframe(tf)}
               className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors ${
                 timeframe === tf
-                  ? 'bg-secondary text-background'
+                  ? 'bg-secondary text-white'
                   : 'text-text-secondary hover:text-text-primary bg-background/50'
               }`}
             >

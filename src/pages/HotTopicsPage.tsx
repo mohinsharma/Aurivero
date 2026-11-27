@@ -152,7 +152,7 @@ export const HotTopicsPage: React.FC = () => {
                   alt={breakingArticle.title}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 />
-                <div className="absolute top-3 left-3 px-2 py-1 rounded bg-danger text-background text-[10px] font-mono font-bold tracking-wider uppercase">
+                <div className="absolute top-3 left-3 px-2 py-1 rounded bg-danger text-white text-[10px] font-mono font-bold tracking-wider uppercase">
                   BREAKING STORY
                 </div>
               </div>
@@ -256,14 +256,14 @@ export const HotTopicsPage: React.FC = () => {
             onClick={() => setSelectedCategory(cat.name)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 ${
               selectedCategory === cat.name
-                ? 'bg-primary text-background font-bold shadow-glow'
+                ? 'bg-primary text-white font-bold shadow-glow'
                 : 'bg-surface-elevated/70 text-text-secondary hover:text-text-primary border border-border/60 hover:border-border'
             }`}
           >
             <span>{cat.name}</span>
             <span
               className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                selectedCategory === cat.name ? 'bg-background/20 text-background' : 'bg-background/50 text-text-muted'
+                selectedCategory === cat.name ? 'bg-white/20 text-white' : 'bg-background/50 text-text-muted'
               }`}
             >
               {cat.count}
@@ -317,7 +317,7 @@ export const HotTopicsPage: React.FC = () => {
                       onClick={(e) => handleToggleBookmark(art.id, e)}
                       className={`p-1.5 rounded-lg backdrop-blur-md transition-colors ${
                         art.is_bookmarked
-                          ? 'bg-primary text-background'
+                          ? 'bg-primary text-white'
                           : 'bg-background/70 text-text-muted hover:text-text-primary'
                       }`}
                       title="Bookmark"

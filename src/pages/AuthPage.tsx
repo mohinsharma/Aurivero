@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, ShieldCheck, UserCheck, AlertCircle } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { Card } from '../components/common/Card';
+import { AuriveroLogo } from '../components/common/AuriveroLogo';
 
 export const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -21,49 +22,40 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
-
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center items-center p-4 relative overflow-hidden">
       <div className="w-full max-w-md relative z-10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-glow">
-              <svg className="w-5 h-5 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="12" r="6" />
-                <circle cx="12" cy="12" r="2" />
-              </svg>
-            </div>
-            <span className="font-extrabold text-2xl font-mono tracking-wider text-text-primary">
-              MINDMARK
+            <AuriveroLogo size="lg" />
+            <span className="font-bold text-2xl tracking-tight text-[#131722]">
+              Aurivero
             </span>
           </Link>
-          <p className="text-xs text-text-secondary font-mono">
+          <p className="text-xs text-[#64748B]">
             Learn the market. Train your decisions. Protect your future.
           </p>
         </div>
 
         {/* Auth Card */}
-        <Card variant="elevated" className="border border-border/80 shadow-2xl p-6 sm:p-8">
-          <div className="flex border-b border-border/60 pb-3 mb-6">
+        <Card className="p-6 sm:p-8 shadow-md">
+          <div className="flex border-b border-[#E2E8F0] pb-3 mb-6">
             <button
               onClick={() => setIsSignUp(false)}
-              className={`flex-1 pb-2 text-xs font-mono font-semibold tracking-wider text-center transition-colors border-b-2 ${
+              className={`flex-1 pb-2 text-xs font-semibold tracking-wide text-center transition-colors border-b-2 ${
                 !isSignUp
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-text-muted hover:text-text-secondary'
+                  ? 'border-[#2962FF] text-[#2962FF]'
+                  : 'border-transparent text-[#64748B] hover:text-[#131722]'
               }`}
             >
               SIGN IN
             </button>
             <button
               onClick={() => setIsSignUp(true)}
-              className={`flex-1 pb-2 text-xs font-mono font-semibold tracking-wider text-center transition-colors border-b-2 ${
+              className={`flex-1 pb-2 text-xs font-semibold tracking-wide text-center transition-colors border-b-2 ${
                 isSignUp
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-text-muted hover:text-text-secondary'
+                  ? 'border-[#2962FF] text-[#2962FF]'
+                  : 'border-transparent text-[#64748B] hover:text-[#131722]'
               }`}
             >
               CREATE SIMULATOR ACCOUNT
@@ -73,7 +65,7 @@ export const AuthPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div>
-                <label className="block text-xs font-mono text-text-secondary mb-1.5">
+                <label className="block text-xs font-medium text-[#64748B] mb-1.5">
                   Your Full Name
                 </label>
                 <div className="relative">
@@ -83,47 +75,47 @@ export const AuthPage: React.FC = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full bg-surface border border-border px-3.5 py-2.5 rounded-xl text-text-primary text-xs focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] px-3.5 py-2.5 rounded-lg text-[#131722] text-xs focus:outline-none focus:border-[#2962FF] transition-colors"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-mono text-text-secondary mb-1.5">
+              <label className="block text-xs font-medium text-[#64748B] mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full bg-surface border border-border pl-10 pr-4 py-2.5 rounded-xl text-text-primary text-xs focus:outline-none focus:border-primary transition-colors"
+                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] pl-10 pr-4 py-2.5 rounded-lg text-[#131722] text-xs focus:outline-none focus:border-[#2962FF] transition-colors"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-mono text-text-secondary">Password</label>
+                <label className="text-xs font-medium text-[#64748B]">Password</label>
                 {!isSignUp && (
-                  <span className="text-[11px] text-secondary hover:underline cursor-pointer">
+                  <span className="text-[11px] text-[#2962FF] hover:underline cursor-pointer">
                     Forgot password?
                   </span>
                 )}
               </div>
               <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-surface border border-border pl-10 pr-4 py-2.5 rounded-xl text-text-primary text-xs focus:outline-none focus:border-primary transition-colors"
+                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] pl-10 pr-4 py-2.5 rounded-lg text-[#131722] text-xs focus:outline-none focus:border-[#2962FF] transition-colors"
                 />
               </div>
             </div>
@@ -141,7 +133,7 @@ export const AuthPage: React.FC = () => {
           </form>
 
           {/* Quick 1-Click Guest Test Drive */}
-          <div className="mt-6 pt-5 border-t border-border/60">
+          <div className="mt-6 pt-5 border-t border-[#E2E8F0]">
             <Button
               type="button"
               variant="outline"
@@ -154,8 +146,8 @@ export const AuthPage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="mt-4 p-3 rounded-xl bg-surface border border-border/50 text-[11px] text-text-muted flex items-start gap-2">
-            <ShieldCheck size={15} className="text-primary flex-shrink-0 mt-0.5" />
+          <div className="mt-4 p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] text-[#64748B] flex items-start gap-2">
+            <ShieldCheck size={15} className="text-[#2962FF] flex-shrink-0 mt-0.5" />
             <span>
               Zero banking or Demat credentials needed. BULLSEYE is purely an educational simulator.
             </span>
@@ -164,7 +156,7 @@ export const AuthPage: React.FC = () => {
 
         {/* Back to Home */}
         <div className="text-center">
-          <Link to="/" className="text-xs text-text-muted hover:text-text-primary transition-colors">
+          <Link to="/" className="text-xs text-[#64748B] hover:text-[#131722] transition-colors">
             ← Return to Landing Page
           </Link>
         </div>

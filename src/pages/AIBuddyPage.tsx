@@ -106,7 +106,7 @@ export const AIBuddyPage: React.FC = () => {
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } else {
-      const errMsg = res.error?.detail || res.error?.message || 'Unable to reach MINDMARK AI Buddy right now.';
+      const errMsg = res.error?.detail || res.error?.message || 'Unable to reach Aurivero AI Buddy right now.';
       setMessages((prev) => [
         ...prev,
         {
@@ -149,7 +149,7 @@ export const AIBuddyPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-extrabold text-text-primary tracking-tight">
-                MINDMARK AI Buddy
+                Aurivero AI Buddy
               </h1>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-[10px] font-mono font-semibold">
                 <span className={`w-1.5 h-1.5 rounded-full ${buddyStatus?.is_live ? 'bg-primary animate-pulse' : 'bg-warning'}`} />
@@ -250,7 +250,7 @@ export const AIBuddyPage: React.FC = () => {
                 <div
                   className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-primary text-background font-medium rounded-br-sm'
+                      ? 'bg-primary text-white font-medium rounded-br-sm'
                       : msg.isError
                       ? 'bg-danger/10 border border-danger/30 text-text-primary rounded-bl-sm'
                       : 'bg-surface-elevated border border-border/80 text-text-primary rounded-bl-sm'
@@ -259,7 +259,7 @@ export const AIBuddyPage: React.FC = () => {
                   {msg.role === 'assistant' && (
                     <div className="flex items-center justify-between gap-3 mb-1.5 pb-1 border-b border-border/40 text-[10px] font-mono">
                       <span className="text-primary font-bold flex items-center gap-1">
-                        <Bot size={12} /> MINDMARK AI Buddy
+                        <Bot size={12} /> Aurivero AI Buddy
                       </span>
                       {msg.status === 'rejected_off_topic' && (
                         <span className="text-warning">Finance-Only Guardrail</span>
@@ -317,7 +317,7 @@ export const AIBuddyPage: React.FC = () => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask about NIFTY 50, SIPs, RSI, P/E ratio, risk management, or your paper portfolio..."
-          aria-label="Message MINDMARK AI Buddy"
+          aria-label="Message Aurivero AI Buddy"
           className="flex-1 bg-surface-elevated/60 border border-border/60 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 resize-none max-h-32"
         />
         <Button

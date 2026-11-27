@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,47 +8,68 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B1017',
-        surface: '#141C25',
-        'surface-elevated': '#1A2531',
+        background: 'rgb(var(--color-bg) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        'surface-elevated': 'rgb(var(--color-elevated) / <alpha-value>)',
         primary: {
-          DEFAULT: '#45D6B5',
-          hover: '#37bf9f',
-          light: 'rgba(69, 214, 181, 0.12)',
+          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          hover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
+          light: 'rgb(var(--color-primary) / 0.10)',
         },
         secondary: {
-          DEFAULT: '#78A9FF',
-          hover: '#6196f0',
-          light: 'rgba(120, 169, 255, 0.12)',
+          DEFAULT: '#3B82F6',
+          hover: '#2563EB',
+          light: 'rgba(59, 130, 246, 0.12)',
+        },
+        profit: {
+          DEFAULT: '#089981',
+          hover: '#067D69',
+          light: 'rgba(8, 153, 129, 0.12)',
+        },
+        loss: {
+          DEFAULT: '#F23645',
+          hover: '#D92B39',
+          light: 'rgba(242, 54, 69, 0.12)',
         },
         warning: {
-          DEFAULT: '#F5B942',
-          hover: '#e0a42e',
-          light: 'rgba(245, 185, 66, 0.12)',
+          DEFAULT: '#D97706',
+          hover: '#B45309',
+          light: 'rgba(217, 119, 6, 0.12)',
         },
         danger: {
-          DEFAULT: '#F16D75',
-          hover: '#dc555e',
-          light: 'rgba(241, 109, 117, 0.12)',
+          DEFAULT: '#F23645',
+          hover: '#D92B39',
+          light: 'rgba(242, 54, 69, 0.12)',
         },
         text: {
-          primary: '#F3F6F8',
-          secondary: '#93A2B4',
-          muted: '#5F7085',
+          primary: 'rgb(var(--color-text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
         },
         border: {
-          DEFAULT: '#223142',
-          subtle: '#192634',
+          DEFAULT: 'rgb(var(--color-border) / <alpha-value>)',
+          subtle: 'rgb(var(--color-elevated) / <alpha-value>)',
         }
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Inter', 'sans-serif'],
+        jakarta: ['"Plus Jakarta Sans"', '"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        'serif-accent': ['"Instrument Serif"', 'Georgia', 'serif'],
+        mono: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Inter', 'sans-serif'],
       },
       boxShadow: {
-        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        glow: '0 0 20px -3px rgba(69, 214, 181, 0.3)',
-      }
+        glass: '0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04)',
+        glow: '0 1px 2px 0 rgba(15, 23, 42, 0.05)',
+      },
+      keyframes: {
+        ticker: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
+      animation: {
+        ticker: 'ticker 42s linear infinite',
+      },
     },
   },
   plugins: [],

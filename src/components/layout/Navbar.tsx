@@ -1,24 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Search,
-  RotateCcw,
   Bell,
   Menu,
-  ChevronRight,
-  TrendingUp,
-  TrendingDown,
-  ShieldAlert,
-  Wallet,
-  Sparkles,
-  User,
-  Bot
+  Mail,
+  ChevronDown,
+  Bot,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
 import { SearchModal } from '../common/SearchModal';
-import { Modal } from '../common/Modal';
-import { Button } from '../common/Button';
-import { LiveMarketTicker } from '../markets/LiveMarketTicker';
+import { AuriveroLogo } from '../common/AuriveroLogo';
 import { api } from '../../services/api';
 
 interface NavbarProps {
@@ -26,21 +20,31 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
-  const { virtualCash, totalPortfolioValue, resetPortfolio } = useSimulator();
+  const { theme, toggleTheme } = useSimulator();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     api.personalization.getNotifications().then((res) => {
       if (res.success && res.data) {
         setNotifications(res.data.notifications || []);
         setUnreadCount(res.data.unread_count || 0);
       }
     });
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleMarkAsRead = async (notifId: string, actionUrl?: string) => {
@@ -53,157 +57,128 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
     }
   };
 
-  const handleConfirmReset = () => {
-    resetPortfolio();
-    setIsResetModalOpen(false);
-  };
-
   return (
     <>
-      <header className="sticky top-0 z-30 w-full border-b border-border/80 bg-surface/90 backdrop-blur-md">
-        {/* Live Left-to-Right Bloomberg-Style Market Ticker */}
-        <LiveMarketTicker />
-
-        {/* Main Navbar */}
-        <div className="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-          {/* Left: Mobile Menu Toggle & Brand Mobile */}
-          <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-30 w-full bg-surface border-b border-border">
+        <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Left: Mobile Menu + Minimal Search Trigger */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <button
+              type="button"
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors"
+              className="lg:hidden p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors"
               aria-label="Open navigation menu"
             >
               <Menu size={20} />
             </button>
 
-            <Link to="/dashboard" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-glow">
-                {/* Custom Target Mark / Bullseye icon */}
-                <svg className="w-5 h-5 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <circle cx="12" cy="12" r="6" />
-                  <circle cx="12" cy="12" r="2" />
-                </svg>
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-lg tracking-wider text-text-primary font-mono group-hover:text-primary transition-colors">
-                    MINDMARK
-                  </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">
-                    SIMULATOR
-                  </span>
-                </div>
-                <span className="text-[10px] text-text-muted hidden sm:inline -mt-0.5">
-                  Train your decisions.
-                </span>
-              </div>
+            <Link to="/dashboard" className="lg:hidden flex items-center gap-2 shrink-0">
+              <AuriveroLogo size="sm" />
+              <span className="font-bold text-base tracking-tight text-text-primary">Aurivero</span>
             </Link>
-          </div>
 
-          {/* Center: Search Trigger Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
             <button
+              type="button"
               onClick={() => setIsSearchOpen(true)}
-              className="w-full h-10 px-3.5 rounded-xl bg-surface border border-border hover:border-text-secondary/40 text-text-muted hover:text-text-secondary text-xs flex items-center justify-between transition-colors shadow-inner"
+              className="hidden sm:flex items-center justify-between w-full max-w-sm h-10 px-3.5 rounded-xl bg-background hover:bg-surface-elevated border border-border text-xs text-text-secondary transition-colors"
             >
-              <span className="flex items-center gap-2">
-                <Search size={15} />
-                <span>Search stocks, lessons, crash replays...</span>
+              <span className="flex items-center gap-2.5 truncate">
+                <Search size={15} className="text-text-muted shrink-0" />
+                <span className="truncate">Press &ldquo;⌘K&rdquo; to search stocks, lessons...</span>
               </span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-text-muted bg-surface-elevated border border-border rounded">
-                ⌘K
-              </kbd>
             </button>
           </div>
 
-          {/* Right: Virtual Capital Display, Reset, Search Icon (mobile), Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Mobile Search Icon Button */}
+          {/* Right: Clean Utility Icons, Theme Switch, Notifications & Profile */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <button
+              type="button"
               onClick={() => setIsSearchOpen(true)}
-              className="md:hidden p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
+              className="sm:hidden p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
               aria-label="Search"
             >
               <Search size={18} />
             </button>
 
-            {/* Virtual Capital Chip */}
-            <div className="flex items-center gap-2 bg-surface-elevated/90 border border-primary/25 rounded-xl px-3 py-1.5 shadow-sm">
-              <div className="p-1 rounded-md bg-primary/10 text-primary hidden sm:block">
-                <Wallet size={15} />
-              </div>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] font-mono text-text-muted uppercase">Virtual Capital</span>
-                <span className="font-mono font-bold text-xs sm:text-sm text-primary text-tabular">
-                  ₹{totalPortfolioValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                </span>
-              </div>
-              <button
-                onClick={() => setIsResetModalOpen(true)}
-                title="Reset Virtual Capital to ₹10,00,000"
-                className="ml-1 p-1 rounded-md text-text-muted hover:text-warning hover:bg-surface transition-colors"
-                aria-label="Reset virtual capital"
-              >
-                <RotateCcw size={13} />
-              </button>
-            </div>
+            {/* Light / Dark Mode Switch (Uses Cobalt/Neutral UI, never Trade Green/Red) */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="p-2 rounded-xl text-text-secondary hover:text-primary hover:bg-surface-elevated border border-transparent hover:border-border transition-colors"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
 
-            {/* AI Buddy Quick Access Button */}
+            {/* Quick AI Buddy Link */}
             <Link
               to="/ai-buddy"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-mono font-bold transition-colors"
-              title="Open MINDMARK AI Buddy (Finance Assistant)"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background hover:bg-primary/10 border border-border hover:border-primary/30 text-xs font-semibold text-text-primary hover:text-primary transition-colors"
+              title="Open Aurivero AI Buddy (Finance Assistant)"
             >
-              <Bot size={16} />
-              <span className="hidden sm:inline">AI Buddy</span>
+              <Bot size={15} className="text-primary" />
+              <span>AI Buddy</span>
             </Link>
 
-            {/* Notifications Button */}
+            {/* Personal Hub / Saved Messages Icon */}
+            <Link
+              to="/hub"
+              className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors"
+              aria-label="Personal Hub & Saved Items"
+              title="Personal Hub"
+            >
+              <Mail size={18} />
+            </Link>
+
+            {/* Notifications Button (Uses Primary Cobalt Badge, not Trade Loss Red) */}
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setShowNotificationPopup(!showNotificationPopup)}
-                className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated border border-border/50 transition-colors relative"
+                className="p-2 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated transition-colors relative"
                 aria-label="View notifications"
               >
                 <Bell size={18} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-secondary ring-2 ring-background animate-pulse" />
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center tabular-nums">
+                    {unreadCount}
+                  </span>
                 )}
               </button>
 
               {showNotificationPopup && (
-                <div className="absolute right-0 mt-2 w-80 rounded-xl bg-surface-elevated border border-border shadow-2xl p-4 z-40 text-xs">
-                  <div className="flex items-center justify-between pb-2 border-b border-border/50">
+                <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-surface border border-border shadow-xl p-4 z-40 text-xs">
+                  <div className="flex items-center justify-between pb-2.5 border-b border-border">
                     <span className="font-bold text-text-primary flex items-center gap-1.5">
-                      <Bell size={13} className="text-secondary" />
-                      Platform Notifications
+                      <Bell size={14} className="text-primary" />
+                      Notifications
                     </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-secondary/15 text-secondary">
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
                       {unreadCount} Unread
                     </span>
                   </div>
-                  <div className="mt-3 space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                  <div className="mt-3 space-y-2 max-h-72 overflow-y-auto pr-1">
                     {notifications.length === 0 ? (
-                      <div className="text-center py-4 text-text-muted">No new alerts.</div>
+                      <div className="text-center py-4 text-text-secondary">No new alerts.</div>
                     ) : (
                       notifications.map((n) => (
                         <div
                           key={n.id}
                           onClick={() => handleMarkAsRead(n.id, n.action_url)}
-                          className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
+                          className={`p-3 rounded-xl border transition-all cursor-pointer ${
                             n.is_read
-                              ? 'bg-surface/50 border-border/30 opacity-75'
-                              : 'bg-surface border-secondary/30 hover:border-secondary shadow-sm'
+                              ? 'bg-background border-border/60 opacity-75'
+                              : 'bg-surface border-border hover:border-primary/40 shadow-sm'
                           }`}
                         >
-                          <div className="font-semibold text-text-primary flex items-center justify-between">
+                          <div className="font-semibold text-text-primary flex items-center justify-between gap-2">
                             <span className="truncate">{n.title}</span>
                             {!n.is_read && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0" />
+                              <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                             )}
                           </div>
-                          <p className="text-text-muted text-[11px] mt-1 leading-snug">
+                          <p className="text-text-secondary text-[11px] mt-1 leading-snug">
                             {n.message}
                           </p>
                         </div>
@@ -211,30 +186,34 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
                     )}
                   </div>
                   <button
+                    type="button"
                     onClick={() => {
                       setShowNotificationPopup(false);
                       navigate('/hub');
                     }}
-                    className="w-full mt-3 py-1.5 text-center text-[11px] text-secondary hover:underline font-mono border-t border-border/40 pt-2"
+                    className="w-full mt-3 py-2 text-center text-xs text-primary hover:underline font-semibold border-t border-border pt-2.5"
                   >
-                    Open Personal Hub & Saved Items →
+                    Open Personal Hub &amp; Saved Items →
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Profile Avatar / Quick Link */}
+            <span className="hidden sm:block h-6 w-px bg-border" aria-hidden="true" />
+
+            {/* Profile Avatar & Name Link */}
             <Link
               to="/settings"
-              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-surface-elevated transition-colors border border-border/40"
+              className="flex items-center gap-2.5 py-1 px-1.5 rounded-xl hover:bg-surface-elevated transition-colors"
               title="Profile & Settings"
             >
-              <div className="w-7 h-7 rounded-lg bg-surface-elevated border border-primary/30 flex items-center justify-center text-primary text-xs font-bold font-mono">
-                AM
+              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                AP
               </div>
-              <span className="hidden xl:inline text-xs font-medium text-text-primary">
-                Amay (Novice)
+              <span className="hidden md:inline text-sm font-medium text-text-primary">
+                Amay Puri
               </span>
+              <ChevronDown size={14} className="hidden md:inline text-text-secondary" />
             </Link>
           </div>
         </div>
@@ -242,36 +221,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
 
       {/* Global Search Dialog */}
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-
-      {/* Reset Portfolio Confirmation Modal */}
-      <Modal
-        isOpen={isResetModalOpen}
-        onClose={() => setIsResetModalOpen(false)}
-        title="Reset Virtual Trading Capital"
-        description="Are you sure you want to restore your virtual balance back to ₹10,00,000?"
-      >
-        <div className="space-y-4">
-          <p className="text-xs text-text-secondary leading-relaxed">
-            This will wipe your simulated open positions and restore ₹10,00,000 in paper cash. Your learning progress and completed course tracks will remain saved.
-          </p>
-
-          <div className="p-3 rounded-xl bg-warning/10 border border-warning/20 flex items-start gap-2.5 text-warning text-xs">
-            <ShieldAlert size={16} className="flex-shrink-0 mt-0.5" />
-            <span>
-              In real financial markets, there is no reset button. Use virtual resets thoughtfully to test distinct asset allocation strategies.
-            </span>
-          </div>
-
-          <div className="flex justify-end gap-2.5 pt-2">
-            <Button variant="outline" size="sm" onClick={() => setIsResetModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="warning" size="sm" onClick={handleConfirmReset}>
-              Reset to ₹10 Lakhs
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 };

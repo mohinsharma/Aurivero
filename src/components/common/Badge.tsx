@@ -16,29 +16,29 @@ export const Badge: React.FC<BadgeProps> = ({
   dot = false,
 }) => {
   const variantStyles = {
-    primary: 'bg-primary/10 text-primary border-primary/20',
-    secondary: 'bg-secondary/10 text-secondary border-secondary/20',
-    warning: 'bg-warning/10 text-warning border-warning/20',
-    danger: 'bg-danger/10 text-danger border-danger/20',
-    neutral: 'bg-surface-elevated text-text-secondary border-border',
+    primary: 'bg-primary/10 text-primary',
+    secondary: 'bg-surface-elevated text-text-primary',
+    warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-300',
+    danger: 'bg-loss/10 text-loss',
+    neutral: 'bg-surface-elevated text-text-secondary',
   };
 
   const dotColors = {
     primary: 'bg-primary',
-    secondary: 'bg-secondary',
-    warning: 'bg-warning',
-    danger: 'bg-danger',
-    neutral: 'bg-text-secondary',
+    secondary: 'bg-primary',
+    warning: 'bg-amber-500',
+    danger: 'bg-loss',
+    neutral: 'bg-text-muted',
   };
 
   const sizeStyles = {
-    sm: 'text-xs px-2 py-0.5 gap-1',
-    md: 'text-xs px-2.5 py-1 gap-1.5 font-medium',
+    sm: 'text-[11px] px-2.5 py-0.5 gap-1.5',
+    md: 'text-xs px-3 py-1 gap-1.5',
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border tracking-wide uppercase font-mono ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      className={`inline-flex items-center rounded-full font-medium ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
     >
       {dot && <span className={`w-1.5 h-1.5 rounded-full ${dotColors[variant]}`} />}
       {children}

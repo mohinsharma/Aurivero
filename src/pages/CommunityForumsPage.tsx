@@ -333,7 +333,7 @@ export const CommunityForumsPage: React.FC = () => {
   };
 
   const getOriginStyle = (origin: string) => {
-    if (origin === 'Official MINDMARK') return 'bg-secondary/20 text-secondary border-secondary/40';
+    if (origin === 'Official MINDMARK' || origin === 'Official Aurivero') return 'bg-secondary/20 text-secondary border-secondary/40';
     if (origin === 'Verified Experience') return 'bg-primary/20 text-primary border-primary/40';
     return 'bg-surface text-text-muted border-border/60';
   };
@@ -351,7 +351,7 @@ export const CommunityForumsPage: React.FC = () => {
             <strong className="text-text-primary">Trust & Safety Guardrail:</strong> Educational peer learning only—zero stock tips. Never share OTPs, bank account numbers, or seed phrases.
           </span>
         </div>
-        <span className="text-[11px] text-primary font-semibold">MINDMARK Staff Never DM</span>
+        <span className="text-[11px] text-primary font-semibold">Aurivero Staff Never DM</span>
       </div>
 
       {/* Top Hero Banner */}
@@ -364,7 +364,7 @@ export const CommunityForumsPage: React.FC = () => {
               6 STARTER SPACES • PEER LEARNING NETWORK
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight font-mono">
-              MINDMARK Community Forums
+              Aurivero Community Forums
             </h1>
             <p className="text-text-secondary text-sm mt-1.5 max-w-2xl leading-relaxed">
               Ask honest money questions, share disciplined experiences, spot scams early, and earn reputation by helping others learn.
@@ -407,7 +407,7 @@ export const CommunityForumsPage: React.FC = () => {
                 }}
                 className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all ${
                   selectedMainCat === cat
-                    ? 'bg-secondary text-background shadow-md'
+                    ? 'bg-secondary text-white shadow-md'
                     : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
                 }`}
               >
@@ -728,7 +728,7 @@ export const CommunityForumsPage: React.FC = () => {
               {/* Author badge */}
               <div className="flex items-center justify-between flex-wrap gap-3 mt-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-bold text-background text-xs font-mono">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-bold text-white text-xs font-mono">
                     {activeThread.is_anonymous ? '?' : activeThread.author_name?.charAt(0)}
                   </div>
                   <div>

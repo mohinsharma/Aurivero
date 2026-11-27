@@ -174,93 +174,93 @@ export const ChallengesPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-surface border border-border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      <div className="p-6 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono uppercase tracking-wider text-primary font-semibold flex items-center gap-1.5">
-              <Trophy size={14} className="text-primary" /> Educational Gamification
+            <span className="text-xs font-semibold text-[#2962FF] flex items-center gap-1.5">
+              <Trophy size={14} className="text-[#2962FF]" /> Educational Gamification
             </span>
             <Badge variant="primary" size="sm">Level {currentTier.level}: {currentTier.name}</Badge>
-            <Badge variant="secondary" size="sm">Ethical Progression</Badge>
+            <Badge variant="neutral" size="sm">Ethical Progression</Badge>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#131722] mt-1">
             Learning Challenges & Progression
           </h1>
-          <p className="text-xs text-text-secondary mt-1 max-w-2xl leading-relaxed">
-            MINDMARK rewards financial understanding, diversification, risk management, and decision discipline. Progression is earned by mastering concepts—never by trade volume or speculative profit.
+          <p className="text-xs text-[#64748B] mt-1 max-w-2xl leading-relaxed">
+            Aurivero rewards financial understanding, diversification, risk management, and decision discipline. Progression is earned by mastering concepts—never by trade volume or speculative profit.
           </p>
         </div>
 
         {/* Top User XP & Streak Quick Pill */}
-        <div className="flex items-center gap-3 font-mono">
-          <div className="p-3.5 rounded-xl bg-surface-elevated border border-primary/30 text-center">
-            <span className="text-[10px] text-text-muted uppercase block">Learning XP</span>
-            <span className="text-xl font-bold text-primary">{userXP.toLocaleString('en-IN')} XP</span>
+        <div className="flex items-center gap-3 tabular-nums">
+          <div className="px-4 py-3 rounded-xl bg-[#F8FAFC] text-center">
+            <span className="text-[11px] text-[#64748B] block">Learning XP</span>
+            <span className="text-xl font-bold text-[#2962FF]">{userXP.toLocaleString('en-IN')} XP</span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-surface-elevated border border-warning/30 text-center">
-            <span className="text-[10px] text-text-muted uppercase block flex items-center justify-center gap-1">
-              <Flame size={12} className="text-warning" /> Study Streak
+          <div className="px-4 py-3 rounded-xl bg-[#F8FAFC] text-center">
+            <span className="text-[11px] text-[#64748B] block flex items-center justify-center gap-1">
+              <Flame size={12} className="text-amber-600" /> Study Streak
             </span>
-            <span className="text-xl font-bold text-warning">5 Days</span>
+            <span className="text-xl font-bold text-amber-600">5 Days</span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-surface-elevated border border-secondary/30 text-center hidden sm:block">
-            <span className="text-[10px] text-text-muted uppercase block">Badges</span>
-            <span className="text-xl font-bold text-secondary">5 / 8</span>
+          <div className="px-4 py-3 rounded-xl bg-[#F8FAFC] text-center hidden sm:block">
+            <span className="text-[11px] text-[#64748B] block">Badges</span>
+            <span className="text-xl font-bold text-[#131722]">5 / 8</span>
           </div>
         </div>
       </div>
 
       {/* Reward Claim Banner Toast */}
       {claimedRewardMessage && (
-        <div className="p-3.5 rounded-xl bg-primary/15 border border-primary/40 text-xs text-primary font-mono font-semibold flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="p-4 rounded-xl bg-[#089981]/10 border border-[#089981]/30 text-xs text-[#089981] font-semibold flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
           <span className="flex items-center gap-2">
             <Sparkles size={16} /> {claimedRewardMessage}
           </span>
-          <button onClick={() => setClaimedRewardMessage(null)} className="text-text-muted hover:text-text-primary text-xs">
+          <button onClick={() => setClaimedRewardMessage(null)} className="text-[#64748B] hover:text-[#131722] text-xs">
             Dismiss
           </button>
         </div>
       )}
 
       {/* LEVEL PROGRESSION ROADMAP CARD */}
-      <Card variant="elevated" className="p-5 border-border/80 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/40">
+      <Card className="p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E2E8F0]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase text-primary font-bold">
+              <span className="text-xs text-[#2962FF] font-bold tabular-nums">
                 Tier {currentTier.level} of 5: {currentTier.name}
               </span>
-              <span className="text-text-muted">•</span>
-              <span className="text-xs text-text-secondary">{currentTier.subtitle}</span>
+              <span className="text-[#64748B]">•</span>
+              <span className="text-xs text-[#64748B]">{currentTier.subtitle}</span>
             </div>
           </div>
-          <div className="text-xs font-mono text-text-muted">
+          <div className="text-xs text-[#64748B] tabular-nums">
             {nextTier ? (
-              <span>Next Level: <strong className="text-text-primary">{nextTier.name}</strong> at {nextTier.minXP} XP ({nextTier.minXP - userXP} XP to go)</span>
+              <span>Next Level: <strong className="text-[#131722]">{nextTier.name}</strong> at {nextTier.minXP} XP ({nextTier.minXP - userXP} XP to go)</span>
             ) : (
-              <span className="text-primary font-bold">Max Mastery Tier Reached!</span>
+              <span className="text-[#089981] font-bold">Max Mastery Tier Reached!</span>
             )}
           </div>
         </div>
 
         {/* Level Progression Bar */}
         <div className="space-y-1.5">
-          <div className="flex justify-between text-[11px] font-mono text-text-muted">
+          <div className="flex justify-between text-xs text-[#64748B] tabular-nums">
             <span>Level Progress</span>
-            <span className="text-primary font-bold">{tierProgressPercent}%</span>
+            <span className="text-[#2962FF] font-bold">{tierProgressPercent}%</span>
           </div>
-          <div className="w-full bg-background rounded-full h-2.5 overflow-hidden border border-border/40 flex">
+          <div className="w-full bg-[#F1F5F9] rounded-full h-2 overflow-hidden flex">
             <div
-              className="bg-primary h-full transition-all duration-500 rounded-full shadow-glow"
+              className="bg-[#2962FF] h-full transition-all duration-500 rounded-full"
               style={{ width: `${tierProgressPercent}%` }}
             />
           </div>
         </div>
 
         {/* 5-Level Milestone Nodes */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
           {LEVEL_TIERS.map(tier => {
             const isCompleted = userXP > tier.maxXP;
             const isCurrent = userXP >= tier.minXP && userXP <= tier.maxXP;
@@ -268,26 +268,26 @@ export const ChallengesPage: React.FC = () => {
             return (
               <div
                 key={tier.level}
-                className={`p-2.5 rounded-lg border text-left transition-all ${
+                className={`p-3.5 rounded-xl border text-left transition-colors ${
                   isCurrent
-                    ? 'bg-primary/10 border-primary text-text-primary shadow-glow'
+                    ? 'bg-[#2962FF]/[0.06] border-[#2962FF] text-[#131722]'
                     : isCompleted
-                    ? 'bg-surface border-primary/30 text-text-secondary'
-                    : 'bg-surface/50 border-border/40 text-text-muted'
+                    ? 'bg-[#F8FAFC] border-[#089981]/30 text-[#131722]'
+                    : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B]'
                 }`}
               >
-                <div className="flex items-center justify-between text-[10px] font-mono mb-1">
+                <div className="flex items-center justify-between text-[11px] mb-1 tabular-nums">
                   <span>Lvl {tier.level}</span>
                   {isCompleted ? (
-                    <CheckCircle2 size={13} className="text-primary" />
+                    <CheckCircle2 size={13} className="text-[#089981]" />
                   ) : isCurrent ? (
-                    <span className="text-primary font-bold">ACTIVE</span>
+                    <span className="text-[#2962FF] font-bold">ACTIVE</span>
                   ) : (
-                    <Lock size={12} className="text-text-muted" />
+                    <Lock size={12} className="text-[#64748B]" />
                   )}
                 </div>
                 <h4 className="text-xs font-bold truncate">{tier.name}</h4>
-                <span className="text-[10px] font-mono block mt-0.5 opacity-80">{tier.minXP} XP</span>
+                <span className="text-[11px] block mt-0.5 opacity-80 tabular-nums">{tier.minXP} XP</span>
               </div>
             );
           })}
@@ -295,7 +295,7 @@ export const ChallengesPage: React.FC = () => {
       </Card>
 
       {/* Main Tab Navigation */}
-      <div className="flex items-center gap-2 border-b border-border/60 pb-2 overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-3 overflow-x-auto scrollbar-none">
         {[
           { id: 'QUESTS' as PageTab, label: 'Challenges & Quests', icon: <Target size={14} />, badge: `${questsList.filter(q => q.completed && !q.claimed).length} Claimable` },
           { id: 'LEADERBOARD' as PageTab, label: 'Ethical Discipline Leaderboard', icon: <Trophy size={14} /> },
@@ -305,17 +305,17 @@ export const ChallengesPage: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 whitespace-nowrap border ${
               activeTab === tab.id
-                ? 'bg-primary text-background shadow-glow'
-                : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-elevated'
+                ? 'bg-[#2962FF] text-white border-[#2962FF]'
+                : 'bg-white border-[#E2E8F0] text-[#64748B] hover:text-[#131722] hover:bg-[#F8FAFC]'
             }`}
           >
             {tab.icon}
             {tab.label}
             {tab.badge && (
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                activeTab === tab.id ? 'bg-background text-primary' : 'bg-primary/20 text-primary'
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold tabular-nums ${
+                activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-[#2962FF]/10 text-[#2962FF]'
               }`}>
                 {tab.badge}
               </span>
@@ -331,15 +331,15 @@ export const ChallengesPage: React.FC = () => {
         <div className="space-y-4">
           {/* Frequency Filters */}
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-1.5 font-mono text-xs">
+            <div className="flex items-center gap-2 text-xs">
               {(['ALL', 'DAILY', 'WEEKLY', 'MILESTONE'] as QuestFilter[]).map(filter => (
                 <button
                   key={filter}
                   onClick={() => setQuestFilter(filter)}
-                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg transition-colors border font-medium ${
                     questFilter === filter
-                      ? 'bg-surface-elevated text-primary border border-primary/40 font-bold'
-                      : 'bg-surface text-text-muted hover:text-text-primary border border-border/40'
+                      ? 'bg-[#2962FF]/10 text-[#2962FF] border-[#2962FF]/30 font-semibold'
+                      : 'bg-white text-[#64748B] hover:text-[#131722] border-[#E2E8F0]'
                   }`}
                 >
                   {filter === 'ALL' ? 'All Quests' : filter === 'DAILY' ? 'Daily Drills' : filter === 'WEEKLY' ? 'Weekly Habits' : 'Milestones'}
@@ -347,13 +347,13 @@ export const ChallengesPage: React.FC = () => {
               ))}
             </div>
 
-            <span className="text-[11px] font-mono text-text-muted">
+            <span className="text-xs text-[#64748B] tabular-nums">
               Showing {filteredQuests.length} educational quests
             </span>
           </div>
 
           {/* Quests Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredQuests.map((quest) => {
               const progressPct = Math.min(100, Math.round((quest.progress / quest.maxProgress) * 100));
               const isClaimable = quest.completed && !quest.claimed;
@@ -361,13 +361,12 @@ export const ChallengesPage: React.FC = () => {
               return (
                 <Card
                   key={quest.id}
-                  variant="elevated"
-                  className={`p-5 flex flex-col justify-between space-y-4 border transition-all ${
+                  className={`p-6 flex flex-col justify-between space-y-4 transition-colors ${
                     isClaimable
-                      ? 'border-primary/60 bg-surface-elevated shadow-glow'
+                      ? 'border-[#2962FF]/50'
                       : quest.claimed
-                      ? 'border-border/60 bg-surface/80 opacity-90'
-                      : 'border-border hover:border-text-secondary/40'
+                      ? 'opacity-85'
+                      : 'hover:border-[#CBD5E1]'
                   }`}
                 >
                   <div className="space-y-2.5">
@@ -382,39 +381,39 @@ export const ChallengesPage: React.FC = () => {
                         >
                           {quest.frequency || 'QUEST'}
                         </Badge>
-                        <span className="text-[10px] font-mono text-text-muted uppercase px-1.5 py-0.5 rounded bg-background border border-border/50">
+                        <span className="text-[11px] text-[#64748B] px-2 py-0.5 rounded-full bg-[#F1F5F9]">
                           {quest.category}
                         </span>
                       </div>
 
-                      <span className="text-xs font-mono font-bold text-primary">
+                      <span className="text-xs font-bold text-[#2962FF] tabular-nums">
                         +{quest.rewardXP} XP
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="font-bold text-sm text-text-primary">
+                      <h3 className="font-bold text-sm text-[#131722]">
                         {quest.title}
                       </h3>
-                      <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                      <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
                         {quest.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-3 pt-2 border-t border-border/40">
+                  <div className="space-y-3 pt-3 border-t border-[#E2E8F0]">
                     {/* Progress Bar */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[11px] font-mono text-text-muted">
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs text-[#64748B] tabular-nums">
                         <span>Progress</span>
-                        <span className={quest.completed ? 'text-primary font-bold' : ''}>
+                        <span className={quest.completed ? 'text-[#089981] font-semibold' : 'font-medium text-[#131722]'}>
                           {quest.progress} / {quest.maxProgress} ({progressPct}%)
                         </span>
                       </div>
-                      <div className="w-full bg-background rounded-full h-1.5 overflow-hidden">
+                      <div className="w-full bg-[#F1F5F9] rounded-full h-1.5 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
-                            quest.completed ? 'bg-primary' : 'bg-secondary'
+                            quest.completed ? 'bg-[#089981]' : 'bg-[#2962FF]'
                           }`}
                           style={{ width: `${progressPct}%` }}
                         />
@@ -423,8 +422,8 @@ export const ChallengesPage: React.FC = () => {
 
                     {/* Quest Action / Claim Button */}
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[10px] font-mono text-text-muted flex items-center gap-1">
-                        <Award size={12} className="text-secondary" /> Badge: {quest.badgeName}
+                      <span className="text-[11px] text-[#64748B] flex items-center gap-1">
+                        <Award size={12} className="text-[#2962FF]" /> Badge: {quest.badgeName}
                       </span>
 
                       {isClaimable ? (
@@ -437,7 +436,7 @@ export const ChallengesPage: React.FC = () => {
                           Claim +{quest.rewardXP} XP
                         </Button>
                       ) : quest.claimed ? (
-                        <span className="text-[11px] font-mono text-primary flex items-center gap-1 font-semibold">
+                        <span className="text-xs text-[#089981] flex items-center gap-1 font-semibold">
                           <CheckCircle2 size={13} /> Reward Claimed
                         </span>
                       ) : quest.actionRoute ? (
@@ -466,98 +465,98 @@ export const ChallengesPage: React.FC = () => {
       {activeTab === 'LEADERBOARD' && (
         <div className="space-y-4">
           {/* Ethical Philosophy Callout */}
-          <div className="p-4 rounded-xl bg-surface border-l-4 border-l-primary border-y border-r border-border space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-primary uppercase">
+          <div className="p-5 rounded-xl bg-white border-l-4 border-l-[#2962FF] border-y border-r border-[#E2E8F0] shadow-sm space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#2962FF]">
               <Shield size={14} /> Ethical Leaderboard Philosophy
             </div>
-            <p className="text-xs text-text-secondary leading-relaxed font-sans">
-              MINDMARK strictly rejects ranking users by trading volume or virtual paper profit. Wall Street research proves that chasing returns triggers reckless gambling habits. Here, you are recognized for <strong>decision consistency, risk controls, loss-prevention discipline, and conceptual knowledge.</strong>
+            <p className="text-xs text-[#64748B] leading-relaxed">
+              Aurivero strictly rejects ranking users by trading volume or virtual paper profit. Wall Street research proves that chasing returns triggers reckless gambling habits. Here, you are recognized for <strong className="text-[#131722]">decision consistency, risk controls, loss-prevention discipline, and conceptual knowledge.</strong>
             </p>
           </div>
 
           {/* Sort Controls */}
-          <div className="flex items-center justify-between flex-wrap gap-2 p-3 rounded-xl bg-surface border border-border">
-            <div className="flex items-center gap-2 font-mono text-xs">
-              <span className="text-text-muted">Rank Leaderboard By:</span>
+          <div className="flex items-center justify-between flex-wrap gap-2 p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-sm">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-[#64748B] font-medium">Rank Leaderboard By:</span>
               <button
                 onClick={() => setLeaderboardSort('DISCIPLINE')}
-                className={`px-3 py-1 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors border font-medium ${
                   leaderboardSort === 'DISCIPLINE'
-                    ? 'bg-primary text-background font-bold'
-                    : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
+                    ? 'bg-[#2962FF] text-white border-[#2962FF] font-semibold'
+                    : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#131722]'
                 }`}
               >
                 Behavioral Discipline Score (0–100)
               </button>
               <button
                 onClick={() => setLeaderboardSort('XP')}
-                className={`px-3 py-1 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors border font-medium ${
                   leaderboardSort === 'XP'
-                    ? 'bg-primary text-background font-bold'
-                    : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
+                    ? 'bg-[#2962FF] text-white border-[#2962FF] font-semibold'
+                    : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#131722]'
                 }`}
               >
                 Total Learning XP
               </button>
             </div>
 
-            <span className="text-[11px] font-mono text-text-muted">
+            <span className="text-xs text-[#64748B]">
               Privacy Protected: Individual trade tickets remain private.
             </span>
           </div>
 
           {/* Leaderboard Table */}
-          <div className="rounded-xl border border-border bg-surface overflow-hidden">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-xs font-mono">
+              <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-border/80 text-[10px] text-text-muted uppercase text-left bg-background/50">
-                    <th className="py-3 px-4">Rank</th>
-                    <th className="py-3 px-4">Learner</th>
-                    <th className="py-3 px-4">Mastery Level</th>
-                    <th className="py-3 px-4">Discipline Score</th>
-                    <th className="py-3 px-4">Learning XP</th>
-                    <th className="py-3 px-4 text-center">Badges</th>
-                    <th className="py-3 px-4 text-right">Study Streak</th>
+                  <tr className="border-b border-[#E2E8F0] text-[11px] font-semibold text-[#64748B] text-left bg-[#F8FAFC]">
+                    <th className="py-3.5 px-4">Rank</th>
+                    <th className="py-3.5 px-4">Learner</th>
+                    <th className="py-3.5 px-4">Mastery Level</th>
+                    <th className="py-3.5 px-4">Discipline Score</th>
+                    <th className="py-3.5 px-4">Learning XP</th>
+                    <th className="py-3.5 px-4 text-center">Badges</th>
+                    <th className="py-3.5 px-4 text-right">Study Streak</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/40">
+                <tbody className="divide-y divide-[#E2E8F0]">
                   {sortedLeaderboard.map((entry, idx) => (
                     <tr
                       key={entry.id}
                       className={`transition-colors ${
                         entry.isCurrentUser
-                          ? 'bg-primary/10 border-l-4 border-l-primary font-semibold'
-                          : 'hover:bg-surface-elevated/40'
+                          ? 'bg-[#2962FF]/[0.06] border-l-4 border-l-[#2962FF] font-semibold'
+                          : 'hover:bg-[#F8FAFC]'
                       }`}
                     >
-                      <td className="py-3.5 px-4 font-bold">
+                      <td className="py-3.5 px-4 font-bold tabular-nums text-[#131722]">
                         {idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`}
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-text-primary">{entry.name}</div>
-                        <span className="text-[10px] text-text-muted">{entry.city}</span>
+                        <div className="font-bold text-[#131722]">{entry.name}</div>
+                        <span className="text-[11px] text-[#64748B]">{entry.city}</span>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="text-secondary font-semibold">{entry.levelName}</span>
-                        <span className="text-[10px] text-text-muted block">Tier {entry.levelNumber}</span>
+                        <span className="text-[#2962FF] font-semibold">{entry.levelName}</span>
+                        <span className="text-[11px] text-[#64748B] block tabular-nums">Tier {entry.levelNumber}</span>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-primary">{entry.disciplineScore}</span>
-                          <span className="text-[10px] text-text-muted">/100</span>
+                      <td className="py-3.5 px-4 tabular-nums">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-bold text-[#089981]">{entry.disciplineScore}</span>
+                          <span className="text-[11px] text-[#64748B]">/100</span>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 font-bold text-text-primary">
+                      <td className="py-3.5 px-4 font-bold text-[#131722] tabular-nums">
                         {entry.xp.toLocaleString('en-IN')} XP
                       </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="px-2 py-0.5 rounded bg-background border border-border text-[11px]">
+                      <td className="py-3.5 px-4 text-center tabular-nums">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#131722] text-[11px] font-medium">
                           {entry.badgesCount}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <span className="font-bold text-warning flex items-center justify-end gap-1">
+                      <td className="py-3.5 px-4 text-right tabular-nums">
+                        <span className="font-bold text-amber-600 flex items-center justify-end gap-1">
                           <Flame size={13} /> {entry.streakDays}d
                         </span>
                       </td>
@@ -575,70 +574,69 @@ export const ChallengesPage: React.FC = () => {
       {/* ========================================================================= */}
       {activeTab === 'BADGES' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs font-mono text-text-muted px-1">
+          <div className="flex items-center justify-between text-xs text-[#64748B] px-1 tabular-nums">
             <span>
-              Unlocked <strong className="text-primary">{ACHIEVEMENT_BADGES.filter(b => b.unlocked).length}</strong> of {ACHIEVEMENT_BADGES.length} milestone badges
+              Unlocked <strong className="text-[#2962FF]">{ACHIEVEMENT_BADGES.filter(b => b.unlocked).length}</strong> of {ACHIEVEMENT_BADGES.length} milestone badges
             </span>
             <span>Earned through verified learning milestones</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {ACHIEVEMENT_BADGES.map((badge) => {
               const rarityColorMap: Record<AchievementBadge['rarity'], string> = {
-                Common: 'text-text-secondary border-border',
-                Rare: 'text-secondary border-secondary/40',
-                Epic: 'text-warning border-warning/40',
-                Legendary: 'text-primary border-primary/50'
+                Common: 'text-[#64748B] bg-[#F1F5F9]',
+                Rare: 'text-[#2962FF] bg-[#2962FF]/10',
+                Epic: 'text-amber-700 bg-amber-50',
+                Legendary: 'text-[#089981] bg-[#089981]/10'
               };
               const rarityColor = rarityColorMap[badge.rarity];
 
               return (
                 <Card
                   key={badge.id}
-                  variant="elevated"
-                  className={`p-5 flex flex-col justify-between space-y-3 transition-all ${
+                  className={`p-6 flex flex-col justify-between space-y-3 transition-colors ${
                     badge.unlocked
-                      ? 'border-primary/40 bg-surface shadow-glow'
-                      : 'border-border/40 bg-surface/50 opacity-70'
+                      ? 'border-[#2962FF]/35'
+                      : 'opacity-75'
                   }`}
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex items-start justify-between">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         badge.unlocked
-                          ? 'bg-primary/20 text-primary border border-primary/40'
-                          : 'bg-background text-text-muted border border-border'
+                          ? 'bg-[#2962FF]/10 text-[#2962FF]'
+                          : 'bg-[#F1F5F9] text-[#64748B]'
                       }`}>
                         {badge.unlocked ? <Award size={20} /> : <Lock size={18} />}
                       </div>
 
                       <div className="text-right">
-                        <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border ${rarityColor}`}>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${rarityColor}`}>
                           {badge.rarity}
                         </span>
-                        <span className="text-[10px] font-mono text-text-muted block mt-1">
+                        <span className="text-[11px] text-[#64748B] block mt-1">
                           {badge.category}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="font-bold text-sm text-text-primary">
+                      <h3 className="font-bold text-sm text-[#131722]">
                         {badge.title}
                       </h3>
-                      <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                      <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
                         {badge.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-border/40 text-[10px] font-mono">
+                  <div className="pt-3 border-t border-[#E2E8F0] text-[11px] tabular-nums">
                     {badge.unlocked ? (
-                      <span className="text-primary flex items-center gap-1 font-semibold">
+                      <span className="text-[#089981] flex items-center gap-1 font-semibold">
                         <CheckCircle2 size={12} /> Unlocked on {badge.unlockedAt}
                       </span>
                     ) : (
-                      <span className="text-text-muted">
+                      <span className="text-[#64748B]">
                         Req: {badge.requirement}
                       </span>
                     )}
@@ -655,36 +653,36 @@ export const ChallengesPage: React.FC = () => {
       {/* ========================================================================= */}
       {activeTab === 'STREAK' && (
         <div className="space-y-4">
-          <Card variant="elevated" className="p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+          <Card className="p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-warning/20 border border-warning/40 flex items-center justify-center text-warning">
-                  <Flame size={28} />
+                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Flame size={26} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-text-primary">
+                  <h3 className="text-lg font-bold text-[#131722]">
                     5-Day Financial Curiosity Streak
                   </h3>
-                  <p className="text-xs text-text-secondary mt-0.5">
+                  <p className="text-xs text-[#64748B] mt-0.5">
                     Streaks count consecutive days of curriculum reading, quiz completions, and risk checks.
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-surface border border-border font-mono text-center">
-                <span className="text-[10px] text-text-muted block uppercase">Streak Protection</span>
-                <span className="text-xs font-bold text-primary flex items-center gap-1 justify-center mt-0.5">
+              <div className="px-4 py-2.5 rounded-xl bg-[#F8FAFC] text-center">
+                <span className="text-[11px] text-[#64748B] block">Streak Protection</span>
+                <span className="text-xs font-bold text-[#089981] flex items-center gap-1 justify-center mt-0.5">
                   <Shield size={12} /> 1 Freeze Active
                 </span>
               </div>
             </div>
 
             {/* 7-Day Visual Calendar Tracker */}
-            <div className="space-y-2">
-              <span className="text-xs font-mono uppercase text-text-muted font-semibold block">
+            <div className="space-y-2.5">
+              <span className="text-xs text-[#64748B] font-semibold block">
                 This Week's Activity
               </span>
-              <div className="grid grid-cols-7 gap-2 text-center font-mono text-xs">
+              <div className="grid grid-cols-7 gap-2.5 text-center text-xs tabular-nums">
                 {[
                   { day: 'Mon', completed: true, date: '18 Nov' },
                   { day: 'Tue', completed: true, date: '19 Nov' },
@@ -698,31 +696,31 @@ export const ChallengesPage: React.FC = () => {
                     key={i}
                     className={`p-3 rounded-xl border flex flex-col items-center justify-between gap-1.5 ${
                       d.completed
-                        ? 'bg-warning/15 border-warning/50 text-warning'
-                        : 'bg-surface border-border text-text-muted'
+                        ? 'bg-amber-50 border-amber-200 text-amber-700'
+                        : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B]'
                     }`}
                   >
-                    <span className="text-[10px] uppercase font-bold">{d.day}</span>
+                    <span className="text-[11px] font-bold">{d.day}</span>
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                      d.completed ? 'bg-warning text-background' : 'bg-background text-text-muted'
+                      d.completed ? 'bg-amber-500 text-white' : 'bg-white border border-[#E2E8F0] text-[#64748B]'
                     }`}>
                       {d.completed ? <Check size={14} /> : <Clock size={12} />}
                     </div>
-                    <span className="text-[9px]">{d.date}</span>
+                    <span className="text-[10px]">{d.date}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Streak Rules & Pedagogical Note */}
-            <div className="p-4 rounded-xl bg-surface border border-border space-y-2 text-xs">
-              <span className="font-mono font-bold text-text-primary uppercase flex items-center gap-1.5">
-                <Compass size={14} className="text-primary" /> How Educational Streaks Work on MINDMARK
+            <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-2 text-xs">
+              <span className="font-bold text-[#131722] flex items-center gap-1.5">
+                <Compass size={14} className="text-[#2962FF]" /> How Educational Streaks Work on Aurivero
               </span>
-              <ul className="space-y-1.5 text-text-secondary leading-relaxed list-disc list-inside">
+              <ul className="space-y-1.5 text-[#64748B] leading-relaxed list-disc list-inside">
                 <li>Completing 1 lesson in the Learn Center extends your streak.</li>
                 <li>Answering an AI Market News Explainer quiz extends your streak.</li>
-                <li>Executing a simulated trade does <strong>NOT</strong> extend your streak unless accompanied by a written trade thesis and a Pre-Trade Risk Check.</li>
+                <li>Executing a simulated trade does <strong className="text-[#131722]">NOT</strong> extend your streak unless accompanied by a written trade thesis and a Pre-Trade Risk Check.</li>
                 <li>If you miss a day, your 1 earned Streak Freeze automatically preserves your record.</li>
               </ul>
             </div>

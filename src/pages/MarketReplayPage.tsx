@@ -331,19 +331,19 @@ export const MarketReplayPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Cinematic Header */}
-      <div className="p-6 rounded-2xl bg-surface border border-border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      <div className="p-6 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono uppercase tracking-wider text-warning font-semibold flex items-center gap-1.5">
-              <History size={14} className="text-warning" /> Historical Market Time Machine
+            <span className="text-xs font-semibold text-amber-700 flex items-center gap-1.5">
+              <History size={14} className="text-amber-600" /> Historical Market Time Machine
             </span>
             <Badge variant="warning" size="sm">Blind Decision Sandbox</Badge>
-            <Badge variant="secondary" size="sm">NSE/BSE Verified Archives</Badge>
+            <Badge variant="primary" size="sm">NSE/BSE Verified Archives</Badge>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-primary mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#131722] mt-1">
             Historical Market Replay Simulator
           </h1>
-          <p className="text-xs text-text-secondary mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#64748B] mt-1 max-w-2xl leading-relaxed">
             Step back into past crises and recoveries without hindsight bias. Make real-time decisions using only information known on that date; the future remains strictly hidden until you commit.
           </p>
         </div>
@@ -371,7 +371,7 @@ export const MarketReplayPage: React.FC = () => {
       </div>
 
       {/* Scenario Selector Tabs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {HISTORICAL_REPLAY_EVENTS.map(event => {
           const isSelected = event.id === selectedEventId;
           const typeBadgeMap: Record<'CRASH' | 'CRISIS' | 'RECOVERY' | 'VOLATILITY', { label: string; variant: 'danger' | 'warning' | 'primary' | 'secondary' }> = {
@@ -386,28 +386,28 @@ export const MarketReplayPage: React.FC = () => {
             <div
               key={event.id}
               onClick={() => handleSelectScenario(event.id)}
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+              className={`p-5 rounded-xl border transition-colors cursor-pointer flex flex-col justify-between shadow-sm ${
                 isSelected
-                  ? 'bg-surface-elevated border-warning/60 shadow-glow'
-                  : 'bg-surface border-border hover:border-text-secondary/40 hover:bg-surface-elevated/40'
+                  ? 'bg-[#2962FF]/[0.04] border-[#2962FF]/60'
+                  : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]'
               }`}
             >
               <div>
-                <div className="flex items-center justify-between gap-1 mb-1.5">
+                <div className="flex items-center justify-between gap-1 mb-2">
                   <Badge variant={typeBadge.variant} size="sm">{typeBadge.label}</Badge>
-                  <span className="text-[10px] font-mono text-text-muted">{event.period}</span>
+                  <span className="text-[11px] text-[#64748B] tabular-nums">{event.period}</span>
                 </div>
-                <h3 className={`font-bold text-xs ${isSelected ? 'text-warning' : 'text-text-primary'} line-clamp-1`}>
+                <h3 className={`font-bold text-xs ${isSelected ? 'text-[#2962FF]' : 'text-[#131722]'} line-clamp-1`}>
                   {event.title}
                 </h3>
-                <p className="text-[11px] text-text-muted mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] mt-1 line-clamp-2 leading-relaxed">
                   {event.subtitle}
                 </p>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-border/40 flex items-center justify-between text-[10px] font-mono">
-                <span className="text-text-secondary">Magnitude: <strong className="text-text-primary">{event.dropPercentage}</strong></span>
-                <span className="text-warning flex items-center gap-0.5">
+              <div className="mt-3 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-[11px]">
+                <span className="text-[#64748B] tabular-nums">Magnitude: <strong className="text-[#131722]">{event.dropPercentage}</strong></span>
+                <span className="text-[#2962FF] font-semibold flex items-center gap-0.5">
                   Select <ChevronRight size={12} />
                 </span>
               </div>
@@ -417,73 +417,73 @@ export const MarketReplayPage: React.FC = () => {
       </div>
 
       {/* Live Simulation Top HUD */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-xl bg-surface border border-border">
-          <span className="text-[10px] font-mono uppercase text-text-muted block">Simulated Portfolio</span>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-lg font-bold font-mono text-text-primary">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-sm">
+          <span className="text-xs font-medium text-[#64748B] block">Simulated Portfolio</span>
+          <div className="flex items-baseline gap-2 mt-1.5 tabular-nums">
+            <span className="text-lg font-bold text-[#131722]">
               ₹{Math.round(currentTotalPortfolio).toLocaleString('en-IN')}
             </span>
-            <span className={`text-xs font-mono font-semibold ${userTotalReturnPercent >= 0 ? 'text-primary' : 'text-danger'}`}>
-              {userTotalReturnPercent >= 0 ? '+' : ''}{userTotalReturnPercent.toFixed(1)}%
+            <span className={`text-xs font-semibold ${userTotalReturnPercent >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+              {userTotalReturnPercent >= 0 ? '+' : '-'}{Math.abs(userTotalReturnPercent).toFixed(1)}%
             </span>
           </div>
-          <span className="text-[10px] text-text-muted block mt-0.5">Initial: ₹1,00,000</span>
+          <span className="text-[11px] text-[#64748B] block mt-0.5 tabular-nums">Initial: ₹1,00,000</span>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-surface border border-border">
-          <span className="text-[10px] font-mono uppercase text-text-muted block">Liquid Cash Reserve</span>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-lg font-bold font-mono text-text-primary">
+        <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-sm">
+          <span className="text-xs font-medium text-[#64748B] block">Liquid Cash Reserve</span>
+          <div className="flex items-baseline gap-2 mt-1.5 tabular-nums">
+            <span className="text-lg font-bold text-[#131722]">
               ₹{Math.round(userCash).toLocaleString('en-IN')}
             </span>
-            <span className="text-[10px] font-mono text-text-secondary">
+            <span className="text-[11px] text-[#64748B]">
               ({((userCash / currentTotalPortfolio) * 100).toFixed(0)}% Cash)
             </span>
           </div>
-          <span className="text-[10px] text-text-muted block mt-0.5">Dry powder available</span>
+          <span className="text-[11px] text-[#64748B] block mt-0.5">Dry powder available</span>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-surface border border-border">
-          <span className="text-[10px] font-mono uppercase text-text-muted block">Index Equity Value</span>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-lg font-bold font-mono text-text-primary">
+        <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-sm">
+          <span className="text-xs font-medium text-[#64748B] block">Index Equity Value</span>
+          <div className="flex items-baseline gap-2 mt-1.5 tabular-nums">
+            <span className="text-lg font-bold text-[#131722]">
               ₹{Math.round(currentEquityValue).toLocaleString('en-IN')}
             </span>
-            <span className="text-[10px] font-mono text-text-secondary">
+            <span className="text-[11px] text-[#64748B]">
               ({userUnits.toFixed(2)} units)
             </span>
           </div>
-          <span className="text-[10px] text-text-muted block mt-0.5">Market exposure</span>
+          <span className="text-[11px] text-[#64748B] block mt-0.5">Market exposure</span>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-surface border border-border">
-          <span className="text-[10px] font-mono uppercase text-text-muted block">Benchmark Buy & Hold</span>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-lg font-bold font-mono text-text-primary">
+        <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-sm">
+          <span className="text-xs font-medium text-[#64748B] block">Benchmark Buy & Hold</span>
+          <div className="flex items-baseline gap-2 mt-1.5 tabular-nums">
+            <span className="text-lg font-bold text-[#131722]">
               ₹{Math.round(benchmarkPortfolioValue).toLocaleString('en-IN')}
             </span>
-            <span className={`text-xs font-mono font-semibold ${benchmarkReturnPercent >= 0 ? 'text-primary' : 'text-danger'}`}>
-              {benchmarkReturnPercent >= 0 ? '+' : ''}{benchmarkReturnPercent.toFixed(1)}%
+            <span className={`text-xs font-semibold ${benchmarkReturnPercent >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+              {benchmarkReturnPercent >= 0 ? '+' : '-'}{Math.abs(benchmarkReturnPercent).toFixed(1)}%
             </span>
           </div>
-          <span className="text-[10px] text-text-muted block mt-0.5">
-            Alpha: <strong className={alphaPercent >= 0 ? 'text-primary' : 'text-danger'}>{alphaPercent >= 0 ? '+' : ''}{alphaPercent.toFixed(1)}%</strong>
+          <span className="text-[11px] text-[#64748B] block mt-0.5 tabular-nums">
+            Alpha: <strong className={alphaPercent >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}>{alphaPercent >= 0 ? '+' : '-'}{Math.abs(alphaPercent).toFixed(1)}%</strong>
           </span>
         </div>
       </div>
 
       {/* Main Interactive Stage */}
-      <Card variant="elevated" className="p-6 space-y-6 border-border/80">
+      <Card className="p-6 space-y-6">
         {/* Step Indicator Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-warning font-semibold">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-[#2962FF] font-semibold tabular-nums">
                 Checkpoint {currentStep + 1} of {activeEvent.checkpoints.length}
               </span>
-              <span className="text-text-muted">•</span>
-              <span className="text-xs font-mono text-text-primary font-bold">
+              <span className="text-[#64748B]">•</span>
+              <span className="text-xs text-[#131722] font-bold tabular-nums">
                 {activeCheckpoint.date}
               </span>
               <Badge
@@ -498,26 +498,26 @@ export const MarketReplayPage: React.FC = () => {
                 Sentiment: {activeCheckpoint.marketSentiment}
               </Badge>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-text-primary mt-1">
+            <h2 className="text-lg sm:text-xl font-bold text-[#131722] mt-1">
               {activeEvent.title}
             </h2>
           </div>
 
-          <div className="flex items-center gap-6 font-mono bg-background/60 px-4 py-2 rounded-xl border border-border/40">
+          <div className="flex items-center gap-6 bg-[#F8FAFC] px-4 py-2.5 rounded-xl border border-[#E2E8F0] tabular-nums">
             <div>
-              <span className="text-[10px] text-text-muted uppercase block">NIFTY 50 Level</span>
+              <span className="text-[11px] text-[#64748B] block">NIFTY 50 Level</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-lg font-bold text-text-primary">
+                <span className="text-lg font-bold text-[#131722]">
                   {activeCheckpoint.nifty.toLocaleString('en-IN')}
                 </span>
-                <span className={`text-xs ${activeCheckpoint.nifty >= initialCheckpoint.nifty ? 'text-primary' : 'text-danger'}`}>
-                  ({((activeCheckpoint.nifty - initialCheckpoint.nifty) / initialCheckpoint.nifty * 100).toFixed(1)}%)
+                <span className={`text-xs font-semibold ${activeCheckpoint.nifty >= initialCheckpoint.nifty ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                  ({((activeCheckpoint.nifty - initialCheckpoint.nifty) / initialCheckpoint.nifty * 100) >= 0 ? '+' : ''}{((activeCheckpoint.nifty - initialCheckpoint.nifty) / initialCheckpoint.nifty * 100).toFixed(1)}%)
                 </span>
               </div>
             </div>
-            <div className="hidden sm:block border-l border-border/40 pl-4">
-              <span className="text-[10px] text-text-muted uppercase block">SENSEX Level</span>
-              <span className="text-lg font-bold text-text-primary">
+            <div className="hidden sm:block border-l border-[#E2E8F0] pl-4">
+              <span className="text-[11px] text-[#64748B] block">SENSEX Level</span>
+              <span className="text-lg font-bold text-[#131722]">
                 {activeCheckpoint.sensex.toLocaleString('en-IN')}
               </span>
             </div>
@@ -526,20 +526,20 @@ export const MarketReplayPage: React.FC = () => {
 
         {/* Timeline Visual Track */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-mono text-text-muted">
+          <div className="flex items-center justify-between text-xs text-[#64748B] tabular-nums">
             <span>Historical Timeline Progress</span>
-            <span>{Math.round(((currentStep + 1) / activeEvent.checkpoints.length) * 100)}% Revealed</span>
+            <span className="font-semibold text-[#131722]">{Math.round(((currentStep + 1) / activeEvent.checkpoints.length) * 100)}% Revealed</span>
           </div>
-          <div className="w-full bg-background rounded-full h-2.5 overflow-hidden border border-border/40 flex">
+          <div className="w-full bg-[#F1F5F9] rounded-full h-2 overflow-hidden flex">
             {activeEvent.checkpoints.map((cp, idx) => {
               const isPast = idx < currentStep;
               const isCurrent = idx === currentStep;
               return (
                 <div
                   key={idx}
-                  className={`h-full flex-1 border-r border-border/20 transition-all duration-300 ${
-                    isCurrent ? 'bg-warning animate-pulse' :
-                    isPast ? 'bg-primary' : 'bg-surface-elevated/40'
+                  className={`h-full flex-1 border-r border-white/60 transition-all duration-300 ${
+                    isCurrent ? 'bg-[#2962FF]' :
+                    isPast ? 'bg-[#089981]' : 'bg-[#E2E8F0]'
                   }`}
                   title={`${cp.date} - ${cp.nifty}`}
                 />
@@ -549,21 +549,21 @@ export const MarketReplayPage: React.FC = () => {
         </div>
 
         {/* Interactive Blind Historical Chart (Future Hidden) */}
-        <div className="p-4 rounded-xl bg-background border border-border/80 space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs">
+        <div className="p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between text-xs flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <BarChart2 size={15} className="text-warning" />
-              <span className="font-semibold text-text-primary font-mono">
+              <BarChart2 size={15} className="text-[#2962FF]" />
+              <span className="font-semibold text-[#131722]">
                 {activeEvent.benchmark} Closing Track
               </span>
               <Badge variant="warning" size="sm">Blind Mode Active</Badge>
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-text-muted font-mono">
+            <div className="flex items-center gap-3 text-[11px] text-[#64748B]">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-primary inline-block"></span> Known History
+                <span className="w-2 h-2 rounded-full bg-[#2962FF] inline-block"></span> Known History
               </span>
               <span className="flex items-center gap-1">
-                <EyeOff size={11} className="text-text-muted" /> Future Data Strictly Masked
+                <EyeOff size={11} /> Future Data Strictly Masked
               </span>
             </div>
           </div>
@@ -576,11 +576,11 @@ export const MarketReplayPage: React.FC = () => {
             >
               <defs>
                 <linearGradient id="chartFillGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#45D6B5" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#45D6B5" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#2962FF" stopOpacity="0.16" />
+                  <stop offset="100%" stopColor="#2962FF" stopOpacity="0.0" />
                 </linearGradient>
                 <pattern id="fogPattern" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                  <line x1="0" y1="0" x2="0" y2="10" stroke="#1A2531" strokeWidth="2" />
+                  <line x1="0" y1="0" x2="0" y2="10" stroke="#E2E8F0" strokeWidth="2" />
                 </pattern>
               </defs>
 
@@ -594,7 +594,7 @@ export const MarketReplayPage: React.FC = () => {
                     y1={y}
                     x2={chartPoints.width - 40}
                     y2={y}
-                    stroke="#1A2531"
+                    stroke="#E2E8F0"
                     strokeDasharray="4 4"
                     strokeWidth="1"
                   />
@@ -611,23 +611,23 @@ export const MarketReplayPage: React.FC = () => {
                     height={chartPoints.height - 20}
                     fill="url(#fogPattern)"
                     rx="8"
-                    opacity="0.85"
+                    opacity="0.9"
                   />
                   <line
                     x1={chartPoints.revealedCoords[chartPoints.revealedCoords.length - 1].x}
                     y1="10"
                     x2={chartPoints.revealedCoords[chartPoints.revealedCoords.length - 1].x}
                     y2={chartPoints.height - 20}
-                    stroke="#F5B942"
+                    stroke="#D97706"
                     strokeWidth="2"
                     strokeDasharray="3 3"
                   />
                   <text
                     x={chartPoints.revealedCoords[chartPoints.revealedCoords.length - 1].x + 15}
                     y="35"
-                    fill="#8E9CAE"
+                    fill="#64748B"
                     fontSize="10"
-                    fontFamily="monospace"
+                    fontWeight="600"
                   >
                     🔒 UNREVEALED FUTURE
                   </text>
@@ -644,7 +644,7 @@ export const MarketReplayPage: React.FC = () => {
                 <path
                   d={chartPoints.pathString}
                   fill="none"
-                  stroke="#45D6B5"
+                  stroke="#2962FF"
                   strokeWidth="3"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -656,31 +656,20 @@ export const MarketReplayPage: React.FC = () => {
                 const isLatest = idx === currentStep;
                 return (
                   <g key={idx}>
-                    {isLatest && (
-                      <circle
-                        cx={pt.x}
-                        cy={pt.y}
-                        r="8"
-                        fill="#F5B942"
-                        opacity="0.3"
-                        className="animate-ping"
-                      />
-                    )}
                     <circle
                       cx={pt.x}
                       cy={pt.y}
                       r={isLatest ? '5' : '3.5'}
-                      fill={isLatest ? '#F5B942' : '#45D6B5'}
-                      stroke="#0B1017"
+                      fill={isLatest ? '#2962FF' : '#089981'}
+                      stroke="#FFFFFF"
                       strokeWidth="2"
                     />
                     <text
                       x={pt.x}
                       y={chartPoints.height - 8}
                       textAnchor="middle"
-                      fill={isLatest ? '#F5B942' : '#8E9CAE'}
+                      fill={isLatest ? '#2962FF' : '#64748B'}
                       fontSize="9"
-                      fontFamily="monospace"
                       fontWeight={isLatest ? 'bold' : 'normal'}
                     >
                       {pt.date.split(' ')[0]} {pt.date.split(' ')[1]}
@@ -689,9 +678,8 @@ export const MarketReplayPage: React.FC = () => {
                       x={pt.x}
                       y={pt.y - 10}
                       textAnchor="middle"
-                      fill={isLatest ? '#FFFFFF' : '#8E9CAE'}
+                      fill={isLatest ? '#131722' : '#64748B'}
                       fontSize="10"
-                      fontFamily="monospace"
                       fontWeight={isLatest ? 'bold' : 'normal'}
                     >
                       {pt.nifty}
@@ -702,48 +690,48 @@ export const MarketReplayPage: React.FC = () => {
             </svg>
           </div>
 
-          <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[10px] font-mono text-text-muted">
+          <div className="pt-2 border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#64748B]">
             <span>{activeEvent.historicalDisclaimer}</span>
             <span>All values in INR points</span>
           </div>
         </div>
 
         {/* Breaking News Flash known at this date */}
-        <div className="p-4 rounded-xl bg-surface border-l-4 border-l-warning border-y border-r border-border/80 space-y-2">
+        <div className="p-4 rounded-xl bg-amber-50/70 border-l-4 border-l-amber-500 border-y border-r border-[#E2E8F0] space-y-2">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <span className="text-[11px] font-mono font-bold text-warning uppercase flex items-center gap-1.5">
+            <span className="text-xs font-bold text-amber-700 flex items-center gap-1.5">
               <Newspaper size={14} /> Breaking News Flash • {activeCheckpoint.date}
             </span>
-            <span className="text-[10px] font-mono text-text-muted bg-background px-2 py-0.5 rounded border border-border/50">
+            <span className="text-[11px] text-[#64748B] bg-white px-2.5 py-0.5 rounded-full border border-[#E2E8F0]">
               Source: {activeCheckpoint.newsSource}
             </span>
           </div>
-          <h3 className="text-sm sm:text-base font-bold text-text-primary leading-snug">
+          <h3 className="text-sm sm:text-base font-bold text-[#131722] leading-snug">
             "{activeCheckpoint.headline}"
           </h3>
-          <p className="text-xs text-text-secondary leading-relaxed">
+          <p className="text-xs text-[#64748B] leading-relaxed">
             {activeCheckpoint.narrative}
           </p>
-          <div className="mt-2 pt-2 border-t border-border/40 flex items-center gap-2 text-[11px] text-text-muted">
-            <Info size={13} className="text-secondary shrink-0" />
-            <span><strong>Historical Reality:</strong> {activeCheckpoint.historicalFact}</span>
+          <div className="mt-2 pt-2 border-t border-amber-200/70 flex items-center gap-2 text-xs text-[#64748B]">
+            <Info size={13} className="text-[#2962FF] shrink-0" />
+            <span><strong className="text-[#131722]">Historical Reality:</strong> {activeCheckpoint.historicalFact}</span>
           </div>
         </div>
 
         {/* Decision Simulation Prompt */}
         {!revealedStepOutcome ? (
-          <div className="p-5 rounded-xl bg-surface-elevated border border-warning/30 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-border/40">
+          <div className="p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-[#E2E8F0]">
               <div>
-                <span className="text-xs font-mono uppercase text-warning font-semibold">
+                <span className="text-xs text-[#2962FF] font-semibold">
                   Decision Checkpoint #{currentStep + 1}
                 </span>
-                <h3 className="text-base font-bold text-text-primary mt-0.5">
+                <h3 className="text-base font-bold text-[#131722] mt-0.5">
                   What is your decision right now?
                 </h3>
               </div>
-              <span className="text-[11px] font-mono text-text-muted">
-                Available Cash: <strong className="text-primary font-bold">₹{Math.round(userCash).toLocaleString('en-IN')}</strong>
+              <span className="text-xs text-[#64748B] tabular-nums">
+                Available Cash: <strong className="text-[#131722] font-bold">₹{Math.round(userCash).toLocaleString('en-IN')}</strong>
               </span>
             </div>
 
@@ -755,29 +743,29 @@ export const MarketReplayPage: React.FC = () => {
                   <div
                     key={opt.id}
                     onClick={() => setSelectedActionId(opt.id)}
-                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    className={`p-4 rounded-xl border text-left transition-colors cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? 'bg-warning/15 border-warning shadow-glow text-text-primary'
-                        : 'bg-surface border-border text-text-secondary hover:border-text-secondary/40 hover:bg-surface/80'
+                        ? 'bg-[#2962FF]/[0.06] border-[#2962FF] text-[#131722]'
+                        : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]'
                     }`}
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="flex items-center gap-1.5 font-bold text-xs text-text-primary">
+                      <div className="flex items-center justify-between mb-1.5 gap-2">
+                        <span className="flex items-center gap-1.5 font-bold text-xs text-[#131722]">
                           {opt.icon} {opt.label}
                         </span>
                         <Badge variant={opt.badgeVariant} size="sm">{opt.badge}</Badge>
                       </div>
-                      <p className="text-[11px] text-text-muted leading-relaxed">
+                      <p className="text-xs text-[#64748B] leading-relaxed">
                         {opt.shortDesc}
                       </p>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-border/30 flex items-center justify-between text-[10px] font-mono">
-                      <span className={isSelected ? 'text-warning font-semibold' : 'text-text-muted'}>
+                    <div className="mt-3 pt-2 border-t border-[#E2E8F0] flex items-center justify-between text-[11px]">
+                      <span className={isSelected ? 'text-[#2962FF] font-semibold' : 'text-[#64748B]'}>
                         {isSelected ? '✓ Selected' : 'Click to select'}
                       </span>
-                      <ChevronRight size={12} className={isSelected ? 'text-warning' : 'text-text-muted'} />
+                      <ChevronRight size={12} className={isSelected ? 'text-[#2962FF]' : 'text-[#64748B]'} />
                     </div>
                   </div>
                 );
@@ -785,9 +773,9 @@ export const MarketReplayPage: React.FC = () => {
             </div>
 
             {/* Optional Reasoning Input */}
-            <div className="pt-2 space-y-2">
-              <label className="text-xs font-mono text-text-secondary flex items-center gap-1.5">
-                <Compass size={13} className="text-secondary" /> Why are you making this decision? (Optional reasoning)
+            <div className="pt-2 space-y-2.5">
+              <label className="text-xs font-medium text-[#131722] flex items-center gap-1.5">
+                <Compass size={13} className="text-[#2962FF]" /> Why are you making this decision? (Optional reasoning)
               </label>
               
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -799,10 +787,10 @@ export const MarketReplayPage: React.FC = () => {
                       setSelectedReasoning(preset);
                       setCustomReasoning('');
                     }}
-                    className={`text-[10px] px-2.5 py-1 rounded-full border transition-all ${
+                    className={`text-[11px] px-3 py-1 rounded-full border transition-colors ${
                       selectedReasoning === preset
-                        ? 'bg-secondary/20 border-secondary text-text-primary'
-                        : 'bg-surface border-border/60 text-text-muted hover:text-text-secondary'
+                        ? 'bg-[#2962FF]/10 border-[#2962FF] text-[#2962FF] font-medium'
+                        : 'bg-white border-[#E2E8F0] text-[#64748B] hover:text-[#131722]'
                     }`}
                   >
                     {preset}
@@ -818,14 +806,14 @@ export const MarketReplayPage: React.FC = () => {
                   setSelectedReasoning('');
                 }}
                 placeholder="Or type your personal rationale here (e.g. Risk-reward looks skewed...)"
-                className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-warning"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#E2E8F0] text-xs text-[#131722] placeholder:text-[#64748B] focus:outline-none focus:border-[#2962FF]"
               />
             </div>
 
             {/* Commit Button */}
-            <div className="flex justify-end pt-3 border-t border-border/40">
+            <div className="flex justify-end pt-3 border-t border-[#E2E8F0]">
               <Button
-                variant="warning"
+                variant="primary"
                 size="md"
                 disabled={!selectedActionId}
                 onClick={handleExecuteDecision}
@@ -838,34 +826,34 @@ export const MarketReplayPage: React.FC = () => {
           </div>
         ) : (
           /* Decision Revealed / What Happened Next Outcome */
-          <div className="p-5 rounded-xl bg-surface-elevated border border-primary/40 space-y-4 animate-in fade-in duration-300">
-            <div className="flex items-center justify-between pb-2 border-b border-border/40">
+          <div className="p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 animate-in fade-in duration-300">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-primary" />
-                <span className="text-xs font-mono font-bold text-primary uppercase">
+                <CheckCircle2 size={16} className="text-[#089981]" />
+                <span className="text-xs font-bold text-[#089981]">
                   Decision Executed: {decisionsHistory[decisionsHistory.length - 1]?.actionLabel}
                 </span>
               </div>
-              <span className="text-xs font-mono text-text-muted">
-                Portfolio Net Worth: <strong className="text-text-primary font-bold">₹{Math.round(currentTotalPortfolio).toLocaleString('en-IN')}</strong>
+              <span className="text-xs text-[#64748B] tabular-nums">
+                Portfolio Net Worth: <strong className="text-[#131722] font-bold">₹{Math.round(currentTotalPortfolio).toLocaleString('en-IN')}</strong>
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-3.5 rounded-lg bg-surface border border-border/60 space-y-1.5">
-                <span className="text-[10px] font-mono text-warning uppercase block font-semibold">
+              <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] space-y-1.5">
+                <span className="text-[11px] text-amber-700 font-semibold block">
                   What Happened Next in History
                 </span>
-                <p className="text-xs text-text-primary leading-relaxed font-sans">
+                <p className="text-xs text-[#131722] leading-relaxed">
                   {revealedStepOutcome.whatHappenedNext}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-surface border border-border/60 space-y-1.5">
-                <span className="text-[10px] font-mono text-secondary uppercase block font-semibold">
+              <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] space-y-1.5">
+                <span className="text-[11px] text-[#2962FF] font-semibold block">
                   Portfolio Impact Analysis
                 </span>
-                <p className="text-xs text-text-secondary leading-relaxed">
+                <p className="text-xs text-[#64748B] leading-relaxed">
                   {decisionsHistory[decisionsHistory.length - 1]?.actionId === 'AGGRESSIVE_BUY' &&
                     'You deployed ₹' + Math.round(decisionsHistory[decisionsHistory.length - 1]?.cashBefore * 0.5).toLocaleString('en-IN') + ' into index equity units at this valuation level.'
                   }
@@ -900,14 +888,14 @@ export const MarketReplayPage: React.FC = () => {
         )}
 
         {/* Historical Educational Lessons */}
-        <div className="pt-4 border-t border-border/40">
-          <h4 className="text-xs font-mono uppercase tracking-wider text-text-muted mb-2 flex items-center gap-1.5">
-            <BookOpen size={13} className="text-primary" /> Key Principles From This Scenario
+        <div className="pt-4 border-t border-[#E2E8F0]">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] mb-3 flex items-center gap-1.5">
+            <BookOpen size={13} className="text-[#2962FF]" /> Key Principles From This Scenario
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {activeEvent.keyLessons.map((lesson, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-surface border border-border/60 text-[11px] text-text-secondary leading-relaxed">
-                <span className="font-mono text-warning font-bold mr-1">#{idx + 1}</span>
+              <div key={idx} className="p-3.5 rounded-xl bg-[#F8FAFC] text-xs text-[#64748B] leading-relaxed">
+                <span className="text-[#2962FF] font-bold mr-1">#{idx + 1}</span>
                 {lesson}
               </div>
             ))}
@@ -925,81 +913,81 @@ export const MarketReplayPage: React.FC = () => {
         >
           <div className="space-y-6">
             {/* Top Scorecard */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-xl bg-surface border border-border">
-                <span className="text-[10px] font-mono uppercase text-text-muted block">Final Net Worth</span>
-                <span className="text-lg font-bold font-mono text-text-primary block mt-0.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 tabular-nums">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <span className="text-[11px] text-[#64748B] block">Final Net Worth</span>
+                <span className="text-lg font-bold text-[#131722] block mt-0.5">
                   ₹{Math.round(currentTotalPortfolio).toLocaleString('en-IN')}
                 </span>
-                <span className={`text-xs font-mono font-semibold ${userTotalReturnPercent >= 0 ? 'text-primary' : 'text-danger'}`}>
-                  {userTotalReturnPercent >= 0 ? '+' : ''}{userTotalReturnPercent.toFixed(1)}% Return
+                <span className={`text-xs font-semibold ${userTotalReturnPercent >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                  {userTotalReturnPercent >= 0 ? '+' : '-'}{Math.abs(userTotalReturnPercent).toFixed(1)}% Return
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-surface border border-border">
-                <span className="text-[10px] font-mono uppercase text-text-muted block">Benchmark Buy & Hold</span>
-                <span className="text-lg font-bold font-mono text-text-primary block mt-0.5">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <span className="text-[11px] text-[#64748B] block">Benchmark Buy & Hold</span>
+                <span className="text-lg font-bold text-[#131722] block mt-0.5">
                   ₹{Math.round(benchmarkPortfolioValue).toLocaleString('en-IN')}
                 </span>
-                <span className={`text-xs font-mono font-semibold ${benchmarkReturnPercent >= 0 ? 'text-primary' : 'text-danger'}`}>
-                  {benchmarkReturnPercent >= 0 ? '+' : ''}{benchmarkReturnPercent.toFixed(1)}% Return
+                <span className={`text-xs font-semibold ${benchmarkReturnPercent >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                  {benchmarkReturnPercent >= 0 ? '+' : '-'}{Math.abs(benchmarkReturnPercent).toFixed(1)}% Return
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-surface border border-border">
-                <span className="text-[10px] font-mono uppercase text-text-muted block">Max Drawdown Experienced</span>
-                <span className="text-lg font-bold font-mono text-danger block mt-0.5">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <span className="text-[11px] text-[#64748B] block">Max Drawdown Experienced</span>
+                <span className="text-lg font-bold text-[#F23645] block mt-0.5">
                   -{performanceStats.maxDrawdown.toFixed(1)}%
                 </span>
-                <span className="text-[10px] text-text-muted">Peak-to-trough decline</span>
+                <span className="text-[11px] text-[#64748B]">Peak-to-trough decline</span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-surface border border-border">
-                <span className="text-[10px] font-mono uppercase text-text-muted block">Final Allocation</span>
-                <div className="flex items-center gap-1.5 mt-1 font-mono text-xs">
-                  <span className="text-primary font-bold">{((userCash / currentTotalPortfolio) * 100).toFixed(0)}% Cash</span>
-                  <span className="text-text-muted">/</span>
-                  <span className="text-secondary font-bold">{((currentEquityValue / currentTotalPortfolio) * 100).toFixed(0)}% Eq</span>
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <span className="text-[11px] text-[#64748B] block">Final Allocation</span>
+                <div className="flex items-center gap-1.5 mt-1 text-xs">
+                  <span className="text-[#089981] font-bold">{((userCash / currentTotalPortfolio) * 100).toFixed(0)}% Cash</span>
+                  <span className="text-[#64748B]">/</span>
+                  <span className="text-[#2962FF] font-bold">{((currentEquityValue / currentTotalPortfolio) * 100).toFixed(0)}% Eq</span>
                 </div>
-                <span className="text-[10px] text-text-muted block mt-0.5">Portfolio balance</span>
+                <span className="text-[11px] text-[#64748B] block mt-0.5">Portfolio balance</span>
               </div>
             </div>
 
             {/* AI Pedagogical Reflection: 5 Core Dimensions */}
             <div className="space-y-3">
-              <h3 className="text-sm font-bold text-text-primary font-mono flex items-center gap-2">
-                <Sparkles size={16} className="text-primary" /> AI Pedagogical Reflection
+              <h3 className="text-sm font-bold text-[#131722] flex items-center gap-2">
+                <Sparkles size={16} className="text-[#2962FF]" /> AI Pedagogical Reflection
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 {/* 1. What the market did */}
-                <div className="p-4 rounded-xl bg-surface border border-border space-y-1.5">
-                  <span className="font-mono text-warning font-bold uppercase text-[10px] flex items-center gap-1">
+                <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-1.5">
+                  <span className="text-amber-700 font-bold text-[11px] flex items-center gap-1">
                     1. What the Market Did
                   </span>
-                  <p className="text-text-secondary leading-relaxed">
+                  <p className="text-[#64748B] leading-relaxed">
                     The {activeEvent.benchmark} moved from {initialCheckpoint.nifty.toLocaleString('en-IN')} to {activeCheckpoint.nifty.toLocaleString('en-IN')} ({benchmarkReturnPercent >= 0 ? '+' : ''}{benchmarkReturnPercent.toFixed(1)}%).
                     It experienced extreme volatility of {activeEvent.dropPercentage}, testing the emotional fortitude of every market participant before recovering over {activeEvent.recoveryDuration}.
                   </p>
                 </div>
 
                 {/* 2. What you did */}
-                <div className="p-4 rounded-xl bg-surface border border-border space-y-1.5">
-                  <span className="font-mono text-primary font-bold uppercase text-[10px] flex items-center gap-1">
+                <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-1.5">
+                  <span className="text-[#2962FF] font-bold text-[11px] flex items-center gap-1">
                     2. What You Did
                   </span>
-                  <p className="text-text-secondary leading-relaxed">
+                  <p className="text-[#64748B] leading-relaxed">
                     You executed {decisionsHistory.length} distinct decisions across the scenario timeline.
                     You ended with ₹{Math.round(currentTotalPortfolio).toLocaleString('en-IN')}, generating {alphaPercent >= 0 ? 'an outperformance' : 'an underperformance'} of {Math.abs(alphaPercent).toFixed(1)}% compared to the passive benchmark.
                   </p>
                 </div>
 
                 {/* 3. What your decisions were based on */}
-                <div className="p-4 rounded-xl bg-surface border border-border space-y-1.5">
-                  <span className="font-mono text-secondary font-bold uppercase text-[10px] flex items-center gap-1">
+                <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-1.5">
+                  <span className="text-[#2962FF] font-bold text-[11px] flex items-center gap-1">
                     3. What Your Decisions Were Based On
                   </span>
-                  <p className="text-text-secondary leading-relaxed">
+                  <p className="text-[#64748B] leading-relaxed">
                     Reviewing your decision logs, you demonstrated {
                       decisionsHistory.some(d => d.actionId === 'PANIC_EXIT') ? 'a tendency toward sudden defensive flight when headlines turned bleak.' :
                       decisionsHistory.some(d => d.actionId === 'AGGRESSIVE_BUY') ? 'a strong opportunistic orientation to buy heavily into weakness.' :
@@ -1009,47 +997,47 @@ export const MarketReplayPage: React.FC = () => {
                 </div>
 
                 {/* 4. What you could learn from this scenario */}
-                <div className="p-4 rounded-xl bg-surface border border-border space-y-1.5">
-                  <span className="font-mono text-warning font-bold uppercase text-[10px] flex items-center gap-1">
+                <div className="p-4 rounded-xl bg-[#F8FAFC] space-y-1.5">
+                  <span className="text-amber-700 font-bold text-[11px] flex items-center gap-1">
                     4. What You Could Learn
                   </span>
-                  <p className="text-text-secondary leading-relaxed">
+                  <p className="text-[#64748B] leading-relaxed">
                     Markets move fastest at the extremes. Trying to time the exact bottom or top creates immense psychological fatigue. Having a predetermined rebalancing rule or automated SIP removes the emotional urge to predict black swan events.
                   </p>
                 </div>
               </div>
 
               {/* 5. How different approaches affected simulated portfolios */}
-              <div className="p-4 rounded-xl bg-surface-elevated border border-border space-y-2.5">
-                <span className="font-mono text-text-primary font-bold uppercase text-[10px] flex items-center gap-1.5">
-                  <Layers size={13} className="text-primary" /> 5. How Different Approaches Affected Simulated Portfolios
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2.5">
+                <span className="text-[#131722] font-bold text-xs flex items-center gap-1.5">
+                  <Layers size={13} className="text-[#2962FF]" /> 5. How Different Approaches Affected Simulated Portfolios
                 </span>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center text-[11px] font-mono">
-                  <div className="p-2.5 rounded-lg bg-surface border border-primary/30">
-                    <span className="text-text-muted block text-[10px]">Your Strategy</span>
-                    <span className={`text-sm font-bold block mt-0.5 ${alternativeScenarios.userReturn >= 0 ? 'text-primary' : 'text-danger'}`}>
-                      {alternativeScenarios.userReturn >= 0 ? '+' : ''}{alternativeScenarios.userReturn.toFixed(1)}%
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center text-xs tabular-nums">
+                  <div className="p-3 rounded-lg bg-white border border-[#E2E8F0]">
+                    <span className="text-[#64748B] block text-[11px]">Your Strategy</span>
+                    <span className={`text-sm font-bold block mt-0.5 ${alternativeScenarios.userReturn >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                      {alternativeScenarios.userReturn >= 0 ? '+' : '-'}{Math.abs(alternativeScenarios.userReturn).toFixed(1)}%
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-surface border border-border">
-                    <span className="text-text-muted block text-[10px]">Buy & Hold</span>
-                    <span className={`text-sm font-bold block mt-0.5 ${alternativeScenarios.buyAndHoldReturn >= 0 ? 'text-primary' : 'text-danger'}`}>
-                      {alternativeScenarios.buyAndHoldReturn >= 0 ? '+' : ''}{alternativeScenarios.buyAndHoldReturn.toFixed(1)}%
+                  <div className="p-3 rounded-lg bg-white border border-[#E2E8F0]">
+                    <span className="text-[#64748B] block text-[11px]">Buy & Hold</span>
+                    <span className={`text-sm font-bold block mt-0.5 ${alternativeScenarios.buyAndHoldReturn >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                      {alternativeScenarios.buyAndHoldReturn >= 0 ? '+' : '-'}{Math.abs(alternativeScenarios.buyAndHoldReturn).toFixed(1)}%
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-surface border border-danger/30">
-                    <span className="text-text-muted block text-[10px]">Panic Seller (Trough Exit)</span>
-                    <span className="text-sm font-bold block mt-0.5 text-danger">
+                  <div className="p-3 rounded-lg bg-white border border-[#E2E8F0]">
+                    <span className="text-[#64748B] block text-[11px]">Panic Seller (Trough Exit)</span>
+                    <span className="text-sm font-bold block mt-0.5 text-[#F23645]">
                       {alternativeScenarios.panicSellerReturn.toFixed(1)}%
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-surface border border-secondary/30">
-                    <span className="text-text-muted block text-[10px]">Disciplined Dip Buyer</span>
-                    <span className="text-sm font-bold block mt-0.5 text-secondary">
+                  <div className="p-3 rounded-lg bg-white border border-[#E2E8F0]">
+                    <span className="text-[#64748B] block text-[11px]">Disciplined Dip Buyer</span>
+                    <span className="text-sm font-bold block mt-0.5 text-[#089981]">
                       +{alternativeScenarios.dipBuyerReturn.toFixed(1)}%
                     </span>
                   </div>
@@ -1059,20 +1047,20 @@ export const MarketReplayPage: React.FC = () => {
 
             {/* Decision Log Timeline */}
             <div className="space-y-2">
-              <span className="text-xs font-mono uppercase text-text-muted block font-semibold">
+              <span className="text-xs text-[#64748B] block font-semibold">
                 Chronological Decision Audit Log
               </span>
-              <div className="divide-y divide-border/40 rounded-xl border border-border bg-surface overflow-hidden">
+              <div className="divide-y divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
                 {decisionsHistory.map((d, idx) => (
                   <div key={idx} className="p-3 flex items-center justify-between text-xs flex-wrap gap-2">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-text-muted text-[10px]">#{idx + 1}</span>
-                      <span className="font-mono text-text-primary font-semibold">{d.date}</span>
+                      <span className="text-[#64748B] text-[11px] tabular-nums">#{idx + 1}</span>
+                      <span className="text-[#131722] font-semibold tabular-nums">{d.date}</span>
                       <Badge variant="neutral" size="sm">{d.actionLabel}</Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-[11px] font-mono">
-                      <span className="text-text-muted">NIFTY: <strong>{d.indexPriceAtDecision}</strong></span>
-                      <span className="text-text-primary">Net Worth: <strong>₹{Math.round(d.portfolioValueAfter).toLocaleString('en-IN')}</strong></span>
+                    <div className="flex items-center gap-4 text-[11px] tabular-nums">
+                      <span className="text-[#64748B]">NIFTY: <strong className="text-[#131722]">{d.indexPriceAtDecision}</strong></span>
+                      <span className="text-[#131722]">Net Worth: <strong>₹{Math.round(d.portfolioValueAfter).toLocaleString('en-IN')}</strong></span>
                     </div>
                   </div>
                 ))}
@@ -1080,8 +1068,8 @@ export const MarketReplayPage: React.FC = () => {
             </div>
 
             {/* SEBI Pedagogical Disclaimer */}
-            <div className="p-3 rounded-lg bg-background border border-border/50 text-[11px] text-text-muted flex items-start gap-2">
-              <ShieldAlert size={15} className="text-warning shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+              <ShieldAlert size={15} className="text-amber-600 shrink-0 mt-0.5" />
               <span>
                 <strong>Educational Retrospective Notice:</strong> Historical performance does not guarantee future results. This simulation uses historical market data to build psychological resilience and decision discipline, not to promote market timing.
               </span>

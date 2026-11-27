@@ -33,47 +33,53 @@ export const StatCard: React.FC<StatCardProps> = ({
   return (
     <Card variant={variant} className={`relative overflow-hidden ${className}`}>
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-text-secondary uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-text-secondary">
           <span>{label}</span>
           {tooltip && (
-            <span title={tooltip} className="cursor-help text-text-muted hover:text-text-secondary transition-colors">
+            <span
+              title={tooltip}
+              className="cursor-help text-text-muted hover:text-text-primary transition-colors"
+            >
               <HelpCircle size={13} />
             </span>
           )}
         </div>
-        {icon && <div className="text-text-muted p-1.5 rounded-lg bg-surface-elevated">{icon}</div>}
+        {icon && (
+          <div className="text-text-secondary p-1.5 rounded-lg bg-background">{icon}</div>
+        )}
         {badge && (
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
             {badge}
           </span>
         )}
       </div>
 
-      <div className="mt-2.5 flex items-baseline gap-2">
-        <span className="text-2xl font-bold font-mono tracking-tight text-text-primary text-tabular">
+      <div className="mt-3 flex items-baseline gap-2">
+        <span className="text-2xl font-bold tracking-tight text-text-primary tabular-nums">
           {value}
         </span>
         {subValue && (
-          <span className="text-xs text-text-muted font-mono">{subValue}</span>
+          <span className="text-xs text-text-secondary tabular-nums">{subValue}</span>
         )}
       </div>
 
       {change !== undefined && (
-        <div className="mt-2 flex items-center gap-1.5 text-xs font-mono">
+        <div className="mt-2 flex items-center gap-1.5 text-xs tabular-nums">
           <span
             className={`inline-flex items-center gap-0.5 font-semibold ${
               isPositive
-                ? 'text-primary'
+                ? 'text-profit'
                 : isNegative
-                ? 'text-danger'
+                ? 'text-loss'
                 : 'text-text-secondary'
             }`}
           >
             {isPositive && <TrendingUp size={13} />}
             {isNegative && <TrendingDown size={13} />}
-            {isPositive ? '+' : ''}{change.toFixed(2)}%
+            {isPositive ? '+' : isNegative ? '-' : ''}
+            {Math.abs(change).toFixed(2)}%
           </span>
-          <span className="text-text-muted text-[11px]">{changeLabel}</span>
+          <span className="text-text-secondary text-[11px]">{changeLabel}</span>
         </div>
       )}
     </Card>

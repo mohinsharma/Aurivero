@@ -27,6 +27,7 @@ import {
 import { Button } from '../components/common/Button';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
+import { AuriveroLogo } from '../components/common/AuriveroLogo';
 import { useSimulator } from '../context/SimulatorContext';
 import { UserAssessment } from '../types';
 
@@ -284,7 +285,7 @@ const BEHAVIORAL_SCENARIOS: BehavioralScenario[] = [
         label: 'Ask the group for more hot stock tips to see if another stock is about to jump.',
         biasType: 'Tip Dependency',
         riskScore: 2,
-        insight: 'Relying on tips strips away your autonomy. MINDMARK will train you to analyze setups independently.'
+        insight: 'Relying on tips strips away your autonomy. Aurivero will train you to analyze setups independently.'
       }
     ]
   },
@@ -580,7 +581,7 @@ export const OnboardingPage: React.FC = () => {
                 key={idx}
                 points={webPoints}
                 fill="none"
-                stroke="#223142"
+                stroke="#E2E8F0"
                 strokeWidth="1"
                 strokeDasharray={idx < 3 ? '3,3' : undefined}
               />
@@ -599,7 +600,7 @@ export const OnboardingPage: React.FC = () => {
                 y1={center}
                 x2={x}
                 y2={y}
-                stroke="#223142"
+                stroke="#E2E8F0"
                 strokeWidth="1"
               />
             );
@@ -608,8 +609,8 @@ export const OnboardingPage: React.FC = () => {
           {/* Skill Radar Area Polygon */}
           <polygon
             points={points}
-            fill="rgba(69, 214, 181, 0.25)"
-            stroke="#45D6B5"
+            fill="rgba(41, 98, 255, 0.16)"
+            stroke="#2962FF"
             strokeWidth="2.5"
           />
 
@@ -625,8 +626,8 @@ export const OnboardingPage: React.FC = () => {
                 cx={x}
                 cy={y}
                 r="4.5"
-                fill="#45D6B5"
-                stroke="#0B1017"
+                fill="#2962FF"
+                stroke="#FFFFFF"
                 strokeWidth="2"
               />
             );
@@ -634,11 +635,11 @@ export const OnboardingPage: React.FC = () => {
         </svg>
 
         {/* Labels legend */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4 text-[11px] font-mono w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-4 text-xs w-full tabular-nums">
           {labels.map((lbl, idx) => (
-            <div key={lbl} className="p-2 rounded bg-surface border border-border/60 text-center">
-              <span className="text-text-muted block text-[10px]">{lbl}</span>
-              <span className="font-bold text-primary">{values[idx]}%</span>
+            <div key={lbl} className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-center">
+              <span className="text-[#64748B] block text-[11px]">{lbl}</span>
+              <span className="font-bold text-[#2962FF]">{values[idx]}%</span>
             </div>
           ))}
         </div>
@@ -647,22 +648,16 @@ export const OnboardingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-text-primary selection:bg-primary/20 selection:text-primary flex flex-col justify-between p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#131722] selection:bg-[#2962FF]/15 selection:text-[#2962FF] flex flex-col justify-between p-4 sm:p-6 lg:p-8">
       {/* Top Header & Progress */}
-      <header className="max-w-4xl mx-auto w-full flex items-center justify-between pb-4 border-b border-border/60">
+      <header className="max-w-4xl mx-auto w-full flex items-center justify-between pb-4 border-b border-[#E2E8F0]">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-background font-bold shadow-glow">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="6" />
-              <circle cx="12" cy="12" r="2" />
-            </svg>
-          </div>
+          <AuriveroLogo size="sm" />
           <div>
-            <span className="font-mono font-bold text-sm tracking-wider text-text-primary group-hover:text-primary transition-colors">
-              MINDMARK
+            <span className="font-bold text-sm tracking-tight text-[#131722] group-hover:text-[#2962FF] transition-colors">
+              Aurivero
             </span>
-            <span className="block text-[10px] text-text-muted font-mono -mt-0.5">
+            <span className="block text-[11px] text-[#64748B] -mt-0.5">
               Smart Skill Diagnostic
             </span>
           </div>
@@ -670,9 +665,9 @@ export const OnboardingPage: React.FC = () => {
 
         {/* Step Indicator & Reset action */}
         <div className="flex items-center gap-4">
-          <div className="text-right font-mono hidden sm:block">
-            <span className="text-[10px] text-text-muted uppercase block">Phase {currentStep} of 7</span>
-            <span className="text-xs font-semibold text-primary">
+          <div className="text-right hidden sm:block">
+            <span className="text-[11px] text-[#64748B] block tabular-nums">Phase {currentStep} of 7</span>
+            <span className="text-xs font-semibold text-[#2962FF]">
               {currentStep === 1 && 'Welcome'}
               {currentStep === 2 && 'Experience Mapping'}
               {currentStep === 3 && `Knowledge Test (${currentKnowledgeQ + 1}/8)`}
@@ -686,7 +681,7 @@ export const OnboardingPage: React.FC = () => {
           <button
             onClick={handleReset}
             title="Reset Assessment"
-            className="p-1.5 rounded-lg text-text-muted hover:text-warning hover:bg-surface transition-colors"
+            className="p-2 rounded-lg text-[#64748B] hover:text-amber-600 hover:bg-white border border-transparent hover:border-[#E2E8F0] transition-colors"
           >
             <RotateCcw size={15} />
           </button>
@@ -695,9 +690,9 @@ export const OnboardingPage: React.FC = () => {
 
       {/* Global Stepper Bar */}
       <div className="max-w-4xl mx-auto w-full mt-3">
-        <div className="w-full bg-surface rounded-full h-1.5 overflow-hidden">
+        <div className="w-full bg-[#E2E8F0] rounded-full h-1.5 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-primary to-secondary h-full transition-all duration-300"
+            className="bg-[#2962FF] h-full transition-all duration-300"
             style={{ width: `${(currentStep / 7) * 100}%` }}
           />
         </div>
@@ -709,42 +704,42 @@ export const OnboardingPage: React.FC = () => {
         {/* STEP 1 — WELCOME                                                    */}
         {/* =================================================================== */}
         {currentStep === 1 && (
-          <Card variant="elevated" className="p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6 border-primary/20">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-glow">
+          <Card className="p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#2962FF]/10 text-[#2962FF] flex items-center justify-center mx-auto">
               <Compass size={32} />
             </div>
 
             <div className="space-y-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-primary font-semibold">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#2962FF]">
                 Financial Readiness Diagnostic
               </span>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#131722] tracking-tight leading-tight">
                 Before you enter the market, <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary">
+                <span className="text-[#2962FF]">
                   let's understand where you stand.
                 </span>
               </h1>
-              <p className="text-xs sm:text-sm text-text-secondary max-w-lg mx-auto leading-relaxed pt-1">
-                This is not a financial eligibility test or an exam. There are no wrong answers. It's a personal diagnostic designed to understand your instincts, identify knowledge gaps, and personalize your MINDMARK simulation journey.
+              <p className="text-xs sm:text-sm text-[#64748B] max-w-lg mx-auto leading-relaxed pt-1">
+                This is not a financial eligibility test or an exam. There are no wrong answers. It's a personal diagnostic designed to understand your instincts, identify knowledge gaps, and personalize your Aurivero simulation journey.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-left">
-              <div className="p-3.5 rounded-xl bg-surface border border-border/80">
-                <span className="font-mono text-primary font-bold text-xs">01. Experience</span>
-                <p className="text-[11px] text-text-muted mt-1 leading-snug">
+              <div className="p-4 rounded-xl bg-[#F8FAFC]">
+                <span className="text-[#2962FF] font-bold text-xs">01. Experience</span>
+                <p className="text-xs text-[#64748B] mt-1 leading-snug">
                   Map your familiarity with Demat apps and investing instruments.
                 </p>
               </div>
-              <div className="p-3.5 rounded-xl bg-surface border border-border/80">
-                <span className="font-mono text-secondary font-bold text-xs">02. Knowledge</span>
-                <p className="text-[11px] text-text-muted mt-1 leading-snug">
+              <div className="p-4 rounded-xl bg-[#F8FAFC]">
+                <span className="text-[#2962FF] font-bold text-xs">02. Knowledge</span>
+                <p className="text-xs text-[#64748B] mt-1 leading-snug">
                   8 foundational questions on Dalal Street mechanics and risk.
                 </p>
               </div>
-              <div className="p-3.5 rounded-xl bg-surface border border-border/80">
-                <span className="font-mono text-warning font-bold text-xs">03. Psychology</span>
-                <p className="text-[11px] text-text-muted mt-1 leading-snug">
+              <div className="p-4 rounded-xl bg-[#F8FAFC]">
+                <span className="text-amber-700 font-bold text-xs">03. Psychology</span>
+                <p className="text-xs text-[#64748B] mt-1 leading-snug">
                   Evaluate emotional triggers like FOMO, panicking, and revenge trading.
                 </p>
               </div>
@@ -770,47 +765,47 @@ export const OnboardingPage: React.FC = () => {
         {/* =================================================================== */}
         {currentStep === 2 && (
           <div className="space-y-6 max-w-2xl mx-auto w-full">
-            <div className="text-center space-y-1">
-              <Badge variant="secondary" size="sm">STEP 2 OF 7 • EXPERIENCE MAPPING</Badge>
-              <h2 className="text-2xl font-bold text-text-primary tracking-tight">
+            <div className="text-center space-y-1.5">
+              <Badge variant="primary" size="sm">STEP 2 OF 7 • EXPERIENCE MAPPING</Badge>
+              <h2 className="text-2xl font-bold text-[#131722] tracking-tight">
                 Tell us about your past market exposure
               </h2>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#64748B]">
                 Select the option that best reflects your real background.
               </p>
             </div>
 
             <div className="space-y-5">
               {EXPERIENCE_QUESTIONS.map((eq, qIdx) => (
-                <Card key={eq.id} variant="default" className="p-4 sm:p-5 space-y-3">
+                <Card key={eq.id} className="p-5 sm:p-6 space-y-3.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-secondary">0{qIdx + 1}.</span>
-                    <h3 className="font-semibold text-sm text-text-primary">{eq.question}</h3>
+                    <span className="text-xs font-bold text-[#2962FF] tabular-nums">0{qIdx + 1}.</span>
+                    <h3 className="font-semibold text-sm text-[#131722]">{eq.question}</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {eq.options.map((opt) => {
                       const isSelected = experienceAnswers[eq.id] === opt.score;
                       return (
                         <div
                           key={opt.label}
                           onClick={() => handleSelectExperience(eq.id, opt.score)}
-                          className={`p-3 rounded-xl border cursor-pointer transition-all text-left flex flex-col justify-between ${
+                          className={`p-3.5 rounded-xl border cursor-pointer transition-colors text-left flex flex-col justify-between ${
                             isSelected
-                              ? 'bg-primary/10 border-primary text-text-primary shadow-glow'
-                              : 'bg-surface-elevated border-border hover:border-text-secondary/40 text-text-secondary'
+                              ? 'bg-[#2962FF]/[0.06] border-[#2962FF] text-[#131722]'
+                              : 'bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#CBD5E1] text-[#64748B]'
                           }`}
                         >
                           <div>
-                            <span className="font-semibold text-xs text-text-primary block leading-snug">
+                            <span className="font-semibold text-xs text-[#131722] block leading-snug">
                               {opt.label}
                             </span>
-                            <span className="text-[10px] text-text-muted mt-1 block">
+                            <span className="text-[11px] text-[#64748B] mt-1 block">
                               {opt.hint}
                             </span>
                           </div>
                           {isSelected && (
-                            <div className="mt-2 text-primary flex items-center gap-1 text-[10px] font-mono">
+                            <div className="mt-2 text-[#2962FF] flex items-center gap-1 text-[11px] font-semibold">
                               <Check size={12} /> Selected
                             </div>
                           )}
@@ -845,15 +840,15 @@ export const OnboardingPage: React.FC = () => {
         {/* =================================================================== */}
         {currentStep === 3 && (
           <div className="max-w-2xl mx-auto w-full space-y-6">
-            <div className="flex items-center justify-between text-xs font-mono">
+            <div className="flex items-center justify-between text-xs">
               <Badge variant="primary" size="sm">
                 QUESTION {currentKnowledgeQ + 1} OF {KNOWLEDGE_QUESTIONS.length}
               </Badge>
-              <span className="text-text-muted">Topic: {activeKQ.topic}</span>
+              <span className="text-[#64748B]">Topic: {activeKQ.topic}</span>
             </div>
 
-            <Card variant="elevated" className="p-6 sm:p-8 space-y-6">
-              <h2 className="text-lg sm:text-xl font-bold text-text-primary leading-snug">
+            <Card className="p-6 sm:p-8 space-y-6">
+              <h2 className="text-lg sm:text-xl font-bold text-[#131722] leading-snug">
                 {activeKQ.question}
               </h2>
 
@@ -863,33 +858,33 @@ export const OnboardingPage: React.FC = () => {
                   const isSelected = selectedKnowledgeOption === optIdx;
                   const isCorrect = optIdx === activeKQ.correctIndex;
 
-                  let cardStyle = 'bg-surface border-border hover:border-text-secondary/40 text-text-secondary';
+                  let cardStyle = 'bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#CBD5E1] text-[#131722]';
                   if (hasAnsweredCurrentQ) {
                     if (isCorrect) {
-                      cardStyle = 'bg-primary/10 border-primary text-text-primary';
+                      cardStyle = 'bg-[#089981]/10 border-[#089981] text-[#131722]';
                     } else if (isSelected && !isCorrect) {
-                      cardStyle = 'bg-danger/10 border-danger text-text-primary';
+                      cardStyle = 'bg-[#F23645]/10 border-[#F23645] text-[#131722]';
                     } else {
-                      cardStyle = 'bg-surface/50 border-border/40 text-text-muted opacity-50';
+                      cardStyle = 'bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] opacity-60';
                     }
                   } else if (isSelected) {
-                    cardStyle = 'bg-primary/10 border-primary text-text-primary';
+                    cardStyle = 'bg-[#2962FF]/10 border-[#2962FF] text-[#131722]';
                   }
 
                   return (
                     <div
                       key={optIdx}
                       onClick={() => handleSelectKnowledgeAnswer(optIdx)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${cardStyle}`}
+                      className={`p-4 rounded-xl border cursor-pointer transition-colors flex items-start gap-3 ${cardStyle}`}
                     >
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 mt-0.5 text-[11px] font-mono ${
+                      <div className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-semibold ${
                         hasAnsweredCurrentQ && isCorrect
-                          ? 'border-primary bg-primary text-background font-bold'
+                          ? 'border-[#089981] bg-[#089981] text-white'
                           : hasAnsweredCurrentQ && isSelected && !isCorrect
-                          ? 'border-danger bg-danger text-background font-bold'
+                          ? 'border-[#F23645] bg-[#F23645] text-white'
                           : isSelected
-                          ? 'border-primary text-primary'
-                          : 'border-border text-text-muted'
+                          ? 'border-[#2962FF] text-[#2962FF]'
+                          : 'border-[#CBD5E1] text-[#64748B] bg-white'
                       }`}>
                         {hasAnsweredCurrentQ && isCorrect ? '✓' : hasAnsweredCurrentQ && isSelected && !isCorrect ? '✕' : String.fromCharCode(65 + optIdx)}
                       </div>
@@ -905,27 +900,27 @@ export const OnboardingPage: React.FC = () => {
               {hasAnsweredCurrentQ && (
                 <div className={`p-4 rounded-xl border text-xs space-y-2 animate-in fade-in duration-200 ${
                   selectedKnowledgeOption === activeKQ.correctIndex
-                    ? 'bg-primary/10 border-primary/30 text-text-primary'
-                    : 'bg-warning/10 border-warning/30 text-text-primary'
+                    ? 'bg-[#089981]/10 border-[#089981]/30 text-[#131722]'
+                    : 'bg-amber-50 border-amber-200 text-[#131722]'
                 }`}>
-                  <div className="flex items-center gap-2 font-mono font-bold">
+                  <div className="flex items-center gap-2 font-bold">
                     {selectedKnowledgeOption === activeKQ.correctIndex ? (
-                      <span className="text-primary flex items-center gap-1">
+                      <span className="text-[#089981] flex items-center gap-1">
                         <CheckCircle2 size={16} /> Exactly Right!
                       </span>
                     ) : (
-                      <span className="text-warning flex items-center gap-1">
+                      <span className="text-amber-700 flex items-center gap-1">
                         <AlertTriangle size={16} /> Common Misconception
                       </span>
                     )}
                   </div>
 
-                  <p className="leading-relaxed text-text-secondary text-xs">
+                  <p className="leading-relaxed text-[#64748B] text-xs">
                     {activeKQ.explanation}
                   </p>
 
-                  <div className="p-2.5 rounded-lg bg-background/50 text-[11px] text-text-muted border border-border/40">
-                    <span className="text-primary font-semibold font-mono">Learning Takeaway: </span>
+                  <div className="p-3 rounded-lg bg-white text-xs text-[#64748B] border border-[#E2E8F0]">
+                    <span className="text-[#2962FF] font-semibold">Learning Takeaway: </span>
                     {activeKQ.misconceptionTip}
                   </div>
                 </div>
@@ -953,24 +948,24 @@ export const OnboardingPage: React.FC = () => {
         {/* =================================================================== */}
         {currentStep === 4 && (
           <div className="space-y-6 max-w-2xl mx-auto w-full">
-            <div className="text-center space-y-1">
+            <div className="text-center space-y-1.5">
               <Badge variant="warning" size="sm">STEP 4 OF 7 • BEHAVIORAL AWARENESS</Badge>
-              <h2 className="text-2xl font-bold text-text-primary tracking-tight">
+              <h2 className="text-2xl font-bold text-[#131722] tracking-tight">
                 How do you react under emotional market pressure?
               </h2>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#64748B]">
                 There are no wrong answers. We do not judge your personality; we illuminate your decision habits.
               </p>
             </div>
 
             <div className="space-y-5">
               {BEHAVIORAL_SCENARIOS.map((sc) => (
-                <Card key={sc.id} variant="elevated" className="p-5 sm:p-6 space-y-4">
+                <Card key={sc.id} className="p-6 space-y-4">
                   <div>
-                    <span className="text-[10px] font-mono uppercase text-warning tracking-wider font-semibold">
+                    <span className="text-[11px] uppercase text-amber-700 tracking-wider font-semibold">
                       {sc.title}
                     </span>
-                    <h3 className="font-bold text-sm sm:text-base text-text-primary mt-1">
+                    <h3 className="font-bold text-sm sm:text-base text-[#131722] mt-1">
                       {sc.scenario}
                     </h3>
                   </div>
@@ -982,23 +977,23 @@ export const OnboardingPage: React.FC = () => {
                         <div
                           key={optIdx}
                           onClick={() => handleSelectBehavioral(sc.id, optIdx)}
-                          className={`p-3.5 rounded-xl border cursor-pointer transition-all text-left ${
+                          className={`p-3.5 rounded-xl border cursor-pointer transition-colors text-left ${
                             isSelected
-                              ? 'bg-warning/10 border-warning text-text-primary shadow-glow'
-                              : 'bg-surface border-border hover:border-text-secondary/40 text-text-secondary'
+                              ? 'bg-[#2962FF]/[0.06] border-[#2962FF] text-[#131722]'
+                              : 'bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#CBD5E1] text-[#64748B]'
                           }`}
                         >
-                          <div className="flex items-start justify-between">
-                            <span className="font-semibold text-xs text-text-primary">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-semibold text-xs text-[#131722]">
                               {opt.label}
                             </span>
                             {isSelected && (
-                              <Badge variant="warning" size="sm">Selected</Badge>
+                              <Badge variant="primary" size="sm">Selected</Badge>
                             )}
                           </div>
                           {isSelected && (
-                            <p className="text-[11px] text-text-muted mt-1.5 pt-1.5 border-t border-border/40 font-mono">
-                              <span className="text-warning font-semibold">Trait:</span> {opt.biasType} • {opt.insight}
+                            <p className="text-[11px] text-[#64748B] mt-2 pt-2 border-t border-[#E2E8F0]">
+                              <span className="text-[#2962FF] font-semibold">Trait:</span> {opt.biasType} • {opt.insight}
                             </p>
                           )}
                         </div>
@@ -1032,61 +1027,61 @@ export const OnboardingPage: React.FC = () => {
         {/* =================================================================== */}
         {currentStep === 5 && assessmentResult && (
           <div className="space-y-6 max-w-3xl mx-auto w-full">
-            <div className="text-center space-y-1">
+            <div className="text-center space-y-1.5">
               <Badge variant="primary" size="sm">STEP 5 OF 7 • YOUR RESULTS</Badge>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#131722] tracking-tight">
                 Your Baseline Financial Skill Profile
               </h2>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#64748B]">
                 Here is your objective diagnostic breakdown across 5 foundational dimensions.
               </p>
             </div>
 
-            <Card variant="elevated" className="p-6 sm:p-8 space-y-6 border-primary/30">
+            <Card className="p-6 sm:p-8 space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 {/* Left 6 cols: Radar Chart */}
                 <div className="lg:col-span-6 flex flex-col items-center">
-                  <span className="text-xs font-mono uppercase tracking-wider text-text-muted mb-2">
+                  <span className="text-xs uppercase tracking-wider text-[#64748B] font-semibold mb-2">
                     5-Axis Skill Radar
                   </span>
                   {renderRadarChart()}
                 </div>
 
                 {/* Right 6 cols: Dimension Explanations */}
-                <div className="lg:col-span-6 space-y-3.5 text-xs">
-                  <div className="p-3 rounded-xl bg-surface border border-border/70">
-                    <div className="flex justify-between font-mono mb-1">
-                      <span className="font-bold text-text-primary">Knowledge Score</span>
-                      <span className="text-primary font-bold">{assessmentResult.knowledgeScore}%</span>
+                <div className="lg:col-span-6 space-y-3 text-xs">
+                  <div className="p-4 rounded-xl bg-[#F8FAFC]">
+                    <div className="flex justify-between mb-1 tabular-nums">
+                      <span className="font-bold text-[#131722]">Knowledge Score</span>
+                      <span className="text-[#2962FF] font-bold">{assessmentResult.knowledgeScore}%</span>
                     </div>
-                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                    <p className="text-xs text-[#64748B] leading-relaxed">
                       Measures your comprehension of shares, price discovery, index funds, and F&O risk.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-surface border border-border/70">
-                    <div className="flex justify-between font-mono mb-1">
-                      <span className="font-bold text-text-primary">Risk Awareness</span>
-                      <span className="text-warning font-bold">{assessmentResult.riskAwarenessScore}%</span>
+                  <div className="p-4 rounded-xl bg-[#F8FAFC]">
+                    <div className="flex justify-between mb-1 tabular-nums">
+                      <span className="font-bold text-[#131722]">Risk Awareness</span>
+                      <span className="text-amber-700 font-bold">{assessmentResult.riskAwarenessScore}%</span>
                     </div>
-                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                    <p className="text-xs text-[#64748B] leading-relaxed">
                       Your instinctive respect for downside capital preservation before chasing gains.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-surface border border-border/70">
-                    <div className="flex justify-between font-mono mb-1">
-                      <span className="font-bold text-text-primary">Emotional Discipline</span>
-                      <span className="text-secondary font-bold">{assessmentResult.emotionalAwarenessScore}%</span>
+                  <div className="p-4 rounded-xl bg-[#F8FAFC]">
+                    <div className="flex justify-between mb-1 tabular-nums">
+                      <span className="font-bold text-[#131722]">Emotional Discipline</span>
+                      <span className="text-[#089981] font-bold">{assessmentResult.emotionalAwarenessScore}%</span>
                     </div>
-                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                    <p className="text-xs text-[#64748B] leading-relaxed">
                       Ability to resist panic-selling during drops and FOMO impulses on parabolic green spikes.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-border/50 flex justify-end">
+              <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
                 <Button
                   variant="primary"
                   size="md"
@@ -1106,26 +1101,26 @@ export const OnboardingPage: React.FC = () => {
         {/* =================================================================== */}
         {currentStep === 6 && assessmentResult && (
           <div className="space-y-6 max-w-2xl mx-auto w-full">
-            <div className="text-center space-y-1">
-              <Badge variant="secondary" size="sm">STEP 6 OF 7 • PERSONALIZED PATHWAY</Badge>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+            <div className="text-center space-y-1.5">
+              <Badge variant="primary" size="sm">STEP 6 OF 7 • PERSONALIZED PATHWAY</Badge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#131722] tracking-tight">
                 Recommended Pathway: {assessmentResult.assignedPath}
               </h2>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#64748B]">
                 Tailored according to your diagnostic responses and behavioral baseline.
               </p>
             </div>
 
-            <Card variant="elevated" className="p-6 sm:p-8 space-y-6 border-primary/30">
+            <Card className="p-6 sm:p-8 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-[#2962FF]/10 text-[#2962FF] flex items-center justify-center">
                   <BookOpen size={24} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono uppercase text-primary font-bold">
+                  <span className="text-xs text-[#2962FF] font-semibold">
                     Assigned Pathway Track
                   </span>
-                  <h3 className="text-xl font-bold text-text-primary mt-0.5">
+                  <h3 className="text-xl font-bold text-[#131722] mt-0.5">
                     {assessmentResult.assignedPath === 'BEGINNER' && 'Pathway 1: Foundations & Risk Preservation'}
                     {assessmentResult.assignedPath === 'INTERMEDIATE' && 'Pathway 2: Portfolio Construction & Psychology'}
                     {assessmentResult.assignedPath === 'ADVANCED' && 'Pathway 3: Crisis Scenarios & Advanced Strategy'}
@@ -1133,7 +1128,7 @@ export const OnboardingPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-surface border border-border/70 text-xs text-text-secondary leading-relaxed space-y-2">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] text-xs text-[#64748B] leading-relaxed space-y-2">
                 {assessmentResult.assignedPath === 'BEGINNER' && (
                   <p>
                     Start with market basics, investing vs trading, understanding risk, and building diversification habits. You will master reading candlestick charts and placing basic stop-loss orders in the virtual simulator.
@@ -1152,8 +1147,8 @@ export const OnboardingPage: React.FC = () => {
               </div>
 
               {/* Crucial Disclaimer as requested */}
-              <div className="p-4 rounded-xl bg-warning/10 border border-warning/20 text-xs text-warning flex items-start gap-2.5">
-                <ShieldAlert size={18} className="flex-shrink-0 mt-0.5" />
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2.5">
+                <ShieldAlert size={18} className="flex-shrink-0 mt-0.5 text-amber-600" />
                 <p className="leading-relaxed">
                   <strong>Important Ethical Disclaimer:</strong> This score and pathway assignment are strictly educational benchmarks to tailor your simulation experience. A high score does <em>not</em> claim or imply readiness to trade with real money on live exchanges.
                 </p>
@@ -1181,57 +1176,57 @@ export const OnboardingPage: React.FC = () => {
         {/* STEP 7 — YOUR JOURNEY STARTS HERE (Launch Card)                     */}
         {/* =================================================================== */}
         {currentStep === 7 && assessmentResult && (
-          <Card variant="elevated" className="p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6 border-primary/40 shadow-glow">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary text-background flex items-center justify-center mx-auto shadow-glow">
+          <Card className="p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#2962FF] text-white flex items-center justify-center mx-auto shadow-sm">
               <Award size={32} />
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+              <span className="text-xs uppercase tracking-wider text-[#2962FF] font-bold">
                 Profile Provisioned & Saved
               </span>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#131722] tracking-tight">
                 Your learning journey starts here.
               </h1>
-              <p className="text-xs sm:text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#64748B] max-w-md mx-auto leading-relaxed">
                 We've credited ₹1,00,000 in virtual paper capital to your account and loaded your tailored curriculum.
               </p>
             </div>
 
             {/* Launch Card Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left font-mono">
-              <div className="p-3 rounded-xl bg-surface border border-border">
-                <span className="text-[10px] text-text-muted uppercase block">Current Level</span>
-                <span className="font-bold text-text-primary text-xs mt-0.5 block truncate">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC]">
+                <span className="text-[11px] text-[#64748B] block">Current Level</span>
+                <span className="font-bold text-[#131722] text-xs mt-0.5 block truncate">
                   {assessmentResult.experienceLevel}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-surface border border-border">
-                <span className="text-[10px] text-text-muted uppercase block">Estimated Time</span>
-                <span className="font-bold text-secondary text-xs mt-0.5 block">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC]">
+                <span className="text-[11px] text-[#64748B] block">Estimated Time</span>
+                <span className="font-bold text-[#2962FF] text-xs mt-0.5 block tabular-nums">
                   {assessmentResult.estimatedTime}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-surface border border-border col-span-2">
-                <span className="text-[10px] text-text-muted uppercase block">Recommended Module</span>
-                <span className="font-bold text-primary text-xs mt-0.5 block truncate">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] col-span-2">
+                <span className="text-[11px] text-[#64748B] block">Recommended Module</span>
+                <span className="font-bold text-[#131722] text-xs mt-0.5 block truncate">
                   {assessmentResult.recommendedModule}
                 </span>
               </div>
             </div>
 
             {/* First Challenge Banner */}
-            <div className="p-4 rounded-xl bg-surface-elevated border border-primary/30 text-left flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary flex-shrink-0">
+            <div className="p-4 rounded-xl bg-[#2962FF]/[0.05] border border-[#2962FF]/20 text-left flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-[#2962FF]/10 text-[#2962FF] flex-shrink-0">
                 <Target size={18} />
               </div>
               <div>
-                <span className="text-[10px] font-mono uppercase text-primary font-bold">
+                <span className="text-xs text-[#2962FF] font-bold">
                   Your First Simulator Challenge
                 </span>
-                <p className="font-semibold text-xs text-text-primary mt-0.5">
+                <p className="font-semibold text-xs text-[#131722] mt-0.5">
                   {assessmentResult.firstChallenge}
                 </p>
               </div>
@@ -1253,7 +1248,7 @@ export const OnboardingPage: React.FC = () => {
                 variant="outline"
                 size="lg"
                 onClick={() => navigate('/learn')}
-                className="w-full sm:w-auto font-mono text-xs"
+                className="w-full sm:w-auto text-xs"
               >
                 Start Recommended Module
               </Button>
@@ -1263,8 +1258,8 @@ export const OnboardingPage: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="max-w-4xl mx-auto w-full pt-4 border-t border-border/50 text-center text-[11px] font-mono text-text-muted">
-        MINDMARK Financial Simulator • Educational Diagnostic Tool • Progress saved in browser storage.
+      <footer className="max-w-4xl mx-auto w-full pt-4 border-t border-[#E2E8F0] text-center text-xs text-[#64748B]">
+        Aurivero Financial Simulator • Educational Diagnostic Tool • Progress saved in browser storage.
       </footer>
     </div>
   );

@@ -163,7 +163,7 @@ export const AdminPage: React.FC = () => {
           onClick={() => setActiveTab('reports')}
           className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
             activeTab === 'reports'
-              ? 'bg-danger text-background shadow-md'
+              ? 'bg-danger text-white shadow-md'
               : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
           }`}
         >
@@ -175,7 +175,7 @@ export const AdminPage: React.FC = () => {
           onClick={() => setActiveTab('quarantine')}
           className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
             activeTab === 'quarantine'
-              ? 'bg-warning text-background shadow-md'
+              ? 'bg-warning text-white shadow-md'
               : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
           }`}
         >
@@ -187,7 +187,7 @@ export const AdminPage: React.FC = () => {
           onClick={() => setActiveTab('audit')}
           className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
             activeTab === 'audit'
-              ? 'bg-secondary text-background shadow-md'
+              ? 'bg-secondary text-white shadow-md'
               : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
           }`}
         >
@@ -199,7 +199,7 @@ export const AdminPage: React.FC = () => {
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 ${
             activeTab === 'users'
-              ? 'bg-primary text-background font-bold shadow-md'
+              ? 'bg-primary text-white font-bold shadow-md'
               : 'bg-surface-elevated text-text-secondary hover:text-text-primary border border-border/50'
           }`}
         >

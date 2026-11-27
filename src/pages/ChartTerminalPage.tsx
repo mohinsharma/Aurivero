@@ -306,7 +306,7 @@ export const ChartTerminalPage: React.FC = () => {
               title={t.label}
               className={`p-2 rounded-xl flex items-center justify-center transition-colors ${
                 activeTool === t.id
-                  ? 'bg-primary text-background'
+                  ? 'bg-primary text-white'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated'
               }`}
             >

@@ -66,7 +66,7 @@ export const PersonalHubPage: React.FC = () => {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-surface via-surface-elevated to-surface border border-border/80 p-6 sm:p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-extrabold text-background text-2xl font-mono shadow-glow">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-extrabold text-white text-2xl font-mono shadow-glow">
               {profile.full_name?.charAt(0) || 'U'}
             </div>
             <div>
