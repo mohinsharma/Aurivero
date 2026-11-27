@@ -86,21 +86,54 @@ INDIAN_STOCK_DIRECTORY: List[Dict[str, Any]] = [
 ]
 
 
-def get_indian_market_session(now_utc: Optional[datetime] = None) -> Tuple[str, bool]:
-    """Returns (session_label, is_regular_open) in IST."""
+def get_indian_market_session_details(now_utc: Optional[datetime] = None) -> Dict[str, Any]:
+    """Returns full IST (Asia/Kolkata, +05:30) market session state."""
     now_ist = (now_utc or datetime.now(timezone.utc)).astimezone(IST)
     date_str = now_ist.strftime("%Y-%m-%d")
-    if now_ist.weekday() >= 5:
-        return "Closed (Weekend)", False
-    if date_str in INDIAN_MARKET_HOLIDAYS:
-        return "Closed (Exchange Holiday)", False
+    ist_time_str = now_ist.strftime("%H:%M:%S IST")
+    ist_date_str = now_ist.strftime("%d %b %Y")
 
-    minutes = now_ist.hour * 60 + now_ist.minute
-    if 9 * 60 <= minutes < 9 * 60 + 15:
-        return "Pre-Open Session (09:00–09:15 IST)", False
-    if 9 * 60 + 15 <= minutes <= 15 * 60 + 30:
-        return "Regular Session Open (09:15–15:30 IST)", True
-    return "Closed (After Hours)", False
+    if now_ist.weekday() >= 5:
+        state = "MARKET_CLOSED"
+        label = "Closed (Weekend)"
+        is_open = False
+    elif date_str in INDIAN_MARKET_HOLIDAYS:
+        state = "HOLIDAY"
+        label = "Exchange Holiday (NSE/BSE Closed)"
+        is_open = False
+    else:
+        minutes = now_ist.hour * 60 + now_ist.minute
+        if 9 * 60 <= minutes < 9 * 60 + 15:
+            state = "PRE_OPEN"
+            label = "Pre-Open Session (09:00–09:15 IST)"
+            is_open = False
+        elif 9 * 60 + 15 <= minutes <= 15 * 60 + 30:
+            state = "MARKET_OPEN"
+            label = "Regular Session Open (09:15–15:30 IST)"
+            is_open = True
+        else:
+            state = "MARKET_CLOSED"
+            label = "After-Market / Closed (09:15–15:30 IST)"
+            is_open = False
+
+    return {
+        "state": state,
+        "label": label,
+        "isOpen": is_open,
+        "timezone": "Asia/Kolkata",
+        "utcOffset": "+05:30",
+        "istDate": ist_date_str,
+        "istTime": ist_time_str,
+        "istIso": now_ist.isoformat(),
+        "regularHours": "09:15 – 15:30 IST",
+        "preOpenHours": "09:00 – 09:15 IST",
+    }
+
+
+def get_indian_market_session(now_utc: Optional[datetime] = None) -> Tuple[str, bool]:
+    """Returns (session_label, is_regular_open) in IST."""
+    d = get_indian_market_session_details(now_utc)
+    return d["label"], bool(d["isOpen"])
 
 
 _YAHOO_TF_CONFIG: Dict[Timeframe, Tuple[str, str]] = {

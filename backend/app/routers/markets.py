@@ -20,6 +20,9 @@ from backend.app.services.providers import (
 )
 from backend.app.services.providers.cache_and_limiter import api_rate_limiter
 from backend.app.services.heatmap_service import get_stocks_heatmap
+from backend.app.services.screener_service import run_stock_screener
+from backend.app.services.providers.indian_vendors import bharatstock_adapter, tejhq_adapter
+from backend.app.services.providers.stocks_provider import get_indian_market_session_details
 from backend.app.services.stream_manager import stream_manager
 
 logger = logging.getLogger("mindmark.routers.markets")
@@ -226,6 +229,7 @@ async def get_market_heatmap(
     timeframe: str = Query("1D"),
     sector: Optional[str] = Query(None),
     direction: Optional[str] = Query(None),
+    sort_by: str = Query("HIGHEST_MCAP"),
 ):
     _enforce_rate_limit(request, "heatmap")
     data = await get_stocks_heatmap(
@@ -233,7 +237,69 @@ async def get_market_heatmap(
         timeframe=timeframe,
         sector=sector,
         direction=direction,
+        sort_by=sort_by,
     )
+    return StandardAPIResponse(success=True, data=data)
+
+
+@router.get("/session", response_model=StandardAPIResponse)
+async def get_indian_session():
+    return StandardAPIResponse(
+        success=True,
+        data={
+            "indianEquities": get_indian_market_session_details(),
+            "crypto": {"state": "OPEN_24_7", "label": "24/7 Continuous", "isOpen": True},
+            "providers": {
+                "tejhqConfigured": tejhq_adapter.is_configured,
+                "bharatstockConfigured": bharatstock_adapter.is_configured,
+                "bharatstockRemainingDailyBudget": bharatstock_adapter.remaining_daily_budget(),
+            },
+        },
+    )
+
+
+@router.get("/screener", response_model=StandardAPIResponse)
+async def get_stock_screener(
+    request: Request,
+    exchange: Optional[str] = Query(None),
+    sector: Optional[str] = Query(None),
+    min_mcap_cr: Optional[float] = Query(None),
+    max_mcap_cr: Optional[float] = Query(None),
+    min_price: Optional[float] = Query(None),
+    max_price: Optional[float] = Query(None),
+    min_1m_return: Optional[float] = Query(None),
+    min_1y_return: Optional[float] = Query(None),
+    min_pe: Optional[float] = Query(None),
+    max_pe: Optional[float] = Query(None),
+    sort_by: str = Query("marketCapCr"),
+    sort_dir: str = Query("desc"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1, le=50),
+):
+    _enforce_rate_limit(request, "screener")
+    data = await run_stock_screener(
+        exchange=exchange,
+        sector=sector,
+        min_mcap_cr=min_mcap_cr,
+        max_mcap_cr=max_mcap_cr,
+        min_price=min_price,
+        max_price=max_price,
+        min_1m_return=min_1m_return,
+        min_1y_return=min_1y_return,
+        min_pe=min_pe,
+        max_pe=max_pe,
+        sort_by=sort_by,
+        sort_dir=sort_dir,
+        page=page,
+        page_size=page_size,
+    )
+    return StandardAPIResponse(success=True, data=data)
+
+
+@router.get("/fundamentals/{symbol}", response_model=StandardAPIResponse)
+async def get_stock_fundamentals(request: Request, symbol: str):
+    _enforce_rate_limit(request, "fundamentals")
+    data = await bharatstock_adapter.get_fundamentals(symbol)
     return StandardAPIResponse(success=True, data=data)
 
 

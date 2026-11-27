@@ -100,15 +100,18 @@ async def _fetch_stock_perf(
             return None
         chart_res = res_list[0]
         ymeta = chart_res.get("meta", {})
+        qblock = (chart_res.get("indicators", {}).get("quote") or [{}])[0]
         closes = [
             float(c)
-            for c in ((chart_res.get("indicators", {}).get("quote") or [{}])[0].get("close") or [])
+            for c in (qblock.get("close") or [])
             if c is not None
         ]
+        vols = [float(v) for v in (qblock.get("volume") or []) if v is not None]
         if not closes:
             return None
 
         latest_price = float(ymeta.get("regularMarketPrice") or closes[-1])
+        latest_vol = float(ymeta.get("regularMarketVolume") or (vols[-1] if vols else 0.0))
         if timeframe == "1D":
             base_price = float(ymeta.get("chartPreviousClose") or ymeta.get("previousClose") or (closes[-2] if len(closes) >= 2 else latest_price))
         elif timeframe == "1W":
@@ -128,6 +131,7 @@ async def _fetch_stock_perf(
             "indices": item["indices"],
             "marketCapCr": item["mcapCr"],
             "price": round(latest_price, 2),
+            "volume": latest_vol,
             "change": round(change, 2),
             "changePercent": round(change_pct, 2),
             "status": status,
@@ -156,6 +160,7 @@ async def get_stocks_heatmap(
     timeframe: str = "1D",
     sector: Optional[str] = None,
     direction: Optional[str] = None,
+    sort_by: str = "HIGHEST_MCAP",
 ) -> Dict[str, Any]:
     u = universe.upper().strip()
     tf = timeframe.upper().strip()
@@ -171,6 +176,9 @@ async def get_stocks_heatmap(
                 continue
         elif u == "NSE":
             if item["exchange"] != "NSE":
+                continue
+        elif u == "NIFTY100":
+            if "NIFTY50" not in item["indices"] and "NIFTYNEXT50" not in item["indices"]:
                 continue
         elif u in ("NIFTY50", "NIFTYNEXT50", "NIFTYBANK"):
             if u not in item["indices"]:
@@ -190,7 +198,19 @@ async def get_stocks_heatmap(
     elif direction == "LOSERS":
         items = [it for it in items if it["changePercent"] < 0]
 
-    items.sort(key=lambda x: x["marketCapCr"], reverse=True)
+    sb = sort_by.upper().strip()
+    if sb == "TOP_GAINERS":
+        items.sort(key=lambda x: x["changePercent"], reverse=True)
+    elif sb == "TOP_LOSERS":
+        items.sort(key=lambda x: x["changePercent"], reverse=False)
+    elif sb == "LOWEST_MCAP":
+        items.sort(key=lambda x: x["marketCapCr"], reverse=False)
+    elif sb == "HIGHEST_VOLUME":
+        items.sort(key=lambda x: x.get("volume", 0.0), reverse=True)
+    elif sb == "PCT_CHANGE":
+        items.sort(key=lambda x: abs(x["changePercent"]), reverse=True)
+    else:
+        items.sort(key=lambda x: x["marketCapCr"], reverse=True)
     sectors = sorted({it["sector"] for it in items})
     status: DataFreshnessStatus = "DELAYED" if is_open else "MARKET_CLOSED"
     if items and all(it["status"] == "CACHED" for it in items):

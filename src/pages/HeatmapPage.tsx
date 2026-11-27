@@ -6,6 +6,7 @@ import { DataFreshnessStatus } from '../types/markets';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { FreshnessBadge } from '../components/markets/FreshnessBadge';
+import { IstMarketClock } from '../components/markets/IstMarketClock';
 
 interface HeatmapStock {
   symbol: string;
@@ -99,9 +100,10 @@ function getTileColor(pct: number): string {
 
 export const HeatmapPage: React.FC = () => {
   const navigate = useNavigate();
-  const [universe, setUniverse] = useState<'NIFTY50' | 'NIFTYNEXT50' | 'NIFTYBANK' | 'NSE' | 'BSE'>('NIFTY50');
+  const [universe, setUniverse] = useState<'NIFTY50' | 'NIFTYNEXT50' | 'NIFTY100' | 'NIFTYBANK' | 'NSE' | 'BSE'>('NIFTY50');
   const [timeframe, setTimeframe] = useState<'1D' | '1W' | '1M' | '3M' | '6M' | '1Y'>('1D');
   const [direction, setDirection] = useState<'ALL' | 'GAINERS' | 'LOSERS'>('ALL');
+  const [sortBy, setSortBy] = useState<string>('HIGHEST_MCAP');
   const [sizeBy, setSizeBy] = useState<'MCAP' | 'EQUAL'>('MCAP');
   const [zoomedSector, setZoomedSector] = useState<string | null>(null);
   const [hovered, setHovered] = useState<HeatmapStock | null>(null);
@@ -118,6 +120,7 @@ export const HeatmapPage: React.FC = () => {
       timeframe,
       sector: zoomedSector || undefined,
       direction: direction !== 'ALL' ? direction : undefined,
+      sort_by: sortBy,
     });
     if (res.success && res.data) {
       setData(res.data);
@@ -125,7 +128,7 @@ export const HeatmapPage: React.FC = () => {
       setError(res.error?.message || 'Unable to load heatmap data.');
     }
     setLoading(false);
-  }, [universe, timeframe, zoomedSector, direction]);
+  }, [universe, timeframe, zoomedSector, direction, sortBy]);
 
   useEffect(() => {
     fetchHeatmap();
@@ -188,16 +191,19 @@ export const HeatmapPage: React.FC = () => {
           </p>
         </div>
 
-        <Button size="sm" variant="outline" icon={<RefreshCw size={14} />} onClick={fetchHeatmap}>
-          Refresh
-        </Button>
+        <div className="flex items-center gap-3 flex-wrap">
+          <IstMarketClock compact />
+          <Button size="sm" variant="outline" icon={<RefreshCw size={14} />} onClick={fetchHeatmap}>
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Controls Bar */}
       <Card className="p-4 flex flex-wrap items-center justify-between gap-3">
         {/* Universe */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          {(['NIFTY50', 'NIFTYNEXT50', 'NIFTYBANK', 'NSE', 'BSE'] as const).map((u) => (
+          {(['NIFTY50', 'NIFTYNEXT50', 'NIFTY100', 'NIFTYBANK', 'NSE', 'BSE'] as const).map((u) => (
             <button
               key={u}
               onClick={() => {
@@ -247,12 +253,36 @@ export const HeatmapPage: React.FC = () => {
               {d}
             </button>
           ))}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-2.5 py-1 rounded-lg text-xs font-mono border border-border bg-background/50 text-text-primary"
+          >
+            <option value="HIGHEST_MCAP">Sort: Highest MCap</option>
+            <option value="TOP_GAINERS">Sort: Top Gainers</option>
+            <option value="TOP_LOSERS">Sort: Top Losers</option>
+            <option value="HIGHEST_VOLUME">Sort: Highest Volume</option>
+            <option value="PCT_CHANGE">Sort: |% Change|</option>
+            <option value="LOWEST_MCAP">Sort: Lowest MCap</option>
+          </select>
           <button
             onClick={() => setSizeBy((s) => (s === 'MCAP' ? 'EQUAL' : 'MCAP'))}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono border border-border bg-background/50 text-text-secondary hover:text-text-primary"
           >
             <Layers size={12} />
             {sizeBy === 'MCAP' ? 'Size: MCap' : 'Size: Equal'}
+          </button>
+          <button
+            onClick={() => {
+              setUniverse('NIFTY50');
+              setTimeframe('1D');
+              setDirection('ALL');
+              setSortBy('HIGHEST_MCAP');
+              setZoomedSector(null);
+            }}
+            className="px-2.5 py-1 rounded-lg text-xs font-mono border border-border text-text-muted hover:text-text-primary"
+          >
+            Reset
           </button>
           {zoomedSector && (
             <Button

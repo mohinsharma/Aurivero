@@ -25,6 +25,8 @@ import { MarketsPage } from './pages/MarketsPage';
 import { InstrumentDetailPage } from './pages/InstrumentDetailPage';
 import { HeatmapPage } from './pages/HeatmapPage';
 import { ChartTerminalPage } from './pages/ChartTerminalPage';
+import { ScreenerPage } from './pages/ScreenerPage';
+import { FinancialNewsPage } from './pages/FinancialNewsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export const App: React.FC = () => {
@@ -53,6 +55,8 @@ export const App: React.FC = () => {
               <Route path="/markets" element={<MarketsPage />} />
               <Route path="/markets/heatmap" element={<HeatmapPage />} />
               <Route path="/markets/terminal" element={<ChartTerminalPage />} />
+              <Route path="/markets/screener" element={<ScreenerPage />} />
+              <Route path="/markets/news" element={<FinancialNewsPage />} />
               <Route path="/markets/:tab" element={<MarketsPage />} />
               <Route path="/markets/:assetClass/:symbol" element={<InstrumentDetailPage />} />
 

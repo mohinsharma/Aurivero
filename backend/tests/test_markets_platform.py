@@ -20,7 +20,10 @@ from backend.app.services.providers.base import (
     validate_and_normalize_candles,
 )
 from backend.app.services.providers.cache_and_limiter import market_cache
-from backend.app.services.providers.stocks_provider import get_indian_market_session
+from backend.app.services.providers.stocks_provider import (
+    get_indian_market_session,
+    get_indian_market_session_details,
+)
 
 client = TestClient(app)
 
@@ -335,3 +338,64 @@ def test_chart_drawings_layouts_and_custom_indicators_isolation():
     cid = ci.json()["data"]["indicator"]["id"]
     assert client.delete(f"/api/charts/custom-indicators/{cid}", headers=user_b["headers"]).status_code == 403
     assert client.delete(f"/api/charts/custom-indicators/{cid}", headers=user_a["headers"]).status_code == 200
+
+
+def test_ist_boundaries_and_sample_stock_validation():
+    # Pre-open 09:05 IST = 03:35 UTC
+    pre = get_indian_market_session_details(datetime(2026, 11, 27, 3, 35, tzinfo=timezone.utc))
+    assert pre["state"] == "PRE_OPEN"
+    assert pre["timezone"] == "Asia/Kolkata"
+    assert pre["utcOffset"] == "+05:30"
+
+    # Official Republic Day holiday 2026-01-26 at 11:00 IST = 05:30 UTC
+    hol = get_indian_market_session_details(datetime(2026, 1, 26, 5, 30, tzinfo=timezone.utc))
+    assert hol["state"] == "HOLIDAY"
+    assert hol["isOpen"] is False
+
+    # After-hours 16:00 IST = 10:30 UTC
+    aft = get_indian_market_session_details(datetime(2026, 11, 27, 10, 30, tzinfo=timezone.utc))
+    assert aft["state"] == "MARKET_CLOSED"
+
+    # Verify sample Indian equities
+    for sym in ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"]:
+        res = client.get(f"/api/markets/quote/STOCK/{sym}")
+        assert res.status_code == 200
+        q = res.json()["data"]["quote"]
+        assert q["symbol"] == sym
+        assert q["exchange"] == "NSE"
+        assert q["currency"] == "INR"
+        assert q["price"] is not None and q["price"] > 0
+        assert q["status"] != "LIVE"
+
+
+def test_screener_combined_filters_and_heatmap_sorting():
+    sc = client.get("/api/markets/screener?exchange=NSE&sector=Banking&min_mcap_cr=100000")
+    assert sc.status_code == 200
+    items = sc.json()["data"]["items"]
+    assert len(items) >= 3
+    for row in items:
+        assert row["exchange"] == "NSE"
+        assert row["sector"] == "Banking"
+        assert row["marketCapCr"] >= 100000
+
+    hm = client.get("/api/markets/heatmap?universe=NIFTY50&timeframe=1M&sort_by=TOP_GAINERS")
+    assert hm.status_code == 200
+    h_items = hm.json()["data"]["items"]
+    assert len(h_items) >= 10
+    pcts = [it["changePercent"] for it in h_items]
+    assert pcts == sorted(pcts, reverse=True)
+
+
+def test_real_financial_news_rss_and_instrument_matching():
+    res = client.get("/api/financial-news?page=1&page_size=10")
+    assert res.status_code == 200
+    data = res.json()["data"]
+    assert len(data["articles"]) > 0
+    art = data["articles"][0]
+    assert art["url"].startswith("http")
+    assert art["publishedAtIst"].endswith("IST")
+    assert art["source"] in ("Moneycontrol", "Economic Times", "LiveMint", "Business Standard", "RBI")
+
+    inst = client.get("/api/financial-news/instrument/STOCK/RELIANCE?name=Reliance%20Industries")
+    assert inst.status_code == 200
+    assert isinstance(inst.json()["data"]["articles"], list)

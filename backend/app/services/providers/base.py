@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 DataFreshnessStatus = Literal[
     "LIVE",
     "DELAYED",
+    "END_OF_DAY",
     "POLLING",
     "CACHED",
     "MARKET_CLOSED",

@@ -1,6 +1,7 @@
 export type DataFreshnessStatus =
   | 'LIVE'
   | 'DELAYED'
+  | 'END_OF_DAY'
   | 'POLLING'
   | 'CACHED'
   | 'MARKET_CLOSED'

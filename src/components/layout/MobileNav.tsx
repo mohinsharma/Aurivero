@@ -44,6 +44,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Markets (Stocks, Crypto, FX)', path: '/markets', icon: Coins },
     { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: PieChart },
+    { name: 'Market Screener', path: '/markets/screener', icon: Compass },
+    { name: 'Financial News (IST)', path: '/markets/news', icon: Newspaper },
     { name: 'Pro Charting Terminal', path: '/markets/terminal', icon: CandlestickChart },
     { name: 'Paper Trading Simulator', path: '/simulator', icon: CandlestickChart },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },

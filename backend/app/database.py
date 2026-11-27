@@ -1040,6 +1040,23 @@ def seed_ecosystem_data(conn):
     """)
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_custom_indicators_user ON custom_indicators(user_id);")
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS financial_news_bookmarks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        article_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        url TEXT NOT NULL,
+        source TEXT NOT NULL,
+        category TEXT NOT NULL,
+        published_at_ist TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+        UNIQUE (user_id, article_id)
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_fin_news_bookmarks_user ON financial_news_bookmarks(user_id);")
+
     # 5. User Notifications Seeds
     cursor.execute("SELECT COUNT(*) FROM user_notifications")
     if cursor.fetchone()[0] == 0:

@@ -31,6 +31,11 @@ export const FreshnessBadge: React.FC<FreshnessBadgeProps> = ({
       classes: 'bg-warning/15 text-warning border-warning/30',
       icon: <Clock size={11} />,
     },
+    END_OF_DAY: {
+      label: 'END OF DAY',
+      classes: 'bg-surface-elevated text-secondary border-secondary/30',
+      icon: <Database size={11} />,
+    },
     POLLING: {
       label: 'POLLING',
       classes: 'bg-warning/15 text-warning border-warning/30',

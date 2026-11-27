@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     TWELVE_DATA_API_KEY: str = ""
     UPSTOX_ACCESS_TOKEN: str = ""
     COINGECKO_API_KEY: str = ""
+    TEJHQ_API_KEY: str = ""
+    BHARATSTOCK_API_KEY: str = ""
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://localhost:5173"

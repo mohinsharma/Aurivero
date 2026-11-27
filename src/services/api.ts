@@ -372,12 +372,26 @@ class ApiClient {
       );
     },
     getHealth: () => this.request<any>('/api/markets/health'),
-    getHeatmap: (params?: { universe?: string; timeframe?: string; sector?: string; direction?: string }) => {
+    getSession: () => this.request<any>('/api/markets/session'),
+    getFundamentals: (symbol: string) =>
+      this.request<any>(`/api/markets/fundamentals/${encodeURIComponent(symbol)}`),
+    getScreener: (params?: Record<string, string | number | undefined>) => {
+      const sp = new URLSearchParams();
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          if (v !== undefined && v !== '' && v !== 'ALL') sp.append(k, String(v));
+        });
+      }
+      const qs = sp.toString();
+      return this.request<any>(qs ? `/api/markets/screener?${qs}` : '/api/markets/screener');
+    },
+    getHeatmap: (params?: { universe?: string; timeframe?: string; sector?: string; direction?: string; sort_by?: string }) => {
       const sp = new URLSearchParams();
       if (params?.universe) sp.append('universe', params.universe);
       if (params?.timeframe) sp.append('timeframe', params.timeframe);
       if (params?.sector) sp.append('sector', params.sector);
       if (params?.direction) sp.append('direction', params.direction);
+      if (params?.sort_by) sp.append('sort_by', params.sort_by);
       const qs = sp.toString();
       return this.request<any>(qs ? `/api/markets/heatmap?${qs}` : '/api/markets/heatmap');
     },
@@ -447,6 +461,38 @@ class ApiClient {
       method: 'PATCH',
       body: JSON.stringify({ item_ids: itemIds })
     })
+  };
+
+  // 18. Real Financial News (Moneycontrol, ET, LiveMint, BS, RBI)
+  public financialNews = {
+    list: (params?: { category?: string; source?: string; q?: string; page?: number; page_size?: number }) => {
+      const sp = new URLSearchParams();
+      if (params?.category && params.category !== 'All') sp.append('category', params.category);
+      if (params?.source && params.source !== 'All') sp.append('source', params.source);
+      if (params?.q) sp.append('q', params.q);
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.page_size) sp.append('page_size', String(params.page_size));
+      const qs = sp.toString();
+      return this.request<any>(qs ? `/api/financial-news?${qs}` : '/api/financial-news');
+    },
+    forInstrument: (assetClass: string, symbol: string, name?: string, limit = 6) => {
+      const sp = new URLSearchParams({ limit: String(limit) });
+      if (name) sp.append('name', name);
+      return this.request<any>(`/api/financial-news/instrument/${assetClass}/${encodeURIComponent(symbol)}?${sp.toString()}`);
+    },
+    toggleBookmark: (payload: {
+      article_id: string;
+      title: string;
+      url: string;
+      source: string;
+      category: string;
+      published_at_ist: string;
+    }) =>
+      this.request<any>('/api/financial-news/bookmarks', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    listBookmarks: () => this.request<any>('/api/financial-news/bookmarks'),
   };
 }
 

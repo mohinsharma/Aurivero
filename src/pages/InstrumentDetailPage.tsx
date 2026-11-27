@@ -43,6 +43,7 @@ const TIMEFRAME_SECONDS: Record<Timeframe, number> = {
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { FreshnessBadge } from '../components/markets/FreshnessBadge';
+import { IstMarketClock } from '../components/markets/IstMarketClock';
 import { TechnicalChart } from '../components/markets/TechnicalChart';
 import { formatCompactNumber, formatInstrumentPrice } from '../components/markets/formatters';
 
@@ -83,10 +84,11 @@ export const InstrumentDetailPage: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [warningMsg, setWarningMsg] = useState<string | null>(null);
 
-  // Watchlist integration
+  // Watchlist & related news
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [showWatchlistMenu, setShowWatchlistMenu] = useState(false);
   const [watchlistFeedback, setWatchlistFeedback] = useState<string | null>(null);
+  const [relatedNews, setRelatedNews] = useState<any[]>([]);
 
   // Track active instrument key to prevent cross-instrument data leakage
   const activeKeyRef = useRef<string>(`${assetClass}:${symbol}:${timeframe}`);
@@ -158,14 +160,19 @@ export const InstrumentDetailPage: React.FC = () => {
     return () => controller.abort();
   }, [loadQuote, loadCandles]);
 
-  // Fetch user's watchlists
+  // Fetch user's watchlists & context-aware instrument news
   useEffect(() => {
     api.watchlists.list(false).then((res) => {
       if (res.success && res.data?.watchlists) {
         setWatchlists(res.data.watchlists);
       }
     });
-  }, []);
+    api.financialNews.forInstrument(assetClass, symbol, quote?.name || meta?.name, 6).then((res) => {
+      if (res.success && res.data?.articles) {
+        setRelatedNews(res.data.articles);
+      }
+    });
+  }, [assetClass, symbol, quote?.name, meta?.name]);
 
   // WebSocket live stream with exponential backoff reconnect
   useEffect(() => {
@@ -631,14 +638,51 @@ export const InstrumentDetailPage: React.FC = () => {
             )}
           </div>
           <div className="pt-2 flex flex-wrap gap-2">
-            <Link to="/hot-topics">
+            <Link to="/markets/news">
               <Button size="sm" variant="outline" icon={<Newspaper size={13} />}>
-                Market News
+                All Financial News
               </Button>
             </Link>
+            {assetClass === 'STOCK' && <IstMarketClock compact />}
           </div>
         </Card>
       </div>
+
+      {/* Context-Aware Related Financial News */}
+      <Card className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
+            <Newspaper size={16} className="text-primary" />
+            Related Financial News ({quote?.displaySymbol || symbol})
+          </h2>
+          <Link to="/markets/news" className="text-xs text-primary hover:underline">
+            View all news →
+          </Link>
+        </div>
+        {relatedNews.length === 0 ? (
+          <p className="text-xs text-text-muted">
+            No recent headlines specifically matched {quote?.name || symbol} in the current RSS window.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {relatedNews.map((art) => (
+              <a
+                key={art.id}
+                href={art.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-xl bg-background/60 border border-border/60 hover:border-primary/40 transition-colors flex flex-col justify-between gap-2"
+              >
+                <div className="text-xs font-semibold text-text-primary leading-snug">{art.title}</div>
+                <div className="flex items-center justify-between text-[10px] font-mono text-text-muted">
+                  <span className="text-secondary font-semibold">{art.source}</span>
+                  <span>{art.publishedAtIst}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+      </Card>
     </div>
   );
 };
