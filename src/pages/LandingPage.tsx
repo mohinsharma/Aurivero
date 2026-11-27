@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
@@ -31,7 +31,14 @@ import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { Card } from '../components/common/Card';
 import { BeginnerTooltip } from '../components/common/BeginnerTooltip';
+import { ExplodedArchitectureShowcase } from '../components/landing/ExplodedArchitectureShowcase';
 import { INDIAN_INDICES, POPULAR_INDIAN_STOCKS } from '../data/mockData';
+
+const CinematicMarketScene = lazy(() =>
+  import('../components/landing/CinematicMarketScene').then((m) => ({
+    default: m.CinematicMarketScene,
+  }))
+);
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -67,9 +74,9 @@ export const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background text-text-primary selection:bg-primary/20 selection:text-primary overflow-x-hidden font-sans">
       {/* Top Banner Disclaimer */}
       <div className="bg-surface border-b border-border/80 px-4 py-2 text-center text-xs font-mono text-text-secondary flex items-center justify-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+        <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
         <span className="truncate">
-          MINDMARK EDUCATIONAL PLATFORM • STRICTLY SIMULATED CAPITAL • ZERO REAL-MONEY ADVISORY OR RISK
+          AURIVERO FINANCIAL INTELLIGENCE • STRICTLY SIMULATED PAPER CAPITAL • EDUCATIONAL PLATFORM
         </span>
       </div>
 
@@ -77,24 +84,24 @@ export const LandingPage: React.FC = () => {
       <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-glow">
-              <svg className="w-5 h-5 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="12" r="6" />
-                <circle cx="12" cy="12" r="2" />
+            <div className="w-10 h-10 rounded-xl bg-surface-elevated border border-gold/40 flex items-center justify-center shadow-gold">
+              <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M8.5 15.5L12 7.5l3.5 8" />
+                <path d="M9.8 13h4.4" />
               </svg>
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl font-mono tracking-wider text-text-primary group-hover:text-primary transition-colors">
-                  MINDMARK
+                <span className="font-bold text-xl tracking-[0.14em] text-text-primary group-hover:text-gold transition-colors">
+                  AURIVERO
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/25">
-                  SIMULATOR
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-gold/10 text-gold border border-gold/25">
+                  INTELLIGENCE
                 </span>
               </div>
-              <span className="text-[10px] text-text-muted font-mono -mt-1 hidden sm:block">
-                Learn the market. Train your decisions.
+              <span className="text-[10px] text-text-muted font-mono -mt-0.5 hidden sm:block">
+                Precision Markets, Risk & Learning
               </span>
             </div>
           </Link>
@@ -140,15 +147,15 @@ export const LandingPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left Column: Cinematic Headline & Mission Statement (6 cols) */}
           <div className="lg:col-span-6 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-elevated border border-primary/30 text-primary text-xs font-mono">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-elevated border border-gold/30 text-gold text-xs font-mono">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span>AI-Powered Financial Market Learning Simulator</span>
+              <span>Obsidian Market Intelligence & Risk Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-primary leading-[1.12]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-primary leading-[1.1]">
               Learn to Invest. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#5eecd0] to-primary">
-                Practise Without Risk.
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold via-[#e2c997] to-primary">
+                Master Risk First.
               </span>
             </h1>
 
@@ -265,6 +272,13 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Lazy-loaded 3D Financial Intelligence Landscape */}
+              <div className="mt-4">
+                <Suspense fallback={<div className="h-64 rounded-2xl bg-surface-elevated animate-pulse" />}>
+                  <CinematicMarketScene />
+                </Suspense>
+              </div>
+
               {/* Dynamic SVG Portfolio Chart with timeframes */}
               <div className="mt-4 p-4 rounded-xl bg-surface-elevated border border-border/50 relative overflow-hidden">
                 <div className="flex items-center justify-between text-[11px] font-mono mb-2">
@@ -363,6 +377,9 @@ export const LandingPage: React.FC = () => {
       {/* ========================================================================= */}
       {/* "TRY IT IN 10 SECONDS" INTERACTIVE LEARNING                               */}
       {/* ========================================================================= */}
+      {/* Exploded-View 4-Layer Architecture Showcase */}
+      <ExplodedArchitectureShowcase />
+
       <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pb-16">
         <div className="rounded-3xl bg-surface border border-primary/25 p-6 sm:p-8 space-y-6">
           <div>

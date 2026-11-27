@@ -1,56 +1,79 @@
+@import './styles/tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   * {
-    border-color: #223142;
+    border-color: var(--aurivero-border);
   }
   
   body {
-    background-color: #0B1017;
-    color: #F3F6F8;
+    background-color: var(--aurivero-bg-primary);
+    color: var(--aurivero-text-primary);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom scrollbar */
+  /* Custom obsidian scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0B1017;
+    background: var(--aurivero-bg-primary);
   }
   ::-webkit-scrollbar-thumb {
-    background: #1E2B3A;
+    background: #1F2D3B;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2E4158;
+    background: #2D4053;
   }
 }
 
 @layer utilities {
   .bg-glass {
-    background: rgba(20, 28, 37, 0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(16, 23, 32, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
   
   .bg-glass-elevated {
-    background: rgba(26, 37, 49, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(21, 31, 41, 0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
-  .text-tabular {
+  .text-tabular,
+  .font-mono {
     font-variant-numeric: tabular-nums;
   }
+
+  .aurivero-hairline {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Accessibility: clear keyboard focus indicators & reduced motion support */
 :focus-visible {
-  outline: 2px solid #45D6B5;
+  outline: 2px solid var(--aurivero-gold);
   outline-offset: 2px;
 }
 

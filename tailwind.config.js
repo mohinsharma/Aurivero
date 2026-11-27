@@ -7,37 +7,43 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B1017',
-        surface: '#141C25',
-        'surface-elevated': '#1A2531',
+        background: '#090D12',
+        surface: '#101720',
+        'surface-elevated': '#151F29',
+        'surface-card': '#192530',
         primary: {
-          DEFAULT: '#45D6B5',
-          hover: '#37bf9f',
-          light: 'rgba(69, 214, 181, 0.12)',
+          DEFAULT: '#31B89A',
+          hover: '#29A287',
+          light: 'rgba(49, 184, 154, 0.12)',
+        },
+        gold: {
+          DEFAULT: '#C9A96E',
+          hover: '#D8BA82',
+          light: 'rgba(201, 169, 110, 0.14)',
         },
         secondary: {
-          DEFAULT: '#78A9FF',
-          hover: '#6196f0',
-          light: 'rgba(120, 169, 255, 0.12)',
+          DEFAULT: '#50D6BD',
+          hover: '#3EC4AB',
+          light: 'rgba(80, 214, 189, 0.12)',
         },
         warning: {
-          DEFAULT: '#F5B942',
-          hover: '#e0a42e',
-          light: 'rgba(245, 185, 66, 0.12)',
+          DEFAULT: '#D9A441',
+          hover: '#C49032',
+          light: 'rgba(217, 164, 65, 0.14)',
         },
         danger: {
-          DEFAULT: '#F16D75',
-          hover: '#dc555e',
-          light: 'rgba(241, 109, 117, 0.12)',
+          DEFAULT: '#E0636B',
+          hover: '#CC5058',
+          light: 'rgba(224, 99, 107, 0.14)',
         },
         text: {
-          primary: '#F3F6F8',
-          secondary: '#93A2B4',
-          muted: '#5F7085',
+          primary: '#F3F1EB',
+          secondary: '#A5B0BB',
+          muted: '#718091',
         },
         border: {
-          DEFAULT: '#223142',
-          subtle: '#192634',
+          DEFAULT: '#1F2D3B',
+          subtle: '#16212C',
         }
       },
       fontFamily: {
@@ -45,8 +51,9 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        glow: '0 0 20px -3px rgba(69, 214, 181, 0.3)',
+        glass: '0 12px 36px 0 rgba(0, 0, 0, 0.48)',
+        glow: '0 0 22px -4px rgba(49, 184, 154, 0.28)',
+        gold: '0 0 24px -4px rgba(201, 169, 110, 0.25)',
       }
     },
   },

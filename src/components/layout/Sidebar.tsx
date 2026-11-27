@@ -236,8 +236,8 @@ export const Sidebar: React.FC = () => {
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
                           isActive
-                            ? 'bg-primary/10 text-primary border border-primary/25 shadow-glow'
-                            : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated/80'
+                            ? 'bg-gold/10 text-gold border border-gold/30 shadow-gold'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated/80 border border-transparent'
                         } ${sidebarCollapsed ? 'justify-center px-0' : ''}`
                       }
                     >

@@ -1,0 +1,40 @@
+/* AURIVERO — Figma-Grade Design Token System
+   Obsidian + Champagne Gold + Muted Emerald */
+:root {
+  /* Surfaces */
+  --aurivero-bg-primary: #090D12;
+  --aurivero-bg-secondary: #101720;
+  --aurivero-bg-elevated: #151F29;
+  --aurivero-bg-surface: #192530;
+
+  /* Typography */
+  --aurivero-text-primary: #F3F1EB;
+  --aurivero-text-secondary: #A5B0BB;
+  --aurivero-text-muted: #718091;
+
+  /* Brand & Accents */
+  --aurivero-gold: #C9A96E;
+  --aurivero-gold-hover: #D8BA82;
+  --aurivero-emerald: #31B89A;
+  --aurivero-emerald-hover: #29A287;
+  --aurivero-teal: #50D6BD;
+
+  /* Semantic Financial Colors */
+  --aurivero-positive: #31B89A;
+  --aurivero-negative: #E0636B;
+  --aurivero-warning: #D9A441;
+  --aurivero-neutral: #718091;
+
+  /* Borders & Elevation */
+  --aurivero-border: #1F2D3B;
+  --aurivero-border-subtle: #16212C;
+  --aurivero-shadow-glass: 0 12px 36px rgba(0, 0, 0, 0.48);
+  --aurivero-shadow-gold: 0 0 24px -4px rgba(201, 169, 110, 0.25);
+  --aurivero-shadow-emerald: 0 0 22px -4px rgba(49, 184, 154, 0.28);
+
+  /* Radii */
+  --aurivero-radius-sm: 0.5rem;
+  --aurivero-radius-md: 0.75rem;
+  --aurivero-radius-lg: 1rem;
+  --aurivero-radius-xl: 1.25rem;
+}

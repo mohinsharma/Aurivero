@@ -77,25 +77,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
             </button>
 
             <Link to="/dashboard" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-glow">
-                {/* Custom Target Mark / Bullseye icon */}
-                <svg className="w-5 h-5 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <circle cx="12" cy="12" r="6" />
-                  <circle cx="12" cy="12" r="2" />
+              <div className="w-9 h-9 rounded-xl bg-surface-elevated border border-gold/40 flex items-center justify-center shadow-gold">
+                <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M8.5 15.5L12 7.5l3.5 8" />
+                  <path d="M9.8 13h4.4" />
                 </svg>
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-lg tracking-wider text-text-primary font-mono group-hover:text-primary transition-colors">
-                    MINDMARK
+                  <span className="font-bold text-base sm:text-lg tracking-[0.14em] text-text-primary group-hover:text-gold transition-colors">
+                    AURIVERO
                   </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">
-                    SIMULATOR
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-gold/10 text-gold border border-gold/25">
+                    TERMINAL
                   </span>
                 </div>
                 <span className="text-[10px] text-text-muted hidden sm:inline -mt-0.5">
-                  Train your decisions.
+                  Financial Intelligence & Risk
                 </span>
               </div>
             </Link>
@@ -179,14 +178,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileMenu }) => {
               </button>
             </div>
 
-            {/* AI Buddy Quick Access Button */}
+            {/* Learning Studio Quick Link */}
             <Link
-              to="/ai-buddy"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-mono font-bold transition-colors"
-              title="Open MINDMARK AI Buddy (Finance Assistant)"
+              to="/learning"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/10 hover:bg-gold/15 border border-gold/25 text-gold text-xs font-medium transition-colors"
+              title="Open Learning Studio"
             >
-              <Bot size={16} />
-              <span className="hidden sm:inline">AI Buddy</span>
+              <Sparkles size={14} />
+              <span>Learning</span>
             </Link>
 
             {/* Notifications Button */}
