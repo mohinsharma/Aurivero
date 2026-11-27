@@ -183,7 +183,7 @@ async def get_instrument_candles(
     symbol: str,
     timeframe: Optional[str] = Query(None),
     range: Optional[str] = Query(None),
-    limit: int = Query(200, ge=10, le=500),
+    limit: int = Query(350, ge=10, le=1000),
     before: Optional[int] = Query(None),
 ):
     _enforce_rate_limit(request, "candles")

@@ -120,7 +120,7 @@ export const InstrumentDetailPage: React.FC = () => {
       const res = await api.markets.getCandles(
         assetClass,
         symbol,
-        { timeframe, range: selectedRange, limit: 350 },
+        { timeframe, range: selectedRange, limit: 800 },
         signal
       );
       if (signal?.aborted || activeKeyRef.current !== reqKey) return;
@@ -148,7 +148,6 @@ export const InstrumentDetailPage: React.FC = () => {
 
   const handleRangeChange = (nextRange: HistoricalRange) => {
     setSelectedRange(nextRange);
-    setTimeframe(RANGE_DEFAULT_TIMEFRAME[nextRange]);
   };
 
   // Fetch quote & candles with AbortController on instrument/timeframe switch

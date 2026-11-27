@@ -538,8 +538,17 @@ class IndianStocksProvider(BaseMarketProvider):
             )
 
         y_interval, y_range = _YAHOO_TF_CONFIG.get(timeframe, ("1d", "2y"))
-        safe_limit = max(1, min(limit, 500))
-        cache_key = f"stock:candles:{meta.symbol}:{timeframe}:{range_key or 'default'}:{safe_limit}:{before or 'latest'}"
+        range_warning: Optional[str] = None
+        # Yahoo Finance caps intraday intervals (1m <= 7d, 3m-30m <= 60d, 1h-4h <= 730d)
+        if range_key in ("3M", "6M", "YTD", "1Y", "3Y", "5Y", "ALL") and timeframe in ("1m", "3m", "5m", "15m", "30m"):
+            y_interval = "1d"
+            range_warning = f"Provider limits {timeframe} intraday history; showing daily (1d) candles for {range_key} range."
+        elif range_key in ("3Y", "5Y", "ALL") and timeframe in ("1h", "2h", "4h"):
+            y_interval = "1wk"
+            range_warning = f"Provider limits {timeframe} intraday history; showing weekly (1w) candles for {range_key} range."
+
+        safe_limit = max(1, min(limit, 1000))
+        cache_key = f"stock:candles:{meta.symbol}:{timeframe}:{y_interval}:{range_key or 'default'}:{safe_limit}:{before or 'latest'}"
 
         fresh = market_cache.get_fresh(cache_key)
         if fresh is not None:
@@ -667,6 +676,7 @@ class IndianStocksProvider(BaseMarketProvider):
                 providerTimestamp=latest_ts,
                 status=status,
                 delaySeconds=900 if is_open else None,
+                warning=range_warning,
             ).model_dump()
 
             self.breaker.record_success()

@@ -176,9 +176,27 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
         borderColor: '#223142',
         scaleMargins: { top: 0.1, bottom: indicators.volume.enabled ? 0.25 : 0.1 },
       },
+      localization:
+        assetClass === 'STOCK'
+          ? {
+              timeFormatter: (time: number) =>
+                new Intl.DateTimeFormat('en-IN', {
+                  timeZone: 'Asia/Kolkata',
+                  day: '2-digit',
+                  month: 'short',
+                  hour: ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h'].includes(timeframe)
+                    ? '2-digit'
+                    : undefined,
+                  minute: ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h'].includes(timeframe)
+                    ? '2-digit'
+                    : undefined,
+                  hour12: false,
+                }).format(new Date(time * 1000)),
+            }
+          : undefined,
       timeScale: {
         borderColor: '#223142',
-        timeVisible: ['1m', '5m', '15m', '30m', '1h', '4h'].includes(timeframe),
+        timeVisible: ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h'].includes(timeframe),
         secondsVisible: false,
       },
       width: el.clientWidth,
@@ -458,23 +476,50 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
         isFullscreen ? 'fixed inset-4 z-50 shadow-2xl' : ''
       }`}
     >
-      {/* Chart Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border/80 bg-surface-elevated/60">
-        {/* Timeframes */}
-        <div className="flex items-center gap-1 flex-wrap" role="group" aria-label="Timeframes">
-          {SUPPORTED_TIMEFRAMES.map((tf) => (
-            <button
-              key={tf}
-              onClick={() => onTimeframeChange(tf)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors ${
-                timeframe === tf
-                  ? 'bg-primary text-background'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-surface'
-              }`}
+      {/* Unified Single Chart Toolbar (Interval + Range + Type + Indicators + Status) */}
+      <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 border-b border-border/80 bg-surface-elevated/60">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Candle Interval Selector */}
+          <label className="inline-flex items-center gap-1.5 text-[11px] font-mono text-text-muted">
+            <span>Interval</span>
+            <select
+              aria-label="Candle interval"
+              value={timeframe}
+              onChange={(e) => onTimeframeChange(e.target.value as Timeframe)}
+              className="bg-background border border-border rounded-lg px-2 py-1 text-xs font-mono font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              {tf.toUpperCase()}
-            </button>
-          ))}
+              {SUPPORTED_TIMEFRAMES.map((tf) => (
+                <option key={tf} value={tf}>
+                  {tf}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {/* Historical Range Selector */}
+          {onRangeChange && (
+            <div
+              className="flex items-center gap-0.5 bg-background/60 border border-border rounded-lg p-0.5 overflow-x-auto max-w-full"
+              role="group"
+              aria-label="Historical range"
+            >
+              {SUPPORTED_RANGES.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => onRangeChange(r)}
+                  aria-pressed={selectedRange === r}
+                  className={`px-2 py-1 rounded-md text-[11px] font-mono font-semibold transition-colors whitespace-nowrap ${
+                    selectedRange === r
+                      ? 'bg-primary text-background'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Chart Types, Indicators, Status & Fullscreen */}
@@ -753,46 +798,28 @@ export const TechnicalChart: React.FC<TechnicalChartProps> = ({
         </div>
       )}
 
-      {/* Groww-style Historical Range Selector & Attribution */}
-      <div className="px-4 py-2.5 border-t border-border/60 bg-surface-elevated/40 flex flex-wrap items-center justify-between gap-3 text-[11px]">
-        {onRangeChange ? (
-          <div className="flex items-center gap-1 flex-wrap" role="group" aria-label="Historical Ranges">
-            {SUPPORTED_RANGES.map((r) => (
-              <button
-                key={r}
-                onClick={() => onRangeChange(r)}
-                className={`px-2 py-1 rounded-md font-mono font-semibold transition-colors ${
-                  selectedRange === r
-                    ? 'bg-primary/15 text-primary border border-primary/30'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface'
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-            {rangeReturnPercent !== undefined && rangeReturnPercent !== null && (
-              <span
-                className={`ml-2 font-mono font-bold ${
-                  rangeReturnPercent >= 0 ? 'text-primary' : 'text-danger'
-                }`}
-              >
-                {selectedRange}: {rangeReturnPercent >= 0 ? '+' : ''}
-                {rangeReturnPercent.toFixed(2)}%
-              </span>
-            )}
-          </div>
-        ) : (
-          <span className="text-text-muted">
-            {assetClass === 'CRYPTO'
-              ? 'Scroll left to load earlier Binance candles.'
-              : 'Scroll left to paginate historical candles.'}
+      {/* Clean Footer: Screen-Reader Summary + Range Return + Attribution (No duplicate time-axis controls) */}
+      <p className="sr-only">
+        {symbol} {timeframe} chart over {selectedRange} range with {candles.length} candles.
+        {activeCandle ? ` Latest close ${activeCandle.close}, high ${activeCandle.high}, low ${activeCandle.low}.` : ''}
+      </p>
+      <div className="px-4 py-2 border-t border-border/60 bg-surface-elevated/40 flex flex-wrap items-center justify-between gap-3 text-[11px] text-text-muted">
+        <div className="flex items-center gap-3 font-mono">
+          <span>
+            {timeframe} interval • {selectedRange} range
           </span>
-        )}
+          {rangeReturnPercent !== undefined && rangeReturnPercent !== null && (
+            <span className={`font-bold ${rangeReturnPercent >= 0 ? 'text-primary' : 'text-danger'}`}>
+              {rangeReturnPercent >= 0 ? '▲ +' : '▼ '}
+              {rangeReturnPercent.toFixed(2)}%
+            </span>
+          )}
+        </div>
         <a
           href="https://www.tradingview.com/lightweight-charts/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-text-muted hover:text-text-secondary transition-colors underline underline-offset-2"
+          className="hover:text-text-secondary transition-colors underline underline-offset-2"
         >
           Powered by TradingView Lightweight Charts™
         </a>

@@ -28,9 +28,7 @@ import {
   AssetClass,
   DataFreshnessStatus,
   HistoricalRange,
-  InstrumentMeta,
   NormalizedCandle,
-  RANGE_DEFAULT_TIMEFRAME,
   SUPPORTED_RANGES,
   SUPPORTED_TIMEFRAMES,
   Timeframe,
@@ -56,6 +54,7 @@ import {
 import { evaluateCustomIndicator } from '../../utils/customIndicatorParser';
 import { ChartDrawingOverlay, DrawingToolType, SavedDrawing } from './ChartDrawingOverlay';
 import { FreshnessBadge } from './FreshnessBadge';
+import { InstrumentSearchInput } from './InstrumentSearchInput';
 import { formatInstrumentPrice } from './formatters';
 
 export type TerminalChartType =
@@ -137,8 +136,6 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
   const [source, setSource] = useState('');
   const [loading, setLoading] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQ, setSearchQ] = useState('');
-  const [searchResults, setSearchResults] = useState<InstrumentMeta[]>([]);
   const [showIndMenu, setShowIndMenu] = useState(false);
 
   // Built-in indicators state
@@ -325,16 +322,6 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
       ws?.close();
     };
   }, [config.assetClass, config.symbol, config.timeframe, config.chartType, normalizedComparison]);
-
-  // Search instruments for this pane
-  useEffect(() => {
-    if (!searchOpen) return;
-    const t = window.setTimeout(async () => {
-      const res = await api.markets.search(searchQ, undefined, 10);
-      if (res.success && res.data?.results) setSearchResults(res.data.results);
-    }, 180);
-    return () => window.clearTimeout(t);
-  }, [searchQ, searchOpen]);
 
   const displayCandles = useMemo(() => {
     if (config.chartType === 'HEIKIN_ASHI') return computeHeikinAshi(candles);
@@ -739,37 +726,45 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
           <FreshnessBadge status={status} source={source} compact />
 
           {searchOpen && (
-            <div className="absolute left-0 top-9 w-72 rounded-xl border border-border bg-surface-elevated p-2 shadow-2xl z-40 space-y-2">
-              <input
-                type="text"
-                value={searchQ}
-                onChange={(e) => setSearchQ(e.target.value)}
+            <div className="absolute left-0 top-9 w-80 rounded-xl border border-border bg-surface-elevated p-2 shadow-2xl z-40">
+              <InstrumentSearchInput
                 placeholder="Search symbol (RELIANCE, BTC, EURUSD)..."
-                autoFocus
-                className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-text-primary"
+                onSelect={(r) => {
+                  onConfigChange({ ...config, assetClass: r.assetClass, symbol: r.symbol });
+                  setSearchOpen(false);
+                }}
               />
-              <div className="max-h-56 overflow-y-auto divide-y divide-border/50">
-                {searchResults.map((r) => (
-                  <button
-                    key={`${r.assetClass}-${r.symbol}`}
-                    onClick={() => {
-                      onConfigChange({ ...config, assetClass: r.assetClass, symbol: r.symbol });
-                      setSearchOpen(false);
-                      setSearchQ('');
-                    }}
-                    className="w-full px-2 py-1.5 text-left hover:bg-surface flex items-center justify-between text-xs"
-                  >
-                    <span className="font-mono font-bold text-text-primary">{r.displaySymbol}</span>
-                    <span className="text-[10px] text-text-muted">{r.assetClass} • {r.exchange}</span>
-                  </button>
-                ))}
-              </div>
             </div>
           )}
         </div>
 
-        {/* Chart Type, Scale, Indicators */}
+        {/* Unified Chart Controls: Interval + Range + Chart Type + Scale + Indicators */}
         <div className="flex items-center gap-1.5 flex-wrap">
+          <select
+            aria-label="Candle interval"
+            value={config.timeframe}
+            onChange={(e) => onConfigChange({ ...config, timeframe: e.target.value as Timeframe })}
+            className="bg-background border border-border rounded-lg px-2 py-1 text-[11px] font-mono font-bold text-text-primary"
+          >
+            {SUPPORTED_TIMEFRAMES.map((tf) => (
+              <option key={tf} value={tf}>
+                {tf}
+              </option>
+            ))}
+          </select>
+
+          <select
+            aria-label="Historical range"
+            value={config.range}
+            onChange={(e) => onConfigChange({ ...config, range: e.target.value as HistoricalRange })}
+            className="bg-background border border-border rounded-lg px-2 py-1 text-[11px] font-mono font-bold text-primary"
+          >
+            {SUPPORTED_RANGES.map((r) => (
+              <option key={r} value={r}>
+                Range: {r}
+              </option>
+            ))}
+          </select>
           <select
             value={config.chartType}
             onChange={(e) => onConfigChange({ ...config, chartType: e.target.value as TerminalChartType })}
@@ -830,36 +825,16 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Timeframes */}
-      <div className="px-3 py-1.5 border-b border-border/50 bg-[#0B1017] flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1 flex-wrap">
-          {SUPPORTED_TIMEFRAMES.map((tf) => (
-            <button
-              key={tf}
-              onClick={() => onConfigChange({ ...config, timeframe: tf })}
-              className={`px-2 py-0.5 rounded text-[11px] font-mono ${
-                config.timeframe === tf ? 'bg-primary text-background font-bold' : 'text-text-muted hover:text-text-primary'
-              }`}
-            >
-              {tf}
-            </button>
-          ))}
-        </div>
-        {drawings.length > 0 && (
-          <div className="flex items-center gap-1 text-[10px] font-mono text-text-muted">
-            <span>{drawings.length} drawings</span>
+          {drawings.length > 0 && (
             <button
               onClick={() => handleDeleteDrawing(drawings[drawings.length - 1].id)}
-              className="text-danger hover:underline inline-flex items-center gap-0.5"
-              title="Remove last drawing"
+              className="px-2 py-1 rounded-lg border border-border text-[11px] font-mono text-danger hover:bg-danger/10 inline-flex items-center gap-1"
+              title="Undo last drawing"
             >
-              <Trash2 size={11} /> Undo
+              <Trash2 size={11} /> Undo ({drawings.length})
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Main Chart + Drawing SVG Overlay */}
@@ -894,28 +869,12 @@ export const TerminalChartPane: React.FC<TerminalChartPaneProps> = ({
         </div>
       )}
 
-      {/* Range Footer */}
-      <div className="px-3 py-1.5 border-t border-border/60 bg-surface-elevated/40 flex flex-wrap items-center justify-between gap-2 text-[10px]">
-        <div className="flex items-center gap-1 flex-wrap">
-          {SUPPORTED_RANGES.map((r) => (
-            <button
-              key={r}
-              onClick={() =>
-                onConfigChange({
-                  ...config,
-                  range: r,
-                  timeframe: RANGE_DEFAULT_TIMEFRAME[r],
-                })
-              }
-              className={`px-1.5 py-0.5 rounded font-mono ${
-                config.range === r ? 'bg-primary/20 text-primary font-bold' : 'text-text-muted hover:text-text-primary'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
-        <span className="text-text-muted">TradingView Lightweight Charts™</span>
+      {/* Clean Attribution Footer (No competing range buttons below the chart axis) */}
+      <div className="px-3 py-1.5 border-t border-border/60 bg-surface-elevated/40 flex items-center justify-between text-[10px] text-text-muted font-mono">
+        <span>
+          {config.timeframe} interval • {config.range} range
+        </span>
+        <span>TradingView Lightweight Charts™</span>
       </div>
     </div>
   );

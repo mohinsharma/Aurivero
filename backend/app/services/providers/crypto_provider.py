@@ -490,7 +490,7 @@ class CryptoMarketProvider(BaseMarketProvider):
 
         norm = meta.symbol
         interval = _TIMEFRAME_MAP.get(timeframe, "1d")
-        safe_limit = max(1, min(limit, 500))
+        safe_limit = max(1, min(limit, 1000))
         cache_key = f"crypto:candles:{norm}:{interval}:{range_key or 'default'}:{safe_limit}:{before or 'latest'}"
 
         fresh = market_cache.get_fresh(cache_key)
