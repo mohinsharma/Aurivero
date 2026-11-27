@@ -15,6 +15,8 @@ pyjwt>=2.8.0                # JSON Web Tokens (JWT) for secure user session mana
 
 # HTTP Client & External Integrations
 httpx>=0.27.0               # Async HTTP client for Supabase REST queries & market feeds
+websockets>=12.0            # Real-time upstream WebSocket streaming (Binance)
+tzdata>=2024.1              # IANA timezone database for Windows compatibility
 
 # Artificial Intelligence
 google-generativeai>=0.4.0  # Official Google Gemini 1.5 Flash SDK (with deterministic fallback)

@@ -4,7 +4,7 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
 
@@ -26,7 +26,10 @@ from backend.app.services.providers.cache_and_limiter import CircuitBreaker, mar
 
 logger = logging.getLogger("mindmark.providers.stocks")
 
-IST = ZoneInfo("Asia/Kolkata")
+try:
+    IST = ZoneInfo("Asia/Kolkata")
+except ZoneInfoNotFoundError:
+    IST = timezone(timedelta(hours=5, minutes=30))
 YAHOO_CHART_BASE = "https://query1.finance.yahoo.com/v8/finance/chart"
 YAHOO_SEARCH_BASE = "https://query1.finance.yahoo.com/v1/finance/search"
 YAHOO_HEADERS = {
