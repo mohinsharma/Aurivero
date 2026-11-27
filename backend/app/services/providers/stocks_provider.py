@@ -102,22 +102,25 @@ def get_indian_market_session(now_utc: Optional[datetime] = None) -> Tuple[str, 
 
 _YAHOO_TF_CONFIG: Dict[Timeframe, Tuple[str, str]] = {
     "1m": ("1m", "5d"),
+    "3m": ("1m", "5d"),    # Resampled to 3m
     "5m": ("5m", "1mo"),
     "15m": ("15m", "1mo"),
     "30m": ("30m", "1mo"),
     "1h": ("60m", "3mo"),
+    "2h": ("60m", "6mo"),  # Resampled to 2h
     "4h": ("60m", "6mo"),  # Resampled to 4h
     "1d": ("1d", "2y"),
     "1w": ("1wk", "5y"),
+    "1M": ("1mo", "10y"),
 }
 
 
-def _resample_4h(candles: List[NormalizedCandle]) -> List[NormalizedCandle]:
+def _resample_candles(candles: List[NormalizedCandle], interval_seconds: int) -> List[NormalizedCandle]:
     if not candles:
         return []
     buckets: Dict[int, List[NormalizedCandle]] = {}
     for c in candles:
-        bucket = (c.time // 14400) * 14400
+        bucket = (c.time // interval_seconds) * interval_seconds
         buckets.setdefault(bucket, []).append(c)
     result: List[NormalizedCandle] = []
     for bucket_ts in sorted(buckets.keys()):
@@ -133,6 +136,10 @@ def _resample_4h(candles: List[NormalizedCandle]) -> List[NormalizedCandle]:
             )
         )
     return result
+
+
+def _resample_4h(candles: List[NormalizedCandle]) -> List[NormalizedCandle]:
+    return _resample_candles(candles, 14400)
 
 
 class IndianStocksProvider(BaseMarketProvider):
@@ -585,7 +592,11 @@ class IndianStocksProvider(BaseMarketProvider):
                     )
                 )
 
-            if timeframe == "4h":
+            if timeframe == "3m":
+                candles = _resample_candles(candles, 180)
+            elif timeframe == "2h":
+                candles = _resample_candles(candles, 7200)
+            elif timeframe == "4h":
                 candles = _resample_4h(candles)
 
             candles = validate_and_normalize_candles(candles)

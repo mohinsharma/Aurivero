@@ -43,6 +43,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isMenuOpen, onCloseMenu })
   const fullDrawerItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Markets (Stocks, Crypto, FX)', path: '/markets', icon: Coins },
+    { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: PieChart },
+    { name: 'Pro Charting Terminal', path: '/markets/terminal', icon: CandlestickChart },
     { name: 'Paper Trading Simulator', path: '/simulator', icon: CandlestickChart },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
     { name: 'Market Intelligence (Crypto/FX)', path: '/market-intelligence', icon: Coins },

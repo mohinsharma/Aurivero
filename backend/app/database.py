@@ -995,6 +995,51 @@ def seed_ecosystem_data(conn):
     """)
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_market_data_cache_sym ON market_data_cache(asset_class, symbol);")
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS chart_drawings (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        asset_class TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        tool_type TEXT NOT NULL,
+        points_json TEXT NOT NULL,
+        style_json TEXT,
+        label TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_chart_drawings_user_sym ON chart_drawings(user_id, asset_class, symbol);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS chart_layouts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        layout_json TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_chart_layouts_user ON chart_layouts(user_id);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS custom_indicators (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        expression TEXT NOT NULL,
+        color TEXT DEFAULT '#F5B942',
+        pane TEXT DEFAULT 'OVERLAY',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_custom_indicators_user ON custom_indicators(user_id);")
+
     # 5. User Notifications Seeds
     cursor.execute("SELECT COUNT(*) FROM user_notifications")
     if cursor.fetchone()[0] == 0:

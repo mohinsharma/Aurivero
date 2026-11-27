@@ -372,10 +372,55 @@ class ApiClient {
       );
     },
     getHealth: () => this.request<any>('/api/markets/health'),
+    getHeatmap: (params?: { universe?: string; timeframe?: string; sector?: string; direction?: string }) => {
+      const sp = new URLSearchParams();
+      if (params?.universe) sp.append('universe', params.universe);
+      if (params?.timeframe) sp.append('timeframe', params.timeframe);
+      if (params?.sector) sp.append('sector', params.sector);
+      if (params?.direction) sp.append('direction', params.direction);
+      const qs = sp.toString();
+      return this.request<any>(qs ? `/api/markets/heatmap?${qs}` : '/api/markets/heatmap');
+    },
     getWsUrl: (assetClass: 'STOCK' | 'CRYPTO' | 'FOREX', symbol: string) => {
       const wsBase = API_BASE_URL.replace(/^http/, 'ws');
       return `${wsBase}/api/markets/ws/${assetClass}/${encodeURIComponent(symbol)}`;
     }
+  };
+
+  // 17. Chart Drawings, Layouts & Custom Indicators
+  public charts = {
+    listDrawings: (assetClass: string, symbol: string) =>
+      this.request<any>(`/api/charts/drawings?asset_class=${assetClass}&symbol=${encodeURIComponent(symbol)}`),
+    createDrawing: (payload: {
+      asset_class: 'STOCK' | 'CRYPTO' | 'FOREX';
+      symbol: string;
+      tool_type: string;
+      points: { time: number; price: number }[];
+      style?: Record<string, any>;
+      label?: string;
+    }) =>
+      this.request<any>('/api/charts/drawings', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    deleteDrawing: (id: string) =>
+      this.request<any>(`/api/charts/drawings/${id}`, { method: 'DELETE' }),
+    listLayouts: () => this.request<any>('/api/charts/layouts'),
+    saveLayout: (payload: { name: string; layout: Record<string, any> }) =>
+      this.request<any>('/api/charts/layouts', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    deleteLayout: (id: string) =>
+      this.request<any>(`/api/charts/layouts/${id}`, { method: 'DELETE' }),
+    listCustomIndicators: () => this.request<any>('/api/charts/custom-indicators'),
+    createCustomIndicator: (payload: { name: string; expression: string; color?: string; pane?: 'OVERLAY' | 'SEPARATE' }) =>
+      this.request<any>('/api/charts/custom-indicators', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    deleteCustomIndicator: (id: string) =>
+      this.request<any>(`/api/charts/custom-indicators/${id}`, { method: 'DELETE' }),
   };
 
   // 16. Multi-Watchlist Management Endpoints

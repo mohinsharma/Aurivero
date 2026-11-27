@@ -19,6 +19,7 @@ from backend.app.services.providers import (
     stocks_provider,
 )
 from backend.app.services.providers.cache_and_limiter import api_rate_limiter
+from backend.app.services.heatmap_service import get_stocks_heatmap
 from backend.app.services.stream_manager import stream_manager
 
 logger = logging.getLogger("mindmark.routers.markets")
@@ -216,6 +217,24 @@ async def get_instrument_candles(
         range_key=resolved_range,
     )
     return StandardAPIResponse(success=True, data=series.model_dump())
+
+
+@router.get("/heatmap", response_model=StandardAPIResponse)
+async def get_market_heatmap(
+    request: Request,
+    universe: str = Query("NIFTY50"),
+    timeframe: str = Query("1D"),
+    sector: Optional[str] = Query(None),
+    direction: Optional[str] = Query(None),
+):
+    _enforce_rate_limit(request, "heatmap")
+    data = await get_stocks_heatmap(
+        universe=universe,
+        timeframe=timeframe,
+        sector=sector,
+        direction=direction,
+    )
+    return StandardAPIResponse(success=True, data=data)
 
 
 @router.get("/health", response_model=StandardAPIResponse)

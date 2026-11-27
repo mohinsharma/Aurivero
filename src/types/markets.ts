@@ -10,7 +10,18 @@ export type DataFreshnessStatus =
 
 export type AssetClass = 'STOCK' | 'CRYPTO' | 'FOREX';
 
-export type Timeframe = '1m' | '5m' | '15m' | '30m' | '1h' | '4h' | '1d' | '1w';
+export type Timeframe =
+  | '1m'
+  | '3m'
+  | '5m'
+  | '15m'
+  | '30m'
+  | '1h'
+  | '2h'
+  | '4h'
+  | '1d'
+  | '1w'
+  | '1M';
 
 export type HistoricalRange =
   | '1D'
@@ -26,13 +37,16 @@ export type HistoricalRange =
 
 export const SUPPORTED_TIMEFRAMES: Timeframe[] = [
   '1m',
+  '3m',
   '5m',
   '15m',
   '30m',
   '1h',
+  '2h',
   '4h',
   '1d',
   '1w',
+  '1M',
 ];
 
 export const SUPPORTED_RANGES: HistoricalRange[] = [

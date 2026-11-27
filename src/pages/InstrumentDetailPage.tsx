@@ -29,13 +29,16 @@ import {
 
 const TIMEFRAME_SECONDS: Record<Timeframe, number> = {
   '1m': 60,
+  '3m': 180,
   '5m': 300,
   '15m': 900,
   '30m': 1800,
   '1h': 3600,
+  '2h': 7200,
   '4h': 14400,
   '1d': 86400,
   '1w': 604800,
+  '1M': 2592000,
 };
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';

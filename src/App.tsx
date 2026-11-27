@@ -23,6 +23,8 @@ import { PersonalHubPage } from './pages/PersonalHubPage';
 import { AdminPage } from './pages/AdminPage';
 import { MarketsPage } from './pages/MarketsPage';
 import { InstrumentDetailPage } from './pages/InstrumentDetailPage';
+import { HeatmapPage } from './pages/HeatmapPage';
+import { ChartTerminalPage } from './pages/ChartTerminalPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export const App: React.FC = () => {
@@ -49,6 +51,8 @@ export const App: React.FC = () => {
 
               {/* Unified Multi-Asset Markets Routes */}
               <Route path="/markets" element={<MarketsPage />} />
+              <Route path="/markets/heatmap" element={<HeatmapPage />} />
+              <Route path="/markets/terminal" element={<ChartTerminalPage />} />
               <Route path="/markets/:tab" element={<MarketsPage />} />
               <Route path="/markets/:assetClass/:symbol" element={<InstrumentDetailPage />} />
 

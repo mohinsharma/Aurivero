@@ -27,6 +27,7 @@ from backend.app.services.providers.stocks_provider import (
     YAHOO_HEADERS,
     _YAHOO_TF_CONFIG,
     _resample_4h,
+    _resample_candles,
 )
 
 logger = logging.getLogger("mindmark.providers.forex")
@@ -412,7 +413,11 @@ class ForexMarketProvider(BaseMarketProvider):
                     )
                 )
 
-            if timeframe == "4h":
+            if timeframe == "3m":
+                candles = _resample_candles(candles, 180)
+            elif timeframe == "2h":
+                candles = _resample_candles(candles, 7200)
+            elif timeframe == "4h":
                 candles = _resample_4h(candles)
 
             candles = validate_and_normalize_candles(candles)

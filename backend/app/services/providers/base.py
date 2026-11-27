@@ -17,10 +17,10 @@ DataFreshnessStatus = Literal[
     "UNAVAILABLE",
 ]
 AssetClass = Literal["STOCK", "CRYPTO", "FOREX"]
-Timeframe = Literal["1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w"]
+Timeframe = Literal["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1M"]
 HistoricalRange = Literal["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y", "ALL"]
 
-SUPPORTED_TIMEFRAMES: List[Timeframe] = ["1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w"]
+SUPPORTED_TIMEFRAMES: List[Timeframe] = ["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1M"]
 SUPPORTED_RANGES: List[HistoricalRange] = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y", "ALL"]
 
 RANGE_DEFAULT_TIMEFRAME: Dict[HistoricalRange, Timeframe] = {

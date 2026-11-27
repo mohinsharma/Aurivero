@@ -277,3 +277,61 @@ def test_groww_historical_ranges_and_candle_validation():
         NormalizedCandle(time=-5, open=10, high=12, low=9, close=10, volume=1),   # invalid timestamp
     ])
     assert [c.time for c in validated] == [100, 200]
+
+
+def test_heatmap_and_extended_timeframes():
+    hm = client.get("/api/markets/heatmap?universe=NIFTY50&timeframe=1D")
+    assert hm.status_code == 200
+    hdata = hm.json()["data"]
+    assert hdata["universe"] == "NIFTY50"
+    assert len(hdata["items"]) >= 10
+    assert hdata["status"] in ("DELAYED", "MARKET_CLOSED", "CACHED")
+    assert hdata["status"] != "LIVE"
+
+    for tf in ["3m", "2h", "1M"]:
+        r = client.get(f"/api/markets/candles/CRYPTO/BTCUSDT?timeframe={tf}&limit=15")
+        assert r.status_code == 200
+        assert len(r.json()["data"]["candles"]) > 0
+
+
+def test_chart_drawings_layouts_and_custom_indicators_isolation():
+    user_a = _register_user("chart_a")
+    user_b = _register_user("chart_b")
+
+    # Drawing CRUD + isolation
+    drw = client.post(
+        "/api/charts/drawings",
+        json={
+            "asset_class": "STOCK",
+            "symbol": "RELIANCE",
+            "tool_type": "TRENDLINE",
+            "points": [{"time": 1700000000, "price": 2800.0}, {"time": 1700100000, "price": 2950.0}],
+        },
+        headers=user_a["headers"],
+    )
+    assert drw.status_code == 200
+    did = drw.json()["data"]["drawing"]["id"]
+    assert client.delete(f"/api/charts/drawings/{did}", headers=user_b["headers"]).status_code == 403
+    assert client.delete(f"/api/charts/drawings/{did}", headers=user_a["headers"]).status_code == 200
+
+    # Layout CRUD + isolation
+    lay = client.post(
+        "/api/charts/layouts",
+        json={"name": "Dual NIFTY/BTC", "layout": {"dualMode": True}},
+        headers=user_a["headers"],
+    )
+    assert lay.status_code == 200
+    lid = lay.json()["data"]["layout"]["id"]
+    assert client.delete(f"/api/charts/layouts/{lid}", headers=user_b["headers"]).status_code == 403
+    assert client.delete(f"/api/charts/layouts/{lid}", headers=user_a["headers"]).status_code == 200
+
+    # Custom Indicator CRUD + isolation
+    ci = client.post(
+        "/api/charts/custom-indicators",
+        json={"name": "Spread", "expression": "sma(close, 10) - sma(close, 20)", "pane": "SEPARATE"},
+        headers=user_a["headers"],
+    )
+    assert ci.status_code == 200
+    cid = ci.json()["data"]["indicator"]["id"]
+    assert client.delete(f"/api/charts/custom-indicators/{cid}", headers=user_b["headers"]).status_code == 403
+    assert client.delete(f"/api/charts/custom-indicators/{cid}", headers=user_a["headers"]).status_code == 200

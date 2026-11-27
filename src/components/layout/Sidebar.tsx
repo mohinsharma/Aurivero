@@ -32,6 +32,8 @@ export const Sidebar: React.FC = () => {
   const primaryNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Markets', path: '/markets', icon: Coins, badge: 'NEW' },
+    { name: 'Stocks Heatmap', path: '/markets/heatmap', icon: Sparkles, badge: 'MAP' },
+    { name: 'Pro Charting', path: '/markets/terminal', icon: CandlestickChart, badge: 'PRO' },
     { name: 'Paper Simulator', path: '/simulator', icon: CandlestickChart, badge: 'LIVE' },
     { name: 'Portfolio Analytics', path: '/portfolio', icon: PieChart },
   ];
