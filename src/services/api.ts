@@ -629,14 +629,29 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify({ transcript, language }),
       }),
+    transcribeVoiceAudio: async (blob: Blob, language = 'en-IN') => {
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Failed to read recorded audio'));
+        reader.readAsDataURL(blob);
+      });
+      return this.request<any>('/api/ai-buddy/voice/transcribe', {
+        method: 'POST',
+        body: JSON.stringify({
+          dataBase64,
+          mimeType: blob.type || 'audio/webm',
+          language,
+        }),
+      });
+    },
     uploadOcr: async (file: File, userHint = '') => {
-      const buf = await file.arrayBuffer();
-      const bytes = new Uint8Array(buf);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const dataBase64 = btoa(binary);
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Failed to read uploaded file'));
+        reader.readAsDataURL(file);
+      });
       return this.request<any>('/api/ai-buddy/multimodal/ocr', {
         method: 'POST',
         body: JSON.stringify({

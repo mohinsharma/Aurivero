@@ -574,6 +574,17 @@ def test_multimodal_ai_buddy_ocr_voice_and_guardrails():
     assert v_bad.status_code == 200
     assert v_bad.json()["data"]["allowed"] is False
 
+    # 2b. Voice audio endpoint rejects empty audio & handles valid audio payload
+    import base64 as _b64_v
+    a_empty = client.post("/api/ai-buddy/voice/transcribe", json={"dataBase64": "", "mimeType": "audio/webm"})
+    assert a_empty.status_code == 400
+    a_ok = client.post(
+        "/api/ai-buddy/voice/transcribe",
+        json={"dataBase64": _b64_v.b64encode(b"RIFF" + b"\x00" * 300).decode("ascii"), "mimeType": "audio/wav"},
+    )
+    assert a_ok.status_code == 200
+    assert a_ok.json()["data"]["allowed"] is True
+
     # 3. OCR rejects spoofed PNG magic bytes
     import base64 as _b64
     bad_file = client.post(

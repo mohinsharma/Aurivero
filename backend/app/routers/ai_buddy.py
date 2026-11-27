@@ -9,6 +9,7 @@ from backend.app.services.multimodal_ai_service import (
     FinancialDomainGuardrail,
     analyze_confirmed_multimodal_payload,
     extract_financial_ocr,
+    transcribe_voice_audio,
 )
 from backend.app.services.mentor_engine import (
     build_daily_training_session,
@@ -146,6 +147,30 @@ class MultimodalAnalyzeRequest(BaseModel):
     sanitizedOcrText: str = ""
     learningLevel: str = "BEGINNER"
     allowPortfolioAccess: bool = False
+
+
+class VoiceAudioRequest(BaseModel):
+    dataBase64: str
+    mimeType: str = "audio/webm"
+    language: str = "en-IN"
+
+
+@router.post("/voice/transcribe", response_model=StandardAPIResponse)
+async def transcribe_voice(
+    req: VoiceAudioRequest,
+    user: dict = Depends(get_current_user_optional),
+):
+    if not ai_buddy_service.check_rate_limit(user["id"]):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded.")
+    try:
+        data = await transcribe_voice_audio(
+            data_base64=req.dataBase64,
+            mime_type=req.mimeType,
+            language=req.language,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return StandardAPIResponse(success=True, data=data)
 
 
 @router.post("/voice/validate", response_model=StandardAPIResponse)

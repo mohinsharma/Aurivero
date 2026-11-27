@@ -4,6 +4,7 @@ import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { DisclaimerBanner } from '../common/DisclaimerBanner';
+import { FloatingAIBuddy } from '../mentor/FloatingAIBuddy';
 
 export const AppLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -36,6 +37,9 @@ export const AppLayout: React.FC = () => {
         isMenuOpen={isMobileMenuOpen}
         onCloseMenu={() => setIsMobileMenuOpen(false)}
       />
+
+      {/* Global Floating MINDMARK AI Buddy Bubble */}
+      <FloatingAIBuddy />
     </div>
   );
 };

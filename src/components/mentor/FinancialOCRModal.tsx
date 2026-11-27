@@ -37,6 +37,12 @@ export const FinancialOCRModal: React.FC<FinancialOCRModalProps> = ({
   const [editableFields, setEditableFields] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
     setOcrResult(null);
@@ -176,6 +182,13 @@ export const FinancialOCRModal: React.FC<FinancialOCRModalProps> = ({
                 Static screenshot values — NOT live prices
               </span>
             </div>
+
+            {ocrResult.ocrNotice && (
+              <div className="p-2 rounded bg-warning/10 border border-warning/30 text-[11px] text-warning flex items-start gap-1.5">
+                <AlertTriangle size={13} className="shrink-0 mt-0.5" />
+                <span>{ocrResult.ocrNotice}</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {Object.entries(editableFields).map(([key, val]) => {

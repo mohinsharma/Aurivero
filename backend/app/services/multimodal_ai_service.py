@@ -324,6 +324,12 @@ async def extract_financial_ocr(
 
     return {
         "allowed": True,
+        "ocrAvailable": bool(raw_text.strip()),
+        "ocrNotice": (
+            None
+            if raw_text.strip()
+            else "No automatic OCR engine active (configure GEMINI_API_KEY for Vision OCR or install Tesseract). You can enter visible values manually below."
+        ),
         "filename": filename,
         "format": fmt,
         "sizeBytes": len(content),
@@ -331,6 +337,84 @@ async def extract_financial_ocr(
         "requiresVerification": ocr_provider == "LOCAL_ENTITY_EXTRACTOR" or len(extracted["uncertainFields"]) > 0,
         "visualSummary": visual_summary or None,
         **extracted,
+    }
+
+
+async def transcribe_voice_audio(
+    data_base64: str,
+    mime_type: str = "audio/webm",
+    language: str = "en-IN",
+) -> Dict[str, Any]:
+    """Transcribes recorded audio via Gemini Multimodal API when configured and enforces finance guardrail."""
+    raw_b64 = (data_base64 or "").split(",", 1)[-1].strip()
+    if not raw_b64:
+        raise ValueError("Empty audio recording.")
+    audio_bytes = base64.b64decode(raw_b64, validate=True)
+    if len(audio_bytes) < 200:
+        raise ValueError("Recorded audio is too short or empty.")
+    if len(audio_bytes) > 10 * 1024 * 1024:
+        raise ValueError("Audio recording exceeds 10 MB limit.")
+
+    clean_mime = (mime_type or "audio/webm").split(";")[0].strip().lower()
+    if clean_mime not in ("audio/webm", "audio/wav", "audio/mp3", "audio/mpeg", "audio/ogg", "audio/mp4"):
+        clean_mime = "audio/webm"
+
+    if not settings.is_ai_live:
+        return {
+            "transcribed": False,
+            "transcript": "",
+            "allowed": True,
+            "reason": "Backend audio transcription requires GEMINI_API_KEY. Browser Web Speech API can be used when supported.",
+        }
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": f"Transcribe this spoken audio verbatim (language hint: {language}). Return ONLY the transcribed text."
+                    },
+                    {"inline_data": {"mime_type": clean_mime, "data": base64.b64encode(audio_bytes).decode("ascii")}},
+                ]
+            }
+        ]
+    }
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(url, json=payload)
+            if resp.status_code != 200:
+                return {
+                    "transcribed": False,
+                    "transcript": "",
+                    "allowed": True,
+                    "reason": f"Transcription provider returned HTTP {resp.status_code}.",
+                }
+            j = resp.json()
+            transcript = (
+                j.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "")
+                .strip()
+            )
+    except Exception as exc:
+        logger.warning("voice_transcribe_err err=%s", exc)
+        return {
+            "transcribed": False,
+            "transcript": "",
+            "allowed": True,
+            "reason": "Network timeout or error contacting transcription service.",
+        }
+
+    cleaned = FinancialDomainGuardrail.sanitize_untrusted_text(transcript)
+    guard = FinancialDomainGuardrail.validate(cleaned)
+    return {
+        "transcribed": bool(cleaned),
+        "transcript": cleaned,
+        "language": language,
+        "allowed": guard["allowed"],
+        "guardrailMessage": None if guard["allowed"] else guard["message"],
     }
 
 

@@ -29,6 +29,7 @@ import { ArenaPage } from './pages/ArenaPage';
 import { MyProgressPage } from './pages/MyProgressPage';
 import { AICoachPage } from './pages/AICoachPage';
 import { NewsCommunityPage } from './pages/NewsCommunityPage';
+import { LearningHubPage } from './pages/LearningHubPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 const HeatmapPage = lazy(() => import('./pages/HeatmapPage').then((m) => ({ default: m.HeatmapPage })));
@@ -52,7 +53,8 @@ export const App: React.FC = () => {
             {/* Main App Layout Shell with Collapsible Sidebar & Persistent Header */}
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/ai-buddy" element={<AIBuddyPage />} />
+              <Route path="/learning" element={<LearningHubPage />} />
+              <Route path="/ai-buddy" element={<Navigate to="/learning?tab=scenarios" replace />} />
               <Route path="/mirror-mode" element={<Navigate to="/arena?tab=mirror" replace />} />
               <Route path="/arena" element={<ArenaPage />} />
               <Route path="/my-progress" element={<MyProgressPage />} />

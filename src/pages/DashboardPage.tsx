@@ -259,60 +259,29 @@ export const DashboardPage: React.FC = () => {
           )}
         </section>
 
-        {/* D. AI Buddy Quick Help & E. Your Progress */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          <Card className="p-5 bg-[#141C25] border-white/10 space-y-3">
-            <div className="text-sm font-bold text-[#F3F6F8] flex items-center gap-2">
-              <Bot size={16} className="text-[#45D6B5]" /> AI Buddy Quick Help
+        {/* Your Progress */}
+        <Card className="p-5 bg-[#141C25] border-white/10 space-y-3">
+          <div className="text-sm font-bold text-[#F3F6F8] flex items-center justify-between">
+            <span>Your Progress</span>
+            <button type="button" onClick={() => navigate('/my-progress')} className="text-xs text-[#78A9FF] hover:underline">
+              View Full Progress →
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="text-xl font-bold font-mono text-[#45D6B5]">{gamStats.skills}</div>
+              <div className="text-[11px] text-[#93A2B4]">Skills Completed</div>
             </div>
-            <div className="flex gap-2">
-              <input
-                value={aiQuickPrompt}
-                onChange={(e) => setAiQuickPrompt(e.target.value)}
-                placeholder="Ask anything about investing in simple words..."
-                className="flex-1 rounded-xl bg-[#0B1017] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#45D6B5]"
-              />
-              <Button variant="primary" size="sm" onClick={() => navigate('/ai-buddy')}>
-                Ask
-              </Button>
+            <div className="p-3 rounded-xl bg-[#0B1017] border-white/10">
+              <div className="text-xl font-bold font-mono text-[#F5B942]">{gamStats.streak}d</div>
+              <div className="text-[11px] text-[#93A2B4]">Learning Streak</div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {['What is a stock?', 'Why did my investment fall?', 'What is risk?', 'What does diversification mean?'].map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  onClick={() => navigate('/ai-buddy')}
-                  className="text-[11px] px-2.5 py-1 rounded-lg bg-[#0B1017] border border-white/10 text-[#93A2B4] hover:text-white"
-                >
-                  {q}
-                </button>
-              ))}
+            <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
+              <div className="text-xl font-bold font-mono text-[#F3F6F8]">{gamStats.contests}</div>
+              <div className="text-[11px] text-[#93A2B4]">Badges Earned</div>
             </div>
-          </Card>
-
-          <Card className="p-5 bg-[#141C25] border-white/10 space-y-3">
-            <div className="text-sm font-bold text-[#F3F6F8] flex items-center justify-between">
-              <span>Your Progress</span>
-              <button type="button" onClick={() => navigate('/my-progress')} className="text-xs text-[#78A9FF] hover:underline">
-                View Full Progress →
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
-                <div className="text-xl font-bold font-mono text-[#45D6B5]">{gamStats.skills}</div>
-                <div className="text-[11px] text-[#93A2B4]">Skills Completed</div>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
-                <div className="text-xl font-bold font-mono text-[#F5B942]">{gamStats.streak}d</div>
-                <div className="text-[11px] text-[#93A2B4]">Learning Streak</div>
-              </div>
-              <div className="p-3 rounded-xl bg-[#0B1017] border border-white/10">
-                <div className="text-xl font-bold font-mono text-[#F3F6F8]">{gamStats.contests}</div>
-                <div className="text-[11px] text-[#93A2B4]">Badges Earned</div>
-              </div>
-            </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
 
         {/* F. Market at a Glance (Max 3 Simplified Indicators) */}
         <section className="space-y-3">

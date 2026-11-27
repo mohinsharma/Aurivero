@@ -73,7 +73,6 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'AI Intelligence',
     items: [
       { name: 'AI Coach', path: '/ai-coach', icon: Sparkles, badge: 'COACH' },
-      { name: 'AI Buddy', path: '/ai-buddy', icon: Bot, badge: 'FINANCE AI' },
     ],
   },
   {
@@ -88,6 +87,7 @@ const NAV_GROUPS: NavGroup[] = [
     id: 'learning',
     label: 'Learning',
     items: [
+      { name: 'Learning Studio', path: '/learning', icon: GraduationCap, badge: 'HUB' },
       { name: 'My Progress', path: '/my-progress', icon: Trophy, badge: 'XP' },
       { name: 'Arena', path: '/arena', icon: Swords, badge: 'COMPETE' },
       { name: 'Learn & Teach Academy', path: '/academy', icon: GraduationCap },
